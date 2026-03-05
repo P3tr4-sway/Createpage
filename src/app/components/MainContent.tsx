@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import {
   ListFilter,
-  Monitor,
   Bookmark,
   Music,
   Disc3,
@@ -10,8 +9,9 @@ import {
   FolderOpen,
   ChevronRight,
   Bot,
+  MoreHorizontal,
+  ArrowLeft,
 } from "lucide-react";
-import { PlayerCard } from "./PlayerCard";
 import { ModeSelector } from "./ModeSelector";
 import { JamWithAI } from "./JamWithAI";
 import { ProjectsSheet, recentProjects } from "./ProjectsSheet";
@@ -19,6 +19,7 @@ import { TemplateSheet } from "./TemplateSheet";
 import { TutorialNote } from "./TutorialNote";
 import { InstantBackingTrackPage } from "./InstantBackingTrackPage";
 import { LooperPage } from "./LooperPage";
+import { ImageWithFallback } from "./figma/ImageWithFallback";
 
 const dawCards = [
   {
@@ -181,6 +182,122 @@ const playerCards = [
   },
 ];
 
+const topSongNames = [
+  "Midnight Echoes",
+  "City After Rain",
+  "Golden Hour Drive",
+  "Broken Neon",
+  "Slow Motion Heart",
+  "Static in My Head",
+  "Parallel Love",
+  "Paper Moon",
+];
+
+const topTemplateNames = [
+  "Neo-Soul Starter (92 BPM, Am)",
+  "Lo-Fi Piano Pack (78 BPM, C)",
+  "Trap Bounce Kit (140 BPM, F#)",
+  "Ambient Texture Bed (70 BPM, Dm)",
+  "Pop Hook Builder (122 BPM, G)",
+  "R&B Vocal Space (88 BPM, Bb)",
+  "Cinematic Rise Template (100 BPM, Em)",
+];
+
+interface ShowcaseComment {
+  id: number;
+  user: string;
+  text: string;
+}
+
+interface GuitarShowcaseClip {
+  id: string;
+  title: string;
+  guitarist: string;
+  email: string;
+  avatarInitial: string;
+  duration: string;
+  imageUrl: string;
+  comments: ShowcaseComment[];
+}
+
+const guitarShowcaseClips: GuitarShowcaseClip[] = [
+  {
+    id: "g1",
+    title: "Percussive Fingerstyle in Drop D",
+    guitarist: "Mason Reed",
+    email: "mason.reed@fretmail.com",
+    avatarInitial: "M",
+    duration: "00:42",
+    imageUrl:
+      "https://images.unsplash.com/photo-1511379938547-c1f69419868d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+    comments: [
+      { id: 1, user: "Nora", text: "Great palm muting. The groove feels super tight." },
+      { id: 2, user: "Jules", text: "Can you share the tab for the ending harmonic run?" },
+      { id: 3, user: "Theo", text: "Clean tone and very controlled dynamics." },
+    ],
+  },
+  {
+    id: "g2",
+    title: "Neo-Soul Chords with Slides",
+    guitarist: "Yuna Park",
+    email: "yuna.park@stringspace.io",
+    avatarInitial: "Y",
+    duration: "01:08",
+    imageUrl:
+      "https://images.unsplash.com/photo-1516280440614-37939bbacd81?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+    comments: [
+      { id: 1, user: "Lina", text: "Those chord extensions are beautiful. Love the voicings." },
+      { id: 2, user: "Marco", text: "Maybe add a little less reverb in the first half." },
+      { id: 3, user: "Abe", text: "Slide timing is perfect, very expressive take." },
+    ],
+  },
+  {
+    id: "g3",
+    title: "Ambient Swells + Volume Knob",
+    guitarist: "Leo Santos",
+    email: "leo.santos@ambientlane.net",
+    avatarInitial: "L",
+    duration: "00:55",
+    imageUrl:
+      "https://images.unsplash.com/photo-1525201548942-d8732f6617a0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+    comments: [
+      { id: 1, user: "Ivy", text: "Perfect texture for an intro. Really cinematic." },
+      { id: 2, user: "Kenji", text: "Try panning the swell doubles for more width." },
+      { id: 3, user: "Mia", text: "This would sit great under vocal ad-libs." },
+    ],
+  },
+  {
+    id: "g4",
+    title: "Blues Licks in A Minor",
+    guitarist: "Tara Nguyen",
+    email: "tara.nguyen@bluepick.com",
+    avatarInitial: "T",
+    duration: "01:21",
+    imageUrl:
+      "https://images.unsplash.com/photo-1464375117522-1311d6a5b81f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+    comments: [
+      { id: 1, user: "Rex", text: "Classic phrasing. Bend intonation is spot on." },
+      { id: 2, user: "Paul", text: "The call-and-response around 0:36 is fire." },
+      { id: 3, user: "Sumi", text: "Could you upload a slower practice version?" },
+    ],
+  },
+  {
+    id: "g5",
+    title: "Hybrid Picking Groove Study",
+    guitarist: "Ethan Cole",
+    email: "ethan.cole@groovecraft.co",
+    avatarInitial: "E",
+    duration: "00:49",
+    imageUrl:
+      "https://images.unsplash.com/photo-1506157786151-b8491531f063?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+    comments: [
+      { id: 1, user: "Dana", text: "Right-hand control is crazy. Super clean articulation." },
+      { id: 2, user: "Bryce", text: "Nice pocket. Bass and kick would lock in easily." },
+      { id: 3, user: "Noel", text: "Please post the exact picking pattern in comments." },
+    ],
+  },
+];
+
 interface MainContentProps {
   sectionRefs: {
     create: React.RefObject<HTMLDivElement | null>;
@@ -192,6 +309,252 @@ interface MainContentProps {
   onOpenAgenticProducing?: () => void;
 }
 
+type PlayerItem = (typeof playerCards)[number];
+
+interface TopListColumnProps {
+  title: string;
+  items: PlayerItem[];
+  onItemClick?: (item: PlayerItem) => void;
+  onOpenDetail?: () => void;
+}
+
+function TopListColumn({ title, items, onItemClick, onOpenDetail }: TopListColumnProps) {
+  return (
+    <div
+      className="rounded-card border overflow-hidden"
+      style={{
+        borderColor: "var(--border)",
+        backgroundColor: "var(--card)",
+      }}
+    >
+      <button
+        type="button"
+        onClick={onOpenDetail}
+        className="w-full flex items-center justify-between text-left cursor-pointer"
+        style={{
+          padding: "14px 16px",
+          border: "none",
+          borderBottom: "1px solid var(--border)",
+          background: "transparent",
+        }}
+      >
+        <h3
+          style={{
+            margin: 0,
+            color: "var(--foreground)",
+            fontSize: "var(--text-base)",
+            fontWeight: "var(--font-weight-bold)",
+            fontFamily: "'Lava', sans-serif",
+            letterSpacing: "0.01em",
+          }}
+        >
+          {title}
+        </h3>
+        <ChevronRight size={18} strokeWidth={2} style={{ color: "var(--secondary)" }} />
+      </button>
+
+      <div className="flex flex-col">
+        {items.map((item, index) => {
+          const interactive = typeof onItemClick === "function";
+          return (
+            <button
+              key={item.title}
+              type="button"
+              onClick={() => onItemClick?.(item)}
+              className="flex items-center justify-between text-left transition-colors"
+              style={{
+                padding: "10px 12px",
+                border: "none",
+                borderBottom:
+                  index < items.length - 1 ? "1px solid var(--border)" : "none",
+                background: "transparent",
+                cursor: interactive ? "pointer" : "default",
+              }}
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div
+                  className="relative overflow-hidden flex-shrink-0"
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 10,
+                    border: "1px solid var(--border)",
+                  }}
+                >
+                  <ImageWithFallback
+                    src={item.imageUrl}
+                    alt={item.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p
+                    className="truncate"
+                    style={{
+                      margin: 0,
+                      color: "var(--foreground)",
+                      fontSize: "var(--text-sm)",
+                      fontWeight: "var(--font-weight-medium)",
+                      fontFamily: "'Lava', sans-serif",
+                      lineHeight: 1.25,
+                    }}
+                  >
+                    {item.title}
+                  </p>
+                  <p
+                    className="truncate"
+                    style={{
+                      margin: 0,
+                      marginTop: 2,
+                      color: "var(--secondary)",
+                      fontSize: "var(--text-xs)",
+                      fontWeight: "var(--font-weight-normal)",
+                      fontFamily: "'Lava', sans-serif",
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {item.author}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end" style={{ width: 62 }}>
+                <MoreHorizontal size={16} strokeWidth={1.8} style={{ color: "var(--secondary)" }} />
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+interface TopBrowsePageProps {
+  title: string;
+  subtitle: string;
+  items: PlayerItem[];
+  onBack: () => void;
+  onItemClick: (item: PlayerItem) => void;
+}
+
+function TopBrowsePage({
+  title,
+  subtitle,
+  items,
+  onBack,
+  onItemClick,
+}: TopBrowsePageProps) {
+  return (
+    <section style={{ fontFamily: "'Lava', sans-serif" }}>
+      <div className="mb-6 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex items-center gap-2 cursor-pointer transition-opacity hover:opacity-80"
+          style={{
+            color: "var(--foreground)",
+            fontSize: "var(--text-sm)",
+            fontWeight: "var(--font-weight-medium)",
+            padding: "6px 10px",
+            borderRadius: 10,
+            border: "1px solid var(--border)",
+            backgroundColor: "var(--soft-surface)",
+          }}
+        >
+          <ArrowLeft size={16} strokeWidth={1.8} />
+          Back
+        </button>
+
+        <h2
+          style={{
+            color: "var(--foreground)",
+            fontSize: "var(--text-xl)",
+            fontWeight: "var(--font-weight-bold)",
+            margin: 0,
+          }}
+        >
+          {title}
+        </h2>
+
+        <div style={{ width: 60 }} />
+      </div>
+
+      <p
+        style={{
+          color: "var(--secondary)",
+          fontSize: "var(--text-sm)",
+          fontWeight: "var(--font-weight-normal)",
+          margin: 0,
+          marginBottom: 16,
+        }}
+      >
+        {subtitle}
+      </p>
+
+      <div
+        className="rounded-card border overflow-hidden"
+        style={{ borderColor: "var(--border)", backgroundColor: "var(--card)" }}
+      >
+        {items.map((item, idx) => (
+          <button
+            key={item.title}
+            type="button"
+            onClick={() => onItemClick(item)}
+            className="w-full flex items-center justify-between text-left cursor-pointer transition-colors hover:bg-muted"
+            style={{
+              padding: "12px 14px",
+              border: "none",
+              borderBottom: idx < items.length - 1 ? "1px solid var(--border)" : "none",
+              background: "transparent",
+            }}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div
+                className="relative overflow-hidden flex-shrink-0"
+                style={{ width: 48, height: 48, borderRadius: 10, border: "1px solid var(--border)" }}
+              >
+                <ImageWithFallback
+                  src={item.imageUrl}
+                  alt={item.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              </div>
+              <div className="min-w-0">
+                <p
+                  className="truncate"
+                  style={{
+                    margin: 0,
+                    color: "var(--foreground)",
+                    fontSize: "var(--text-sm)",
+                    fontWeight: "var(--font-weight-medium)",
+                    lineHeight: 1.25,
+                  }}
+                >
+                  {item.title}
+                </p>
+                <p
+                  className="truncate"
+                  style={{
+                    margin: 0,
+                    marginTop: 2,
+                    color: "var(--secondary)",
+                    fontSize: "var(--text-xs)",
+                    fontWeight: "var(--font-weight-normal)",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {item.author}
+                </p>
+              </div>
+            </div>
+            <MoreHorizontal size={16} strokeWidth={1.8} style={{ color: "var(--secondary)" }} />
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function MainContent({
   sectionRefs,
   onScroll,
@@ -199,22 +562,76 @@ export function MainContent({
   onOpenAgenticProducing,
 }: MainContentProps) {
   const [activeSubView, setActiveSubView] = useState<
-    "home" | "instant-backing-track" | "looper"
+    | "home"
+    | "instant-backing-track"
+    | "looper"
+    | "top-songs"
+    | "top-template"
+    | "guitar-showcase"
   >("home");
-  const [showAll, setShowAll] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [templateOpen, setTemplateOpen] = useState(false);
+  const [songOpen, setSongOpen] = useState(false);
+  const [guitarOpen, setGuitarOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<{
     title: string;
     author: string;
     imageUrl: string;
     avatarInitial: string;
   } | null>(null);
-  const visibleCards = showAll ? playerCards : playerCards.slice(0, 6);
+  const [selectedSong, setSelectedSong] = useState<{
+    title: string;
+    author: string;
+    imageUrl: string;
+    avatarInitial: string;
+  } | null>(null);
+  const [selectedGuitarClip, setSelectedGuitarClip] = useState<{
+    title: string;
+    author: string;
+    imageUrl: string;
+    avatarInitial: string;
+    email: string;
+    comments: ShowcaseComment[];
+  } | null>(null);
+  const half = Math.ceil(playerCards.length / 2);
+  const topSongCatalog = playerCards.slice(0, half).map((item, index) => ({
+    ...item,
+    title: topSongNames[index] ?? item.title,
+  }));
+  const topTemplateCatalog = playerCards.slice(half).map((item, index) => ({
+    ...item,
+    title: topTemplateNames[index] ?? item.title,
+  }));
+  const topSongs = topSongCatalog.slice(0, 6);
+  const topTemplates = topTemplateCatalog.slice(0, 6);
+  const guitarShowcaseCatalog = guitarShowcaseClips.map((clip) => ({
+    id: clip.id,
+    title: clip.title,
+    author: clip.guitarist,
+    imageUrl: clip.imageUrl,
+    avatarInitial: clip.avatarInitial,
+  }));
 
-  const handleCardClick = (card: typeof playerCards[number]) => {
+  const handleTemplateClick = (card: typeof playerCards[number]) => {
     setSelectedTemplate(card);
     setTemplateOpen(true);
+  };
+
+  const handleSongClick = (card: typeof playerCards[number]) => {
+    setSelectedSong(card);
+    setSongOpen(true);
+  };
+
+  const handleGuitarClick = (clip: GuitarShowcaseClip) => {
+    setSelectedGuitarClip({
+      title: clip.title,
+      author: clip.guitarist,
+      imageUrl: clip.imageUrl,
+      avatarInitial: clip.avatarInitial,
+      email: clip.email,
+      comments: clip.comments,
+    });
+    setGuitarOpen(true);
   };
 
   const handleModeCardClick = (modeId: string, card: { title: string }) => {
@@ -241,6 +658,36 @@ export function MainContent({
         <LooperPage onBack={() => setActiveSubView("home")} />
       ) : activeSubView === "instant-backing-track" ? (
         <InstantBackingTrackPage onBack={() => setActiveSubView("home")} />
+      ) : activeSubView === "top-songs" ? (
+        <TopBrowsePage
+          title="Top Songs"
+          subtitle="Browse all player-uploaded songs with richer context."
+          items={topSongCatalog}
+          onBack={() => setActiveSubView("home")}
+          onItemClick={handleSongClick}
+        />
+      ) : activeSubView === "top-template" ? (
+        <TopBrowsePage
+          title="Top Template"
+          subtitle="Browse all reusable templates from the player community."
+          items={topTemplateCatalog}
+          onBack={() => setActiveSubView("home")}
+          onItemClick={handleTemplateClick}
+        />
+      ) : activeSubView === "guitar-showcase" ? (
+        <TopBrowsePage
+          title="Guitar Showcase"
+          subtitle="Browse all community guitar clips and open full performance details."
+          items={guitarShowcaseCatalog}
+          onBack={() => setActiveSubView("home")}
+          onItemClick={(item) => {
+            const clip = guitarShowcaseClips.find(
+              (source) =>
+                source.title === item.title && source.guitarist === item.author,
+            );
+            if (clip) handleGuitarClick(clip);
+          }}
+        />
       ) : (
         <>
       {/* Quick actions */}
@@ -371,46 +818,165 @@ export function MainContent({
         >
           Made by Players
         </h2>
-        <div className="grid grid-cols-3 gap-4">
-          {visibleCards.map((card) => (
-            <PlayerCard
-              key={card.title}
-              title={card.title}
-              author={card.author}
-              imageUrl={card.imageUrl}
-              avatarInitial={card.avatarInitial}
-              onClick={() => handleCardClick(card)}
-            />
-          ))}
+        <div className="grid grid-cols-2 gap-4">
+          <TopListColumn
+            title="Top Songs"
+            items={topSongs}
+            onItemClick={handleSongClick}
+            onOpenDetail={() => setActiveSubView("top-songs")}
+          />
+          <TopListColumn
+            title="Top Template"
+            items={topTemplates}
+            onItemClick={handleTemplateClick}
+            onOpenDetail={() => setActiveSubView("top-template")}
+          />
         </div>
 
-        {/* Show More / Show Less */}
-        <div className="flex justify-center" style={{ marginTop: "var(--spacing-6, 24px)" }}>
+        <div
+          className="rounded-card border mt-4 overflow-hidden"
+          style={{
+            borderColor: "var(--border)",
+            backgroundColor: "var(--card)",
+          }}
+        >
           <button
-            onClick={() => setShowAll((prev) => !prev)}
-            className="cursor-pointer transition-opacity hover:opacity-70"
+            type="button"
+            onClick={() => setActiveSubView("guitar-showcase")}
+            className="w-full flex items-center justify-between text-left cursor-pointer"
             style={{
-              backgroundColor: "transparent",
-              color: "var(--foreground)",
-              fontSize: "var(--text-sm)",
-              fontWeight: "var(--font-weight-medium)",
-              fontFamily: "'Lava', sans-serif",
-              padding: "8px 24px",
-              borderRadius: "var(--radius-full, 9999px)",
-              border: "1px solid var(--border)",
-              letterSpacing: "0.04em",
+              padding: "14px 16px",
+              border: "none",
+              background: "transparent",
+              borderBottom: "1px solid var(--border)",
             }}
           >
-            {showAll ? "Show Less" : `Show More (${playerCards.length - 6} more)`}
+            <div>
+              <h3
+                style={{
+                  margin: 0,
+                  color: "var(--foreground)",
+                  fontSize: "var(--text-base)",
+                  fontWeight: "var(--font-weight-bold)",
+                  fontFamily: "'Lava', sans-serif",
+                  letterSpacing: "0.01em",
+                }}
+              >
+                Guitar Showcase
+              </h3>
+              <p
+                style={{
+                  margin: 0,
+                  marginTop: 2,
+                  color: "var(--secondary)",
+                  fontSize: "var(--text-xs)",
+                  fontFamily: "'Lava', sans-serif",
+                }}
+              >
+                Community guitar clips from players
+              </p>
+            </div>
+            <ChevronRight size={18} strokeWidth={2} style={{ color: "var(--secondary)" }} />
           </button>
+
+          <div
+            className="grid grid-cols-5"
+            style={{ gap: 10, padding: "12px 12px 14px" }}
+          >
+            {guitarShowcaseClips.map((clip) => (
+              <button
+                key={clip.id}
+                type="button"
+                onClick={() => handleGuitarClick(clip)}
+                className="relative overflow-hidden text-left cursor-pointer group transition-opacity hover:opacity-90"
+                style={{
+                  minHeight: 148,
+                  borderRadius: "var(--radius)",
+                  border: "1px solid var(--border)",
+                  backgroundColor: "var(--card)",
+                }}
+              >
+                <ImageWithFallback
+                  src={clip.imageUrl}
+                  alt={clip.title}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105"
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.22) 55%, rgba(0,0,0,0.05) 100%)",
+                  }}
+                />
+                <div
+                  className="absolute bottom-0 left-0 right-0"
+                  style={{ padding: "10px 10px 9px" }}
+                >
+                  <p
+                    className="truncate"
+                    style={{
+                      margin: 0,
+                      color: "var(--on-image-primary)",
+                      fontSize: "var(--text-xs)",
+                      fontWeight: "var(--font-weight-bold)",
+                      lineHeight: 1.3,
+                      fontFamily: "'Lava', sans-serif",
+                    }}
+                  >
+                    {clip.title}
+                  </p>
+                  <div className="flex items-center justify-between" style={{ marginTop: 4 }}>
+                    <span
+                      className="truncate"
+                      style={{
+                        color: "var(--on-image-secondary)",
+                        fontSize: "12px",
+                        fontWeight: "var(--font-weight-medium)",
+                        maxWidth: "72%",
+                        fontFamily: "'Lava', sans-serif",
+                      }}
+                    >
+                      {clip.guitarist}
+                    </span>
+                    <span
+                      style={{
+                        color: "var(--on-image-secondary)",
+                        fontSize: "11px",
+                        fontWeight: "var(--font-weight-bold)",
+                        letterSpacing: "0.03em",
+                        fontFamily: "'Lava', sans-serif",
+                      }}
+                    >
+                      {clip.duration}
+                    </span>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Template Sheet */}
       <TemplateSheet
+        mode="song"
+        open={songOpen}
+        onClose={() => setSongOpen(false)}
+        template={selectedSong}
+      />
+
+      <TemplateSheet
+        mode="template"
         open={templateOpen}
         onClose={() => setTemplateOpen(false)}
         template={selectedTemplate}
+      />
+
+      <TemplateSheet
+        mode="guitar"
+        open={guitarOpen}
+        onClose={() => setGuitarOpen(false)}
+        template={selectedGuitarClip}
       />
         </>
       )}

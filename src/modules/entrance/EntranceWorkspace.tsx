@@ -46,6 +46,16 @@ export function EntranceWorkspace() {
 
     setBarVisible(!atBottom);
 
+    // When the scroller reaches the bottom, force-highlight the last section.
+    // This avoids edge cases where the activation line never crosses the last
+    // section top due to viewport height and causes the tab to jump backward.
+    if (atBottom) {
+      if (activeSection !== "improvs") {
+        setActiveSection("improvs");
+      }
+      return;
+    }
+
     const sections: Array<{ id: SectionId; ref: RefObject<HTMLDivElement | null> }> = [
       { id: "create", ref: createRef },
       { id: "loop", ref: loopRef },

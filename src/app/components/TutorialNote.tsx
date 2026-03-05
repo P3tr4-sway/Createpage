@@ -25,10 +25,14 @@ export function TutorialNote({
   const [savedPoints, setSavedPoints] = useState(points);
   const [draftTitle, setDraftTitle] = useState(title);
   const [draftText, setDraftText] = useState(points.join("\n"));
+  const [triggerPosition, setTriggerPosition] = useState({ top: 24, left: 24 });
   const [panelPosition, setPanelPosition] = useState({ top: 24, left: 24 });
-  const rootRef = useRef<HTMLDivElement>(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const TRIGGER_SIZE = 32;
+  const TRIGGER_Z_INDEX = 2147483646;
+  const PANEL_Z_INDEX = 2147483647;
 
   const lockEdits = useCallback(() => {
     const normalizedPoints = draftText
@@ -49,6 +53,15 @@ export function TutorialNote({
     }
     setOpen(false);
   }, [isEditing, lockEdits]);
+
+  const updateTriggerPosition = useCallback(() => {
+    if (!anchorRef.current) return;
+    const anchorRect = anchorRef.current.getBoundingClientRect();
+    setTriggerPosition({
+      top: anchorRect.top,
+      left: anchorRect.left,
+    });
+  }, []);
 
   const updatePanelPosition = useCallback(() => {
     if (!triggerRef.current) return;
@@ -83,13 +96,31 @@ export function TutorialNote({
   }, [panelSide, panelWidth]);
 
   useEffect(() => {
+    const handleLayout = () => {
+      updateTriggerPosition();
+      if (open) {
+        updatePanelPosition();
+      }
+    };
+
+    updateTriggerPosition();
+    const frame = requestAnimationFrame(handleLayout);
+    window.addEventListener("resize", handleLayout);
+    window.addEventListener("scroll", handleLayout, true);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", handleLayout);
+      window.removeEventListener("scroll", handleLayout, true);
+    };
+  }, [open, updatePanelPosition, updateTriggerPosition]);
+
+  useEffect(() => {
     if (!open) return;
 
     const handlePointerDown = (event: PointerEvent) => {
       const target = event.target as Node | null;
-      const inTrigger = Boolean(
-        rootRef.current && target && rootRef.current.contains(target),
-      );
+      const inTrigger = Boolean(triggerRef.current && target && triggerRef.current.contains(target));
       const inPanel = Boolean(
         panelRef.current && target && panelRef.current.contains(target),
       );
@@ -104,24 +135,16 @@ export function TutorialNote({
       }
     };
 
-    const handleLayout = () => {
-      updatePanelPosition();
-    };
-
     updatePanelPosition();
     const frame = requestAnimationFrame(updatePanelPosition);
 
     document.addEventListener("pointerdown", handlePointerDown);
     document.addEventListener("keydown", handleEscape);
-    window.addEventListener("resize", handleLayout);
-    window.addEventListener("scroll", handleLayout, true);
 
     return () => {
       cancelAnimationFrame(frame);
       document.removeEventListener("pointerdown", handlePointerDown);
       document.removeEventListener("keydown", handleEscape);
-      window.removeEventListener("resize", handleLayout);
-      window.removeEventListener("scroll", handleLayout, true);
     };
   }, [closePanel, open, updatePanelPosition]);
 
@@ -140,7 +163,7 @@ export function TutorialNote({
             top: panelPosition.top,
             left: panelPosition.left,
             width: panelWidth,
-            zIndex: 2147483647,
+            zIndex: PANEL_Z_INDEX,
             padding: "14px 14px 12px",
             backgroundColor: "rgba(0,0,0,0.96)",
             borderColor: "rgba(255,255,255,0.24)",
@@ -283,35 +306,40 @@ export function TutorialNote({
       )
     : null;
 
+  const trigger = typeof document !== "undefined"
+    ? createPortal(
+        <button
+          ref={triggerRef}
+          type="button"
+          onClick={() => setOpen((prev) => !prev)}
+          className="flex items-center justify-center cursor-pointer transition-opacity hover:opacity-85"
+          aria-label={open ? "Hide tutorial note" : "Show tutorial note"}
+          style={{
+            position: "fixed",
+            top: triggerPosition.top,
+            left: triggerPosition.left,
+            width: TRIGGER_SIZE,
+            height: TRIGGER_SIZE,
+            borderRadius: "9999px",
+            backgroundColor: "#FFFFFF",
+            border: "1px solid rgba(0,0,0,0.75)",
+            color: "#0B0B0B",
+            backdropFilter: "blur(10px)",
+            boxShadow: "0 8px 28px rgba(0,0,0,0.35)",
+            zIndex: TRIGGER_Z_INDEX,
+          }}
+        >
+          <MessageCircleQuestion size={16} strokeWidth={1.8} />
+        </button>,
+        document.body,
+      )
+    : null;
+
   return (
-    <div
-      ref={rootRef}
-      className="absolute"
-      style={{
-        zIndex: 9999,
-        ...style,
-      }}
-    >
-      <button
-        ref={triggerRef}
-        type="button"
-        onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center justify-center cursor-pointer transition-opacity hover:opacity-85"
-        aria-label={open ? "Hide tutorial note" : "Show tutorial note"}
-        style={{
-          width: 32,
-          height: 32,
-          borderRadius: "9999px",
-          backgroundColor: "#FFFFFF",
-          border: "1px solid rgba(0,0,0,0.75)",
-          color: "#0B0B0B",
-          backdropFilter: "blur(10px)",
-          boxShadow: "0 8px 28px rgba(0,0,0,0.35)",
-        }}
-      >
-        <MessageCircleQuestion size={16} strokeWidth={1.8} />
-      </button>
+    <>
+      <div ref={anchorRef} className="absolute" style={style} />
+      {trigger}
       {panel}
-    </div>
+    </>
   );
 }

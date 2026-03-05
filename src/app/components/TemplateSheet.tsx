@@ -9,6 +9,7 @@ import {
   Clock,
   Music,
   Users,
+  MessageCircle,
 } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
@@ -19,12 +20,19 @@ interface TemplateData {
   author: string;
   imageUrl: string;
   avatarInitial: string;
+  email?: string;
+  comments?: Array<{
+    id: number;
+    user: string;
+    text: string;
+  }>;
 }
 
 interface TemplateSheetProps {
   open: boolean;
   onClose: () => void;
   template: TemplateData | null;
+  mode?: "template" | "song" | "guitar";
 }
 
 /* mock album art grid for this creator */
@@ -37,6 +45,7 @@ const albumArt = [
 const mockStats = {
   plays: "2.4k",
   likes: "318",
+  comments: "0",
   remixes: "47",
   bpm: 82,
   key: "Dm",
@@ -44,8 +53,49 @@ const mockStats = {
   genre: "Neo-Soul",
 };
 
-export function TemplateSheet({ open, onClose, template }: TemplateSheetProps) {
+const mockSongStats = {
+  plays: "18.7k",
+  likes: "1.2k",
+  comments: "86",
+  remixes: "0",
+  bpm: 92,
+  key: "Am",
+  duration: "3:12",
+  genre: "Alt Pop",
+};
+
+const mockGuitarStats = {
+  plays: "9.6k",
+  likes: "742",
+  comments: "29",
+  remixes: "0",
+  bpm: 96,
+  key: "Em",
+  duration: "0:58",
+  genre: "Guitar Performance",
+};
+
+const songComments = [
+  { id: 1, user: "Ari", text: "Love the chord movement in the hook." },
+  { id: 2, user: "Min", text: "Drums hit hard, maybe lift vocal at 2:10." },
+  { id: 3, user: "Ken", text: "Could be a great template base for remix." },
+];
+
+export function TemplateSheet({
+  open,
+  onClose,
+  template,
+  mode = "template",
+}: TemplateSheetProps) {
   if (!template) return null;
+  const isSong = mode === "song";
+  const isGuitar = mode === "guitar";
+  const stats = isSong ? mockSongStats : isGuitar ? mockGuitarStats : mockStats;
+  const commentList = isSong
+    ? songComments
+    : isGuitar
+      ? template.comments ?? []
+      : [];
   const inverseScale = "var(--workbench-inverse-scale, 1)";
   const portalRoot = useMemo(() => {
     if (typeof document === "undefined") return null;
@@ -158,7 +208,7 @@ export function TemplateSheet({ open, onClose, template }: TemplateSheetProps) {
                     textTransform: "uppercase",
                   }}
                 >
-                  Template
+                  {isSong ? "Song" : isGuitar ? "Guitar Clip" : "Template"}
                 </p>
                 <h3
                   style={{
@@ -215,8 +265,22 @@ export function TemplateSheet({ open, onClose, template }: TemplateSheetProps) {
                         margin: 0,
                       }}
                     >
-                      Creator
+                      {isGuitar ? "Guitarist" : "Creator"}
                     </p>
+                    {isGuitar && template.email ? (
+                      <p
+                        style={{
+                          color: "var(--secondary)",
+                          fontSize: 12,
+                          fontWeight: "var(--font-weight-normal)",
+                          fontFamily: FONT,
+                          margin: 0,
+                          marginTop: 2,
+                        }}
+                      >
+                        {template.email}
+                      </p>
+                    ) : null}
                   </div>
                 </div>
 
@@ -253,18 +317,31 @@ export function TemplateSheet({ open, onClose, template }: TemplateSheetProps) {
 
               {/* Stats */}
               <div className="flex items-center gap-6">
-                <StatItem icon={<Play size={14} strokeWidth={1.5} />} label={mockStats.plays} />
-                <StatItem icon={<Heart size={14} strokeWidth={1.5} />} label={mockStats.likes} />
-                <StatItem icon={<Users size={14} strokeWidth={1.5} />} label={`${mockStats.remixes} remixes`} />
+                <StatItem icon={<Play size={14} strokeWidth={1.5} />} label={stats.plays} />
+                <StatItem icon={<Heart size={14} strokeWidth={1.5} />} label={stats.likes} />
+                <StatItem
+                  icon={
+                    isSong || isGuitar ? (
+                      <MessageCircle size={14} strokeWidth={1.5} />
+                    ) : (
+                      <Users size={14} strokeWidth={1.5} />
+                    )
+                  }
+                  label={
+                    isSong || isGuitar
+                      ? `${stats.comments} comments`
+                      : `${stats.remixes} remixes`
+                  }
+                />
               </div>
 
               {/* Meta tags */}
               <div className="flex flex-wrap gap-2">
                 {[
-                  { label: mockStats.genre },
-                  { label: `${mockStats.bpm} BPM` },
-                  { label: mockStats.key },
-                  { label: mockStats.duration, icon: <Clock size={12} strokeWidth={1.5} /> },
+                  { label: stats.genre },
+                  { label: `${stats.bpm} BPM` },
+                  { label: stats.key },
+                  { label: stats.duration, icon: <Clock size={12} strokeWidth={1.5} /> },
                 ].map((tag) => (
                   <span
                     key={tag.label}
@@ -303,7 +380,7 @@ export function TemplateSheet({ open, onClose, template }: TemplateSheetProps) {
                 }}
               >
                 <Music size={18} strokeWidth={1.8} />
-                Use This Template
+                {isSong ? "Open Song" : isGuitar ? "Watch Clip" : "Use This Template"}
               </button>
 
               {/* Divider */}
@@ -314,38 +391,95 @@ export function TemplateSheet({ open, onClose, template }: TemplateSheetProps) {
                 }}
               />
 
-              {/* Album Art section */}
-              <div>
-                <p
-                  style={{
-                    color: "var(--secondary)",
-                    fontSize: "var(--text-sm)",
-                    fontWeight: "var(--font-weight-medium)",
-                    fontFamily: FONT,
-                    margin: 0,
-                    marginBottom: 16,
-                    letterSpacing: "0.04em",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  More by {template.author}
-                </p>
-                <div className="grid grid-cols-3 gap-3">
-                  {albumArt.map((src, i) => (
-                    <div
-                      key={i}
-                      className="relative overflow-hidden aspect-square cursor-pointer group"
-                      style={{ borderRadius: "var(--radius)" }}
-                    >
-                      <ImageWithFallback
-                        src={src}
-                        alt={`Album art ${i + 1}`}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105"
-                      />
-                    </div>
-                  ))}
+              {isSong || isGuitar ? (
+                <div>
+                  <p
+                    style={{
+                      color: "var(--secondary)",
+                      fontSize: "var(--text-sm)",
+                      fontWeight: "var(--font-weight-medium)",
+                      fontFamily: FONT,
+                      margin: 0,
+                      marginBottom: 14,
+                      letterSpacing: "0.04em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Comments
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    {commentList.map((comment) => (
+                      <div
+                        key={comment.id}
+                        style={{
+                          border: "1px solid var(--border)",
+                          backgroundColor: "var(--muted)",
+                          borderRadius: "var(--radius)",
+                          padding: "10px 12px",
+                        }}
+                      >
+                        <p
+                          style={{
+                            margin: 0,
+                            color: "var(--foreground)",
+                            fontSize: "var(--text-xs)",
+                            fontWeight: "var(--font-weight-bold)",
+                            fontFamily: FONT,
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          {comment.user}
+                        </p>
+                        <p
+                          style={{
+                            margin: 0,
+                            marginTop: 4,
+                            color: "var(--secondary)",
+                            fontSize: "13px",
+                            fontWeight: "var(--font-weight-normal)",
+                            fontFamily: FONT,
+                            lineHeight: 1.4,
+                          }}
+                        >
+                          {comment.text}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div>
+                  <p
+                    style={{
+                      color: "var(--secondary)",
+                      fontSize: "var(--text-sm)",
+                      fontWeight: "var(--font-weight-medium)",
+                      fontFamily: FONT,
+                      margin: 0,
+                      marginBottom: 16,
+                      letterSpacing: "0.04em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    More by {template.author}
+                  </p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {albumArt.map((src, i) => (
+                      <div
+                        key={i}
+                        className="relative overflow-hidden aspect-square cursor-pointer group"
+                        style={{ borderRadius: "var(--radius)" }}
+                      >
+                        <ImageWithFallback
+                          src={src}
+                          alt={`Album art ${i + 1}`}
+                          className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
         </div>

@@ -3,7 +3,6 @@ import {
   Guitar,
   GraduationCap,
   LayoutGrid,
-  Sparkles,
   Speaker,
   Users,
 } from "lucide-react";
@@ -19,8 +18,8 @@ type TabDefinition = {
 const tabs: TabDefinition[] = [
   { id: "sounds", label: "Sounds", icon: Speaker, sectionId: "create" },
   { id: "community", label: "Community", icon: Users, sectionId: "create" },
+  { id: "learn", label: "Practice", icon: GraduationCap, sectionId: "loop" },
   { id: "create", label: "Create", icon: Guitar, sectionId: "create" },
-  { id: "learn", label: "Learn & Practice", icon: GraduationCap, sectionId: "loop" },
   { id: "more", label: "More", icon: LayoutGrid, sectionId: "improvs" },
 ];
 
@@ -31,14 +30,13 @@ interface BottomBarProps {
 }
 
 export function BottomBar({ visible, activeSection = "create", onNavigate }: BottomBarProps) {
+  void activeSection;
+
   const inverseScale = "var(--workbench-inverse-scale, 1)";
-  const barWidth = 1280;
-  const activeTabBySection: Record<"create" | "loop" | "improvs", TabDefinition["id"]> = {
-    create: "create",
-    loop: "learn",
-    improvs: "more",
-  };
-  const activeTabId = activeTabBySection[activeSection] ?? "create";
+  const barWidth = "min(1024px, calc(100vw - 128px))";
+  const navPillHeight = 70;
+  const aiButtonWidth = 172;
+  const activeTabId: TabDefinition["id"] = "learn";
 
   const handleTabSelect = (tab: TabDefinition) => {
     if (!onNavigate) {
@@ -78,19 +76,21 @@ export function BottomBar({ visible, activeSection = "create", onNavigate }: Bot
         style={{
           transform: `scale(${inverseScale})`,
           transformOrigin: "center bottom",
+          width: barWidth,
         }}
       >
         <div
-          className="flex items-stretch gap-3"
-          style={{ width: barWidth }}
+          className="flex items-center gap-2.5"
+          style={{ width: "100%" }}
         >
           {/* Main tab group pill */}
           <nav
-            className="flex items-center gap-1 border border-border flex-1"
+            className="flex items-center gap-1.5 border border-border flex-1"
             style={{
               backgroundColor: "var(--surface-glass)",
               borderRadius: "9999px",
-              padding: "10px",
+              height: navPillHeight,
+              padding: "8px",
               boxShadow: "var(--elevation-sm), 0 0 0 1px var(--border)",
               backdropFilter: "blur(24px)",
               WebkitBackdropFilter: "blur(24px)",
@@ -102,15 +102,16 @@ export function BottomBar({ visible, activeSection = "create", onNavigate }: Bot
               return (
                 <button
                   key={tab.id}
-                  className="flex items-center justify-center gap-3 cursor-pointer transition-all flex-1"
+                  className="flex items-center justify-center gap-2 cursor-pointer transition-all flex-1"
                   type="button"
                   onClick={() => handleTabSelect(tab)}
                   style={{
                     borderRadius: "9999px",
-                    padding: "14px 0",
+                    minHeight: 54,
+                    padding: isActive ? "0 18px" : "0 10px",
                     backgroundColor: isActive ? "var(--chip-active-bg)" : "transparent",
                     color: isActive ? "var(--chip-active-text)" : "var(--secondary)",
-                    fontSize: isActive ? "var(--text-base)" : "var(--text-sm)",
+                    fontSize: isActive ? "18px" : "15px",
                     fontWeight: "var(--font-weight-bold)",
                     fontFamily: "'Lava', sans-serif",
                     whiteSpace: "nowrap",
@@ -118,28 +119,28 @@ export function BottomBar({ visible, activeSection = "create", onNavigate }: Bot
                   }}
                 >
                   {isActive ? (
-                    <span>{tab.label}</span>
+                    <span style={{ letterSpacing: "0.01em" }}>{tab.label}</span>
                   ) : (
-                    <tab.icon size={24} strokeWidth={1.8} />
+                    <tab.icon size={20} strokeWidth={1.9} />
                   )}
                 </button>
               );
             })}
           </nav>
 
-          {/* AI Magic Button - separate pill */}
+          {/* AI Agent Button - same height as nav pill */}
           <motion.button
-            whileHover={{ scale: 1.06 }}
+            whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 380, damping: 22 }}
             className="relative flex items-center justify-center border border-border cursor-pointer overflow-hidden"
             style={{
               backgroundColor: "var(--surface-glass)",
-              borderRadius: "50%",
-              width: 72,
-              height: 72,
-              minWidth: 72,
-              minHeight: 72,
+              borderRadius: "9999px",
+              width: aiButtonWidth,
+              height: navPillHeight,
+              minWidth: aiButtonWidth,
+              minHeight: navPillHeight,
               boxShadow: "var(--elevation-sm)",
               borderColor: "var(--border)",
               borderWidth: 1,
@@ -150,11 +151,11 @@ export function BottomBar({ visible, activeSection = "create", onNavigate }: Bot
             {/* Pulse ring */}
             <motion.span
               className="absolute inset-0"
-              style={{ borderRadius: "50%" }}
+              style={{ borderRadius: "9999px" }}
               animate={{
                 boxShadow: [
                   "0 0 0 0px rgba(43,154,252,0.24)",
-                  "0 0 0 10px rgba(43,154,252,0)",
+                  "0 0 0 8px rgba(43,154,252,0)",
                 ],
               }}
               transition={{
@@ -167,7 +168,7 @@ export function BottomBar({ visible, activeSection = "create", onNavigate }: Bot
             {/* Shimmer sweep */}
             <motion.span
               className="absolute inset-0 pointer-events-none overflow-hidden"
-              style={{ borderRadius: "50%" }}
+              style={{ borderRadius: "9999px" }}
             >
               <motion.span
                 className="absolute inset-0 pointer-events-none"
@@ -180,20 +181,18 @@ export function BottomBar({ visible, activeSection = "create", onNavigate }: Bot
               />
             </motion.span>
 
-            {/* Icon */}
-            <motion.span
-              animate={{ rotate: [0, 8, -8, 0], scale: [1, 1.12, 1] }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut",
-                repeatDelay: 1.5,
+            <span
+              className="relative z-10"
+              style={{
+                color: "var(--foreground)",
+                fontSize: 18,
+                fontWeight: "var(--font-weight-bold)",
+                letterSpacing: "0.01em",
+                fontFamily: "'Lava', sans-serif",
               }}
-              className="relative z-10 flex items-center justify-center"
-              style={{ color: "var(--foreground)" }}
             >
-              <Sparkles size={22} strokeWidth={1.6} />
-            </motion.span>
+              AI Agent
+            </span>
           </motion.button>
         </div>
       </div>

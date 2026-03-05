@@ -1,123 +1,75 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Moon, Sparkles, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { TutorialNote } from "./TutorialNote";
 
-const stats = {
-  songs:   { value: 12,  total: 20,   color: "var(--sidebar-foreground)",  label: "Songs Created",  unit: "tracks" },
-  jammed:  { value: 8.5, total: 10,   color: "#4ECDC4",  label: "Hours Jammed",   unit: "hrs"    },
-  remixes: { value: 3,   total: 5,    color: "#FF6B6B",  label: "Remixes",         unit: "mix"    },
-  stems:   { value: 4,   total: null, color: "#A78BFA",  label: "Stem Splits",     unit: "files"  },
-  credits: { used: 150,  total: 1000, color: "#4ECDC4" },
-};
-
-const rings = [
-  { r: 50, progress: stats.songs.value   / stats.songs.total!,   color: stats.songs.color   },
-  { r: 37, progress: stats.jammed.value  / stats.jammed.total!,  color: stats.jammed.color  },
-  { r: 24, progress: stats.remixes.value / stats.remixes.total!, color: stats.remixes.color },
-];
-
-const statRows = [
-  stats.songs,
-  stats.jammed,
-  stats.remixes,
-  stats.stems,
-] as typeof stats.songs[];
-
 const FONT = "'Lava', sans-serif";
 
-function ConcentriRings() {
-  const W = 220, RING_CY = 110;
-  const cx = W / 2;
-  // Bottom of outer ring + text block — sized for larger type
-  const textY = RING_CY + 100 + 28; // 238
-  const H     = textY + 52;          // room for 3 text lines
+const stats = {
+  songs: { value: 12, total: 20, label: "Songs Created", unit: "tracks" },
+  jammed: { value: 8.5, total: 10, label: "Hours Jammed", unit: "hrs" },
+  remixes: { value: 3, total: 5, label: "Remixes", unit: "mix" },
+  stems: { value: 4, total: null, label: "Stem Splits", unit: "files" },
+  credits: { used: 150, total: 1000 },
+};
 
-  const scaledRings = [
-    { r: 100, ...rings[0] },
-    { r:  76, ...rings[1] },
-    { r:  52, ...rings[2] },
+const statRows = [
+  { id: "songs", ...stats.songs, color: "var(--sidebar-foreground)" },
+  { id: "jammed", ...stats.jammed, color: "var(--sidebar-accent-teal)" },
+  { id: "remixes", ...stats.remixes, color: "var(--sidebar-accent-coral)" },
+  { id: "stems", ...stats.stems, color: "var(--sidebar-accent-lilac)" },
+] as const;
+
+function ConcentricRings() {
+  const size = 182;
+  const center = size / 2;
+  const stroke = 11;
+  const rings = [
+    { radius: 64, progress: stats.songs.value / stats.songs.total, color: "var(--sidebar-foreground)" },
+    { radius: 48, progress: stats.jammed.value / stats.jammed.total, color: "var(--sidebar-accent-teal)" },
+    { radius: 32, progress: stats.remixes.value / stats.remixes.total, color: "var(--sidebar-accent-coral)" },
   ];
 
   return (
-    <svg
-      width={W}
-      height={H}
-      viewBox={`0 0 ${W} ${H}`}
-    >
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
       <defs>
-        <filter id="ring-glow" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="3.5" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <radialGradient id="bg-grad" cx="50%" cy="50%" r="50%">
-          <stop offset="0%"   stopColor="rgba(255,255,255,0.05)" />
-          <stop offset="100%" stopColor="rgba(255,255,255,0)"    />
+        <radialGradient id="sidebar-ring-halo" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="var(--sidebar-ring-halo)" />
+          <stop offset="100%" stopColor="transparent" />
         </radialGradient>
       </defs>
 
-      {/* Background glow disc */}
-      <circle cx={cx} cy={RING_CY} r={106} fill="url(#bg-grad)" />
+      <circle cx={center} cy={center} r={72} fill="url(#sidebar-ring-halo)" />
 
-      {scaledRings.map((ring, i) => {
-        const circ = 2 * Math.PI * ring.r;
-        const fill = circ * ring.progress;
-        const gap  = circ * (1 - ring.progress);
+      {rings.map((ring, index) => {
+        const circumference = 2 * Math.PI * ring.radius;
+        const progressLength = circumference * ring.progress;
+        const remainingLength = circumference - progressLength;
+
         return (
-          <g key={i}>
-            <circle cx={cx} cy={RING_CY} r={ring.r} fill="none" stroke={ring.color} strokeWidth={11} opacity={0.1} />
+          <g key={index}>
             <circle
-              cx={cx} cy={RING_CY} r={ring.r}
+              cx={center}
+              cy={center}
+              r={ring.radius}
+              fill="none"
+              stroke="var(--sidebar-ring-track)"
+              strokeWidth={stroke}
+            />
+            <circle
+              cx={center}
+              cy={center}
+              r={ring.radius}
               fill="none"
               stroke={ring.color}
-              strokeWidth={11}
-              strokeDasharray={`${fill} ${gap}`}
+              strokeWidth={stroke}
+              strokeDasharray={`${progressLength} ${remainingLength}`}
               strokeLinecap="round"
-              transform={`rotate(-90 ${cx} ${RING_CY})`}
-              filter="url(#ring-glow)"
+              transform={`rotate(-90 ${center} ${center})`}
             />
           </g>
         );
       })}
-
-      {/* ── Text block below rings ── */}
-      {/* Value */}
-      <text
-        x={cx} y={textY}
-        textAnchor="middle"
-        fill="var(--sidebar-foreground)"
-        fontSize="36"
-        fontWeight="700"
-        fontFamily={FONT}
-      >
-        {stats.songs.value}
-      </text>
-      {/* Unit */}
-      <text
-        x={cx} y={textY + 22}
-        textAnchor="middle"
-        fill="var(--secondary)"
-        fontSize="13"
-        fontFamily={FONT}
-        letterSpacing="0.1em"
-      >
-        TRACKS
-      </text>
-      {/* Sub-label */}
-      <text
-        x={cx} y={textY + 38}
-        textAnchor="middle"
-        fill="var(--secondary)"
-        fontSize="11"
-        fontFamily={FONT}
-        letterSpacing="0.06em"
-        opacity={0.45}
-      >
-        THIS MONTH
-      </text>
     </svg>
   );
 }
@@ -128,26 +80,48 @@ interface SidebarProps {
 }
 
 export function Sidebar({ activeSection, onNavigate }: SidebarProps) {
+  void activeSection;
+  void onNavigate;
+
   const creditsRemaining = stats.credits.total - stats.credits.used;
-  const creditsPercent   = creditsRemaining / stats.credits.total;
-  const { theme, setTheme } = useTheme();
+  const creditsPercent = creditsRemaining / stats.credits.total;
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const isDark = mounted ? theme !== "light" : true;
+  const isDark = mounted ? resolvedTheme === "dark" : true;
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const dateLabel = useMemo(
+    () =>
+      new Intl.DateTimeFormat("en-US", {
+        weekday: "long",
+        month: "short",
+        day: "numeric",
+      }).format(new Date()),
+    [],
+  );
+
+  const cardStyle = {
+    border: "1px solid var(--sidebar-soft-border)",
+    backgroundColor: "var(--sidebar-surface-card)",
+    borderRadius: 20,
+    boxShadow: "0 10px 28px rgba(0,0,0,0.08)",
+  } as const;
 
   return (
     <aside
       className="flex flex-col border-r"
       style={{
         position: "relative",
-        width: 240, minWidth: 240,
+        width: 248,
+        minWidth: 248,
         height: "100%",
         fontFamily: FONT,
-        backgroundColor: "var(--sidebar)",
         borderColor: "var(--sidebar-border, var(--border))",
+        background:
+          "linear-gradient(180deg, var(--sidebar-surface-top) 0%, var(--sidebar) 58%, var(--sidebar) 100%)",
         overflow: "visible",
       }}
     >
@@ -162,242 +136,314 @@ export function Sidebar({ activeSection, onNavigate }: SidebarProps) {
         panelSide="right"
       />
 
-      {/* ── Header ── */}
-      <div style={{ padding: "14px 20px 6px" }}>
-        <p style={{
-          color: "var(--secondary)",
-          fontSize: "11px",
-          fontFamily: FONT,
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
-          marginBottom: 4,
-          opacity: 0.6,
-        }}>
-          Wednesday, Mar 4
-        </p>
-        
-      </div>
-
-      {/* ── Rings (centred) ── */}
-      <div className="flex justify-center" style={{ padding: "4px 0 0" }}>
-        <ConcentriRings />
-      </div>
-
-      {/* ── Stat rows ── */}
       <div
-        className="flex flex-col"
-        style={{ padding: "2px 20px 10px" }}
+        style={{
+          padding: "16px 16px 14px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 12,
+          flex: 1,
+          minHeight: 0,
+        }}
       >
-        {statRows.map((stat, i) => {
-          const pct    = stat.total ? stat.value / stat.total : null;
-          const size   = 36;
-          const mc     = size / 2;
-          const r      = 14;
-          const circ   = 2 * Math.PI * r;
-          const filled = pct !== null ? circ * pct : circ;
-          const gap    = pct !== null ? circ * (1 - pct) : 0;
+        <div style={{ padding: "0 2px" }}>
+          <p
+            style={{
+              margin: 0,
+              color: "var(--secondary)",
+              fontSize: 11,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              opacity: 0.76,
+            }}
+          >
+            {dateLabel}
+          </p>
+        </div>
 
-          return (
-            <div
-              key={i}
-              className="flex items-center"
+        <section style={{ ...cardStyle, padding: "14px 12px 12px" }}>
+          <div className="flex flex-col items-center">
+            <ConcentricRings />
+            <p
               style={{
-                gap: 10,
-                padding: "8px 0",
-                borderBottom: i < statRows.length - 1
-                  ? "1px solid var(--border)"
-                  : "none",
+                margin: 0,
+                marginTop: 4,
+                color: "var(--sidebar-foreground)",
+                fontSize: 58,
+                fontWeight: "var(--font-weight-bold)",
+                lineHeight: 0.95,
+                letterSpacing: "-0.02em",
               }}
             >
-              {/* Mini ring — arc only */}
-              <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0 }}>
-                <circle cx={mc} cy={mc} r={r} fill="none" stroke={stat.color} strokeWidth={3.5} opacity={0.12} />
-                <circle
-                  cx={mc} cy={mc} r={r}
-                  fill="none"
-                  stroke={stat.color}
-                  strokeWidth={3.5}
-                  strokeDasharray={`${filled} ${gap}`}
-                  strokeLinecap="round"
-                  transform={`rotate(-90 ${mc} ${mc})`}
-                  opacity={pct !== null ? 0.9 : 0.35}
-                />
-              </svg>
-
-              {/* Label — secondary, left */}
-              <span style={{
-                flex: 1,
-                color: "var(--secondary)",
-                fontSize: "11px",
-                fontFamily: FONT,
-                letterSpacing: "0.07em",
-                textTransform: "uppercase",
-                opacity: 0.8,
-              }}>
-                {stat.label}
-              </span>
-
-              {/* Value — accent colour, right */}
-              <span style={{
-                color: stat.color,
-                fontSize: "var(--text-sm, 16px)",
+              {stats.songs.value}
+            </p>
+            <p
+              style={{
+                margin: 0,
+                marginTop: 4,
+                color: "var(--sidebar-foreground)",
+                fontSize: 14,
                 fontWeight: "var(--font-weight-bold)",
-                fontFamily: FONT,
-                lineHeight: 1,
-                textAlign: "right",
-              }}>
-                {stat.value}
-                {stat.total && (
-                  <span style={{
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+              }}
+            >
+              Tracks
+            </p>
+            <p
+              style={{
+                margin: 0,
+                marginTop: 2,
+                color: "var(--secondary)",
+                fontSize: 11,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                opacity: 0.7,
+              }}
+            >
+              This Month
+            </p>
+          </div>
+        </section>
+
+        <section style={{ ...cardStyle, padding: "2px 12px" }}>
+          {statRows.map((stat, index) => {
+            const progress = stat.total ? stat.value / stat.total : 1;
+            const size = 32;
+            const radius = 13;
+            const center = size / 2;
+            const circumference = 2 * Math.PI * radius;
+            const progressLength = circumference * progress;
+            const remainingLength = circumference - progressLength;
+
+            return (
+              <div
+                key={stat.id}
+                className="flex items-center"
+                style={{
+                  gap: 10,
+                  padding: "10px 2px",
+                  borderBottom:
+                    index < statRows.length - 1
+                      ? "1px solid var(--sidebar-soft-border)"
+                      : "none",
+                }}
+              >
+                <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0 }}>
+                  <circle
+                    cx={center}
+                    cy={center}
+                    r={radius}
+                    fill="none"
+                    stroke="var(--sidebar-ring-track)"
+                    strokeWidth={3.5}
+                  />
+                  <circle
+                    cx={center}
+                    cy={center}
+                    r={radius}
+                    fill="none"
+                    stroke={stat.color}
+                    strokeWidth={3.5}
+                    strokeDasharray={`${progressLength} ${remainingLength}`}
+                    strokeLinecap="round"
+                    transform={`rotate(-90 ${center} ${center})`}
+                  />
+                </svg>
+
+                <span
+                  style={{
+                    flex: 1,
                     color: "var(--secondary)",
-                    fontWeight: "var(--font-weight-normal)",
-                    fontSize: "12px",
-                  }}>
-                    /{stat.total}
-                  </span>
-                )}
-                {" "}
-                <span style={{
-                  color: "var(--secondary)",
-                  fontSize: "11px",
-                  fontWeight: "var(--font-weight-normal)",
-                  opacity: 0.7,
-                }}>
-                  {stat.unit}
+                    fontSize: 11,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    lineHeight: 1.25,
+                    fontWeight: "var(--font-weight-medium)",
+                  }}
+                >
+                  {stat.label}
                 </span>
+
+                <span
+                  style={{
+                    color: stat.color,
+                    fontSize: 17,
+                    fontWeight: "var(--font-weight-bold)",
+                    lineHeight: 1,
+                    fontFamily: FONT,
+                    textAlign: "right",
+                    display: "inline-flex",
+                    alignItems: "baseline",
+                    gap: 2,
+                    letterSpacing: "-0.015em",
+                  }}
+                >
+                  {stat.value}
+                  {stat.total !== null ? (
+                    <span
+                      style={{
+                        color: "var(--secondary)",
+                        fontSize: 11,
+                        fontWeight: "var(--font-weight-medium)",
+                        opacity: 0.8,
+                        letterSpacing: "0.02em",
+                      }}
+                    >
+                      /{stat.total}
+                    </span>
+                  ) : null}
+                  <span
+                    style={{
+                      color: "var(--secondary)",
+                      fontSize: 11,
+                      fontWeight: "var(--font-weight-medium)",
+                      opacity: 0.78,
+                      letterSpacing: "0.01em",
+                    }}
+                  >
+                    {stat.unit}
+                  </span>
+                </span>
+              </div>
+            );
+          })}
+        </section>
+
+        <section style={{ ...cardStyle, padding: "10px 12px" }}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {isDark ? (
+                <Moon size={14} strokeWidth={1.8} style={{ color: "var(--sidebar-foreground)" }} />
+              ) : (
+                <Sun size={14} strokeWidth={1.8} style={{ color: "var(--sidebar-foreground)" }} />
+              )}
+              <span
+                style={{
+                  color: "var(--sidebar-foreground)",
+                  fontSize: 12,
+                  fontWeight: "var(--font-weight-bold)",
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                }}
+              >
+                {isDark ? "Dark Mode" : "Light Mode"}
               </span>
             </div>
-          );
-        })}
-      </div>
+            <button
+              type="button"
+              aria-label="Toggle color theme"
+              role="switch"
+              aria-checked={isDark}
+              onClick={() => setTheme(isDark ? "light" : "dark")}
+              className="cursor-pointer"
+              style={{
+                width: 46,
+                height: 26,
+                borderRadius: "var(--radius-full)",
+                border: "1px solid var(--sidebar-soft-border)",
+                backgroundColor: isDark
+                  ? "rgba(255,255,255,0.2)"
+                  : "rgba(17,24,39,0.16)",
+                position: "relative",
+                transition: "all 200ms ease",
+              }}
+            >
+              <span
+                style={{
+                  position: "absolute",
+                  top: 1,
+                  left: isDark ? 21 : 1,
+                  width: 22,
+                  height: 22,
+                  borderRadius: "50%",
+                  backgroundColor: "var(--sidebar-surface-card-strong)",
+                  border: "1px solid var(--sidebar-soft-border)",
+                  transition: "all 200ms ease",
+                }}
+              />
+            </button>
+          </div>
+        </section>
 
-      {/* ── Divider ── */}
-      <div style={{
-        height: 1,
-        margin: "0 20px",
-        backgroundColor: "var(--border)",
-        opacity: 0.6,
-      }} />
-
-      {/* ── Theme toggle ── */}
-      <div style={{ padding: "12px 20px 8px" }}>
-        <div
-          className="flex items-center justify-between rounded-lg border"
+        <section
           style={{
-            padding: "10px 12px",
-            backgroundColor: "var(--surface-glass)",
-            borderColor: "var(--border)",
+            ...cardStyle,
+            marginTop: "auto",
+            marginBottom: 2,
+            padding: "12px",
+            backgroundColor: "var(--sidebar-surface-card-strong)",
           }}
         >
-          <div className="flex items-center gap-2">
-            {isDark ? (
-              <Moon size={14} strokeWidth={1.8} style={{ color: "var(--sidebar-foreground)" }} />
-            ) : (
-              <Sun size={14} strokeWidth={1.8} style={{ color: "var(--sidebar-foreground)" }} />
-            )}
+          <div className="flex items-center justify-between" style={{ marginBottom: 8 }}>
+            <div className="flex items-center gap-2">
+              <Sparkles size={14} strokeWidth={1.5} style={{ color: "var(--sidebar-foreground)" }} />
+              <span
+                style={{
+                  color: "var(--sidebar-foreground)",
+                  fontSize: 12,
+                  fontWeight: "var(--font-weight-bold)",
+                  letterSpacing: "0.05em",
+                  textTransform: "uppercase",
+                }}
+              >
+                AI Credits
+              </span>
+            </div>
             <span
               style={{
                 color: "var(--sidebar-foreground)",
-                fontSize: 12,
-                fontWeight: "var(--font-weight-medium)",
-                letterSpacing: "0.05em",
-                textTransform: "uppercase",
+                fontSize: 16,
+                fontWeight: "var(--font-weight-bold)",
               }}
             >
-              {isDark ? "Dark Mode" : "Light Mode"}
+              {creditsRemaining}
+              <span
+                style={{
+                  color: "var(--secondary)",
+                  fontSize: 12,
+                  fontWeight: "var(--font-weight-medium)",
+                }}
+              >
+                /{stats.credits.total}
+              </span>
             </span>
           </div>
-          <button
-            type="button"
-            aria-label="Toggle color theme"
-            role="switch"
-            aria-checked={isDark}
-            onClick={() => setTheme(isDark ? "light" : "dark")}
-            className="cursor-pointer"
+
+          <div
             style={{
-              width: 44,
-              height: 24,
+              width: "100%",
+              height: 4,
+              backgroundColor: "var(--sidebar-ring-track)",
               borderRadius: "var(--radius-full)",
-              border: "1px solid var(--border)",
-              backgroundColor: isDark ? "rgba(43,154,252,0.34)" : "rgba(15,23,42,0.18)",
-              position: "relative",
-              transition: "all 200ms ease",
+              overflow: "hidden",
             }}
           >
-            <span
+            <div
               style={{
-                position: "absolute",
-                top: 1,
-                left: isDark ? 21 : 1,
-                width: 20,
-                height: 20,
-                borderRadius: "50%",
-                backgroundColor: "var(--card)",
-                border: "1px solid var(--border)",
-                transition: "all 200ms ease",
+                width: `${creditsPercent * 100}%`,
+                height: "100%",
+                backgroundColor: "var(--sidebar-foreground)",
+                borderRadius: "var(--radius-full)",
               }}
             />
-          </button>
-        </div>
-      </div>
-
-      {/* ── Lava AI Credits ── */}
-      <div style={{ padding: "var(--spacing-4, 16px) var(--spacing-6, 24px)", marginTop: "auto" }}>
-        <div className="flex items-center justify-between" style={{ marginBottom: 8 }}>
-          <div className="flex items-center gap-2">
-            <Sparkles size={14} strokeWidth={1.5} style={{ color: "#4ECDC4" }} />
-            <span style={{
-              color: "var(--sidebar-foreground)",
-              fontSize: "12px",
-              fontWeight: "var(--font-weight-bold)",
-              fontFamily: FONT,
-              letterSpacing: "0.04em",
-              textTransform: "uppercase",
-            }}>
-              AI Credits
-            </span>
           </div>
-          <span style={{
-            color: "#4ECDC4",
-            fontSize: "var(--text-sm, 16px)",
-            fontWeight: "var(--font-weight-bold)",
-            fontFamily: FONT,
-          }}>
-            {creditsRemaining}
-            <span style={{ color: "var(--secondary)", fontSize: "12px", fontWeight: "var(--font-weight-medium)" }}>
-              /{stats.credits.total}
-            </span>
-          </span>
-        </div>
 
-        <div style={{
-          width: "100%", height: 4,
-          backgroundColor: "var(--soft-surface-strong)",
-          borderRadius: "var(--radius-full, 9999px)",
-          overflow: "hidden",
-        }}>
-          <div style={{
-            width: `${creditsPercent * 100}%`,
-            height: "100%",
-            background: "linear-gradient(to right, #4ECDC4, #81e6df)",
-            borderRadius: "var(--radius-full, 9999px)",
-          }} />
-        </div>
-
-        <p style={{
-          marginTop: 6,
-          color: "var(--secondary)",
-          fontSize: "11px",
-          fontFamily: FONT,
-          letterSpacing: "0.04em",
-          textTransform: "uppercase",
-        }}>
-          {stats.credits.used} used this month
-        </p>
+          <p
+            style={{
+              margin: 0,
+              marginTop: 7,
+              color: "var(--secondary)",
+              fontSize: 11,
+              letterSpacing: "0.05em",
+              textTransform: "uppercase",
+            }}
+          >
+            {stats.credits.used} used this month
+          </p>
+        </section>
       </div>
 
-      {/* ── Footer ── */}
-      {/* My Project button removed — now accessible via MainContent "My Projects" sheet */}
     </aside>
   );
 }

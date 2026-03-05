@@ -9,8 +9,9 @@
   --text-lg: 24px;
   --text-base: 20px;
   --text-sm: 16px;
+  --text-xs: 14px;
   /* The default background color for the application. */
-  --background: rgba(247, 249, 252, 1);
+  --background: rgba(246, 247, 249, 1);
   /* The default color for elements or text that appears on top of the background. */
   --foreground: rgba(17, 24, 39, 1);
   /* The background color for cards, modals, and other containers. */
@@ -26,13 +27,13 @@
   /* The default color for text or elements that appear on top of primary colored elements. */
   --primary-foreground: rgba(255, 255, 255, 1.00);
   /* The secondary color used for secondary(but NOT-DESTRUCTIVE) buttons and interactive elements. */
-  --secondary: rgba(100, 113, 134, 1);
+  --secondary: rgba(75, 85, 104, 1);
   /* The default color for text or elements that appear on top of secondary colored elements. */
   --secondary-foreground: rgba(17, 24, 39, 1);
   /* The muted color used for less prominent elements, such as disabled buttons or disabled text. */
-  --muted: rgba(15, 23, 42, 0.07);
+  --muted: rgba(17, 24, 39, 0.08);
   /* The default color for text or elements that appear on top of muted colored elements. */
-  --muted-foreground: rgba(101, 114, 132, 1);
+  --muted-foreground: rgba(86, 96, 114, 1);
   /* The accent color used for highlights, links, and other interactive elements. */
   --accent: rgba(43, 154, 252, 1.00);
   /* The default color for text or elements that appear on top of accent colored elements. */
@@ -42,11 +43,11 @@
   /* The default color for text or elements that appear on top of destructive colored elements. */
   --destructive-foreground: rgba(255, 255, 255, 1.00);
   /* The default border color for elements such as inputs, buttons, and other containers. */
-  --border: rgba(15, 23, 42, 0.12);
+  --border: rgba(17, 24, 39, 0.14);
   /* The default background color for input fields once the text has been filled. Should be either transparent or match the input-background. */
   --input: rgba(255, 255, 255, 1);
   /* The default background color for input fields, text areas, and other input elements. */
-  --input-background: rgba(255, 255, 255, 0.98);
+  --input-background: rgba(255, 255, 255, 1);
   /* The default font weight for medium text. */
   --font-weight-medium: 500;
   /* The default font weight for normal text. */
@@ -56,7 +57,7 @@
   /* The color for focus rings, outlines, and other focus indicators. */
   --ring: rgba(43, 154, 252, 1.00);
   /* Shadow for small elevations, such as cards or modals. */
-  --elevation-sm: 0px 16px 60px 0px rgba(15, 23, 42, 0.18);
+  --elevation-sm: 0px 12px 32px 0px rgba(17, 24, 39, 0.16);
   /* The color for chart elements, such as a bar or line in a chart. */
   --chart-1: rgba(43, 154, 252, 1.00);
   /* The color for another chart element, such as a bar or line in a chart. */
@@ -74,7 +75,7 @@
   /* The border radius for tooltips and popovers. */
   --radius-tooltip: 32px;
   /* The background color for sidebars, navigation menus, and other persistent elements. */
-  --sidebar: rgba(238, 242, 250, 1);
+  --sidebar: rgba(242, 243, 245, 1);
   /* The default color for text or elements that appear on top of sidebars, navigation menus, and other persistent elements. */
   --sidebar-foreground: rgba(17, 24, 39, 1);
   /* The primary color used for buttons, links, and other interactive elements in sidebars and navigation menus. */
@@ -82,24 +83,33 @@
   /* The default color for text or elements that appear on top of primary colored elements in sidebars and navigation menus. */
   --sidebar-primary-foreground: rgba(255, 255, 255, 1.00);
   /* The accent color used for highlights, links, and other interactive elements in sidebars and navigation menus. */
-  --sidebar-accent: rgba(255, 255, 255, 0.7);
+  --sidebar-accent: rgba(255, 255, 255, 0.95);
   /* The default color for text or elements that appear on top of accent colored elements in sidebars and navigation menus. */
   --sidebar-accent-foreground: rgba(17, 24, 39, 1);
   /* The default border color for elements in sidebars and navigation menus. */
-  --sidebar-border: rgba(15, 23, 42, 0.12);
+  --sidebar-border: rgba(17, 24, 39, 0.14);
   /* The default color for focus rings, outlines, and other focus indicators in sidebars and navigation menus. */
   --sidebar-ring: rgba(43, 154, 252, 1);
+  --sidebar-surface-top: rgba(250, 250, 251, 1);
+  --sidebar-surface-card: rgba(255, 255, 255, 0.78);
+  --sidebar-surface-card-strong: rgba(255, 255, 255, 0.92);
+  --sidebar-soft-border: rgba(17, 24, 39, 0.12);
+  --sidebar-ring-track: rgba(17, 24, 39, 0.16);
+  --sidebar-ring-halo: rgba(17, 24, 39, 0.06);
+  --sidebar-accent-teal: rgba(53, 188, 176, 1);
+  --sidebar-accent-coral: rgba(244, 109, 109, 1);
+  --sidebar-accent-lilac: rgba(159, 140, 240, 1);
   /* Shared semantic tokens */
-  --surface-glass: rgba(255, 255, 255, 0.72);
-  --surface-glass-strong: rgba(255, 255, 255, 0.86);
-  --chip-bg: rgba(15, 23, 42, 0.06);
-  --chip-border: rgba(15, 23, 42, 0.14);
-  --chip-active-bg: rgba(17, 24, 39, 0.92);
-  --chip-active-border: rgba(17, 24, 39, 0.92);
+  --surface-glass: rgba(255, 255, 255, 0.9);
+  --surface-glass-strong: rgba(255, 255, 255, 0.96);
+  --chip-bg: rgba(17, 24, 39, 0.08);
+  --chip-border: rgba(17, 24, 39, 0.16);
+  --chip-active-bg: rgba(43, 154, 252, 0.95);
+  --chip-active-border: rgba(43, 154, 252, 0.6);
   --chip-active-text: rgba(255, 255, 255, 1);
-  --chip-text: rgba(17, 24, 39, 0.84);
-  --soft-surface: rgba(15, 23, 42, 0.03);
-  --soft-surface-strong: rgba(15, 23, 42, 0.06);
+  --chip-text: rgba(17, 24, 39, 0.9);
+  --soft-surface: rgba(17, 24, 39, 0.04);
+  --soft-surface-strong: rgba(17, 24, 39, 0.08);
   --image-overlay-card: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0.12) 0%,
@@ -112,21 +122,21 @@
   --on-image-muted: rgba(255, 255, 255, 0.66);
   --on-image-control-bg: rgba(0, 0, 0, 0.42);
   --on-image-control-border: rgba(255, 255, 255, 0.22);
-  --agentic-bg: #eef2f8;
-  --agentic-topbar: #ffffff;
-  --agentic-surface: #e8edf6;
-  --agentic-grid: #dde4ef;
-  --agentic-border: rgba(15, 23, 42, 0.12);
-  --agentic-border-strong: rgba(15, 23, 42, 0.2);
+  --agentic-bg: #f1f2f4;
+  --agentic-topbar: #fcfcfd;
+  --agentic-surface: #eceef1;
+  --agentic-grid: #e3e5e9;
+  --agentic-border: rgba(17, 24, 39, 0.14);
+  --agentic-border-strong: rgba(17, 24, 39, 0.22);
   --agentic-foreground: #141827;
-  --agentic-muted: rgba(20, 24, 39, 0.58);
+  --agentic-muted: rgba(20, 24, 39, 0.64);
   --agentic-contrast: #f7f8fc;
   --agentic-track-title: #f7f8fc;
   --agentic-track-gradient: linear-gradient(90deg, #ff6a00 0%, #c1541a 26%, #845246 100%);
-  --agentic-slider-track: rgba(20, 24, 39, 0.24);
+  --agentic-slider-track: rgba(20, 24, 39, 0.28);
   --agentic-slider-thumb: #141827;
   --agentic-marker: #ffffff;
-  --agentic-control-bg: rgba(20, 24, 39, 0.08);
+  --agentic-control-bg: rgba(20, 24, 39, 0.1);
   --agentic-control-text: #2d3447;
   --agentic-danger: #ff4e46;
   --radius-full: 9999px;
@@ -134,70 +144,79 @@
 
 .dark {
   /* The default background color for the application. */
-  --background: rgba(25, 25, 27, 1);
+  --background: rgba(17, 17, 20, 1);
   /* The default color for elements or text that appears on top of the background. */
   --foreground: rgba(255, 255, 255, 1);
   /* The background color for cards, modals, and other containers. */
-  --card: rgba(32, 32, 34, 1);
+  --card: rgba(26, 26, 30, 1);
   /* The default color for text or elements that appear on top of cards, modals and other background containers. */
   --card-foreground: rgba(255, 255, 255, 1);
   /* The background color for dropdowns and tooltips. */
-  --popover: rgba(32, 32, 34, 1);
+  --popover: rgba(26, 26, 30, 1);
   /* The default color for text or elements that appear on top of dropdowns and tooltips. */
   --popover-foreground: rgba(229, 229, 234, 1);
   /* The secondary color used for secondary(but NOT-DESTRUCTIVE) buttons and interactive elements. */
-  --secondary: rgba(138, 138, 142, 1);
+  --secondary: rgba(188, 194, 205, 1);
   /* The default color for text or elements that appear on top of secondary colored elements. */
-  --secondary-foreground: rgba(32, 32, 34, 1);
+  --secondary-foreground: rgba(17, 17, 20, 1);
   /* The muted color used for less prominent elements, such as disabled buttons or disabled text. */
-  --muted: rgba(255, 255, 255, 0.05);
+  --muted: rgba(255, 255, 255, 0.08);
   /* The default color for text or elements that appear on top of muted colored elements. */
-  --muted-foreground: rgba(75, 75, 78, 1);
+  --muted-foreground: rgba(156, 163, 175, 1);
   /* The default border color for elements such as inputs, buttons, and other containers. */
-  --border: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.12);
   /* The default background color for input fields once the text has been filled. Should be either transparent or match the input-background. */
-  --input: rgba(32, 32, 34, 1);
+  --input: rgba(26, 26, 30, 1);
   /* The default background color for input fields, text areas, and other input elements. */
-  --input-background: rgba(32, 32, 34, 1);
+  --input-background: rgba(26, 26, 30, 1);
   /* Shadow for small elevations, such as cards or modals. */
-  --elevation-sm: 0px 16px 80px 0px rgba(0, 0, 0, 0.6);
+  --elevation-sm: 0px 12px 40px 0px rgba(0, 0, 0, 0.48);
   /* The background color for sidebars, navigation menus, and other persistent elements. */
-  --sidebar: rgba(25, 25, 27, 1);
+  --sidebar: rgba(20, 20, 23, 1);
   /* The default color for text or elements that appear on top of sidebars, navigation menus, and other persistent elements. */
   --sidebar-foreground: rgba(255, 255, 255, 1);
   /* The accent color used for highlights, links, and other interactive elements in sidebars and navigation menus. */
-  --sidebar-accent: rgba(43, 154, 252, 1);
+  --sidebar-accent: rgba(255, 255, 255, 0.1);
   /* The default color for text or elements that appear on top of accent colored elements in sidebars and navigation menus. */
   --sidebar-accent-foreground: rgba(255, 255, 255, 1);
   /* The default border color for elements in sidebars and navigation menus. */
-  --sidebar-border: rgba(255, 255, 255, 0.05);
+  --sidebar-border: rgba(255, 255, 255, 0.12);
+  --sidebar-surface-top: rgba(20, 21, 25, 1);
+  --sidebar-surface-card: rgba(31, 32, 37, 0.9);
+  --sidebar-surface-card-strong: rgba(35, 36, 41, 0.98);
+  --sidebar-soft-border: rgba(255, 255, 255, 0.14);
+  --sidebar-ring-track: rgba(255, 255, 255, 0.22);
+  --sidebar-ring-halo: rgba(255, 255, 255, 0.08);
+  --sidebar-accent-teal: rgba(100, 218, 205, 1);
+  --sidebar-accent-coral: rgba(255, 133, 133, 1);
+  --sidebar-accent-lilac: rgba(182, 167, 245, 1);
   /* Shared semantic tokens */
-  --surface-glass: rgba(32, 32, 34, 0.55);
-  --surface-glass-strong: rgba(32, 32, 34, 0.74);
-  --chip-bg: rgba(255, 255, 255, 0.06);
-  --chip-border: rgba(255, 255, 255, 0.18);
-  --chip-active-bg: rgba(246, 247, 249, 1);
-  --chip-active-border: rgba(255, 255, 255, 0.2);
-  --chip-active-text: rgba(17, 18, 23, 1);
+  --surface-glass: rgba(23, 24, 28, 0.92);
+  --surface-glass-strong: rgba(23, 24, 28, 0.98);
+  --chip-bg: rgba(255, 255, 255, 0.1);
+  --chip-border: rgba(255, 255, 255, 0.2);
+  --chip-active-bg: rgba(43, 154, 252, 0.95);
+  --chip-active-border: rgba(43, 154, 252, 0.6);
+  --chip-active-text: rgba(255, 255, 255, 1);
   --chip-text: rgba(255, 255, 255, 1);
-  --soft-surface: rgba(255, 255, 255, 0.03);
-  --soft-surface-strong: rgba(255, 255, 255, 0.06);
-  --agentic-bg: #14151a;
-  --agentic-topbar: #121319;
-  --agentic-surface: #1a1c22;
-  --agentic-grid: #1b1d24;
-  --agentic-border: rgba(255, 255, 255, 0.06);
-  --agentic-border-strong: rgba(255, 255, 255, 0.09);
+  --soft-surface: rgba(255, 255, 255, 0.05);
+  --soft-surface-strong: rgba(255, 255, 255, 0.1);
+  --agentic-bg: #121214;
+  --agentic-topbar: #15161a;
+  --agentic-surface: #1b1c21;
+  --agentic-grid: #191a1f;
+  --agentic-border: rgba(255, 255, 255, 0.12);
+  --agentic-border-strong: rgba(255, 255, 255, 0.18);
   --agentic-foreground: #f5f6fa;
-  --agentic-muted: rgba(255, 255, 255, 0.46);
+  --agentic-muted: rgba(255, 255, 255, 0.68);
   --agentic-contrast: #f7f8fc;
   --agentic-track-title: #f7f8fc;
   --agentic-track-gradient: linear-gradient(90deg, #ff6a00 0%, #4a1b0a 22%, #2a1310 100%);
-  --agentic-slider-track: rgba(255, 255, 255, 0.26);
+  --agentic-slider-track: rgba(255, 255, 255, 0.32);
   --agentic-slider-thumb: #d8dbe7;
-  --agentic-marker: #ebedf6;
-  --agentic-control-bg: rgba(255, 255, 255, 0.06);
-  --agentic-control-text: #dee2ee;
+  --agentic-marker: #f5f6fa;
+  --agentic-control-bg: rgba(255, 255, 255, 0.12);
+  --agentic-control-text: #f1f3f9;
   --agentic-danger: #ff4e46;
 }
 
