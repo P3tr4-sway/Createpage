@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -136,6 +136,13 @@ interface ProjectsSheetProps {
 export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("all");
+  const portalContainer = useMemo(
+    () =>
+      typeof document === "undefined"
+        ? null
+        : document.getElementById("design-workbench-portal-root") || document.body,
+    [],
+  );
 
   const filters = ["all", "track", "loop", "remix", "stem"];
 
@@ -150,6 +157,7 @@ export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
+        container={portalContainer}
         className="!w-[480px] !max-w-[480px] flex flex-col"
         style={{
           backgroundColor: "var(--background)",

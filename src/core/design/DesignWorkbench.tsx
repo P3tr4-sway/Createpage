@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 
 type DesignWorkbenchProps = {
   children: ReactNode;
@@ -12,6 +12,7 @@ export function DesignWorkbench({
   height = 1080,
 }: DesignWorkbenchProps) {
   const [scale, setScale] = useState(1);
+  const inverseScale = scale === 0 ? 1 : 1 / scale;
 
   useEffect(() => {
     const updateScale = () => {
@@ -25,6 +26,16 @@ export function DesignWorkbench({
     return () => window.removeEventListener("resize", updateScale);
   }, [width, height]);
 
+  const frameStyle: CSSProperties = {
+    width,
+    height,
+    position: "relative",
+    isolation: "isolate",
+    transform: `scale(${scale})`,
+    ["--workbench-scale" as "--workbench-scale"]: scale,
+    ["--workbench-inverse-scale" as "--workbench-inverse-scale"]: inverseScale,
+  };
+
   return (
     <div className="design-workbench">
       <div
@@ -36,13 +47,14 @@ export function DesignWorkbench({
       >
         <div
           className="design-frame"
-          style={{
-            width,
-            height,
-            transform: `scale(${scale})`,
-          }}
+          style={frameStyle}
         >
           {children}
+          <div
+            id="design-workbench-portal-root"
+            className="absolute inset-0"
+            style={{ pointerEvents: "none", zIndex: 300 }}
+          />
         </div>
       </div>
     </div>

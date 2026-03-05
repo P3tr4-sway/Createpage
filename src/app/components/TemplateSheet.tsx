@@ -1,4 +1,5 @@
 import { createPortal } from "react-dom";
+import { useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   X,
@@ -45,14 +46,34 @@ const mockStats = {
 
 export function TemplateSheet({ open, onClose, template }: TemplateSheetProps) {
   if (!template) return null;
+  const inverseScale = "var(--workbench-inverse-scale, 1)";
+  const portalRoot = useMemo(() => {
+    if (typeof document === "undefined") return null;
+    return (
+      document.getElementById("design-workbench-portal-root") || document.body
+    );
+  }, []);
+  const inWorkbenchPortal = portalRoot?.id === "design-workbench-portal-root";
+  const panelWidth = 620;
 
-  return createPortal(
+  const content = (
     <AnimatePresence>
       {open && (
-        <>
+        <div
+          style={{
+            position: inWorkbenchPortal ? "absolute" : "fixed",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            transform: `scale(${inverseScale})`,
+            transformOrigin: "top right",
+            overflow: "hidden",
+            pointerEvents: "auto",
+          }}
+        >
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 z-50"
+            className={`${inWorkbenchPortal ? "absolute" : "fixed"} inset-0 z-50`}
             style={{ backgroundColor: "rgba(0,0,0,0.6)" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -62,16 +83,16 @@ export function TemplateSheet({ open, onClose, template }: TemplateSheetProps) {
 
           {/* Sheet */}
           <motion.div
-            className="fixed top-0 right-0 bottom-0 z-50 flex flex-col overflow-hidden"
+            className={`${inWorkbenchPortal ? "absolute" : "fixed"} top-0 right-0 bottom-0 z-50 flex flex-col overflow-hidden`}
             style={{
-              width: 520,
+              width: panelWidth,
               backgroundColor: "var(--background)",
               borderLeft: "1px solid var(--border)",
               fontFamily: FONT,
             }}
-            initial={{ x: 520 }}
+            initial={{ x: panelWidth }}
             animate={{ x: 0 }}
-            exit={{ x: 520 }}
+            exit={{ x: panelWidth }}
             transition={{ type: "spring", stiffness: 340, damping: 32 }}
           >
             {/* Header area — hero image */}
@@ -124,9 +145,7 @@ export function TemplateSheet({ open, onClose, template }: TemplateSheetProps) {
               </button>
 
               {/* Title overlay */}
-              <div
-                className="absolute bottom-0 left-0 right-0 px-8 pb-6"
-              >
+              <div className="absolute bottom-0 left-0 right-0 px-8 pb-6">
                 <p
                   style={{
                     color: "var(--secondary)",
@@ -329,11 +348,16 @@ export function TemplateSheet({ open, onClose, template }: TemplateSheetProps) {
               </div>
             </div>
           </motion.div>
-        </>
+        </div>
       )}
-    </AnimatePresence>,
-    document.body
+    </AnimatePresence>
   );
+
+  if (!portalRoot) {
+    return content;
+  }
+
+  return createPortal(content, portalRoot);
 }
 
 function StatItem({ icon, label }: { icon: React.ReactNode; label: string }) {

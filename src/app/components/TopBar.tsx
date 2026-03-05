@@ -1,6 +1,8 @@
-import { AudioLines, Wifi, Settings } from "lucide-react";
+import { Wifi } from "lucide-react";
 
 export function TopBar() {
+  const inverseScale = "var(--workbench-inverse-scale, 1)";
+
   return (
     <div
       className="flex items-center justify-end gap-4 px-8"
@@ -8,9 +10,10 @@ export function TopBar() {
         height: 56,
         minHeight: 56,
         fontFamily: "'Lava', sans-serif",
+        transform: `scale(${inverseScale})`,
+        transformOrigin: "top right",
       }}
     >
-      
       <Wifi
         size={18}
         strokeWidth={1.5}

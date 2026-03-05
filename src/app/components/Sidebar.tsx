@@ -120,8 +120,8 @@ function ConcentriRings() {
 }
 
 interface SidebarProps {
-  activeSection: string;
-  onNavigate: (id: string) => void;
+  activeSection: "create" | "loop" | "improvs";
+  onNavigate: (id: "create" | "loop" | "improvs") => void;
 }
 
 export function Sidebar({ activeSection, onNavigate }: SidebarProps) {
