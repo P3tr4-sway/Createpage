@@ -18,8 +18,8 @@ type TabDefinition = {
 const tabs: TabDefinition[] = [
   { id: "sounds", label: "Sounds", icon: Speaker, sectionId: "create" },
   { id: "community", label: "Community", icon: Users, sectionId: "create" },
-  { id: "learn", label: "Practice", icon: GraduationCap, sectionId: "loop" },
   { id: "create", label: "Create", icon: Guitar, sectionId: "create" },
+  { id: "learn", label: "Practice", icon: GraduationCap, sectionId: "loop" },
   { id: "more", label: "More", icon: LayoutGrid, sectionId: "improvs" },
 ];
 
@@ -42,7 +42,7 @@ export function BottomBar({
   const barWidth = "min(1024px, calc(100vw - 128px))";
   const navPillHeight = 70;
   const aiButtonWidth = 172;
-  const activeTabId: TabDefinition["id"] = "learn";
+  const activeTabId: TabDefinition["id"] = "create";
 
   const handleTabSelect = (tab: TabDefinition) => {
     if (!onNavigate) {
