@@ -3,7 +3,7 @@ import { Moon, Sparkles, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { TutorialNote } from "./TutorialNote";
 
-const FONT = "'Lava', sans-serif";
+const FONT = "var(--app-font-family)";
 
 const stats = {
   songs: { value: 12, total: 20, label: "Songs Created", unit: "tracks" },

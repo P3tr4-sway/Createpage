@@ -83,7 +83,7 @@ export function AgenticProducingPage({ onBack }: AgenticProducingPageProps) {
       className="h-full w-full overflow-hidden flex flex-col"
       style={{
         backgroundColor: "var(--agentic-bg)",
-        fontFamily: "'Lava', sans-serif",
+        fontFamily: "var(--app-font-family)",
       }}
     >
       <div
@@ -135,12 +135,12 @@ export function AgenticProducingPage({ onBack }: AgenticProducingPageProps) {
             style={{
               height: 42,
               padding: "0 14px",
-              borderRadius: 10,
-              border: "none",
+              borderRadius: 9999,
+              border: "1px solid var(--agentic-border)",
               color: "var(--background)",
               backgroundColor: "var(--foreground)",
-              fontSize: 15,
-              fontWeight: 700,
+              fontSize: 14,
+              fontWeight: 600,
             }}
           >
             <Save size={14} strokeWidth={1.9} />
@@ -436,7 +436,7 @@ export function AgenticProducingPage({ onBack }: AgenticProducingPageProps) {
                   width: 7,
                   height: 7,
                   borderRadius: 999,
-                  backgroundColor: "#36D399",
+                  backgroundColor: "var(--sidebar-accent-teal)",
                 }}
               />
               Online
@@ -451,14 +451,14 @@ export function AgenticProducingPage({ onBack }: AgenticProducingPageProps) {
                 onClick={() => sendMessage(prompt)}
                 className="inline-flex items-center gap-1.5"
                 style={{
-                  height: 28,
-                  padding: "0 10px",
-                  borderRadius: 999,
+                  height: 30,
+                  padding: "0 11px",
+                  borderRadius: 12,
                   border: "1px solid var(--agentic-border)",
                   backgroundColor: "var(--agentic-control-bg)",
                   color: "var(--agentic-foreground)",
                   fontSize: 12,
-                  fontWeight: 600,
+                  fontWeight: 500,
                   cursor: "pointer",
                 }}
               >
@@ -481,14 +481,20 @@ export function AgenticProducingPage({ onBack }: AgenticProducingPageProps) {
                     <div
                       style={{
                         maxWidth: "86%",
-                        borderRadius: 14,
+                        borderRadius: isUser ? 14 : 12,
                         padding: "10px 12px",
-                        backgroundColor: isUser ? "var(--foreground)" : "var(--agentic-control-bg)",
-                        color: isUser ? "var(--background)" : "var(--agentic-foreground)",
-                        border: isUser ? "none" : "1px solid var(--agentic-border)",
+                        backgroundColor: isUser
+                          ? "var(--agentic-chat-user-bg)"
+                          : "var(--agentic-chat-agent-bg)",
+                        color: isUser
+                          ? "var(--agentic-chat-user-fg)"
+                          : "var(--agentic-chat-agent-fg)",
+                        border: isUser
+                          ? "1px solid var(--agentic-chat-user-border)"
+                          : "1px solid var(--agentic-chat-agent-border)",
                         fontSize: 14,
                         lineHeight: 1.45,
-                        fontWeight: 500,
+                        fontWeight: 450,
                       }}
                     >
                       {message.text}
@@ -522,12 +528,12 @@ export function AgenticProducingPage({ onBack }: AgenticProducingPageProps) {
                 style={{
                   flex: 1,
                   resize: "none",
-                  borderRadius: 12,
+                  borderRadius: 14,
                   border: "1px solid var(--agentic-border)",
-                  backgroundColor: "var(--agentic-bg)",
+                  backgroundColor: "var(--agentic-elevated-strong)",
                   color: "var(--agentic-foreground)",
                   fontSize: 14,
-                  fontFamily: "'Lava', sans-serif",
+                  fontFamily: "var(--app-font-family)",
                   padding: "9px 10px",
                   outline: "none",
                 }}
@@ -539,10 +545,10 @@ export function AgenticProducingPage({ onBack }: AgenticProducingPageProps) {
                 style={{
                   width: 40,
                   height: 40,
-                  borderRadius: 10,
-                  border: "none",
-                  backgroundColor: "var(--foreground)",
-                  color: "var(--background)",
+                  borderRadius: 9999,
+                  border: "1px solid var(--solid-button-border)",
+                  backgroundColor: "var(--solid-button-bg)",
+                  color: "var(--solid-button-fg)",
                   cursor: "pointer",
                 }}
               >
@@ -559,9 +565,9 @@ export function AgenticProducingPage({ onBack }: AgenticProducingPageProps) {
 const toolbarIconStyle: React.CSSProperties = {
   width: 38,
   height: 38,
-  borderRadius: 9,
-  border: "1px solid var(--agentic-border-strong)",
-  backgroundColor: "var(--agentic-control-bg)",
+  borderRadius: 12,
+  border: "1px solid var(--agentic-border)",
+  backgroundColor: "var(--agentic-elevated)",
   color: "var(--agentic-control-text)",
 };
 
@@ -583,7 +589,7 @@ const trackMoreStyle: React.CSSProperties = {
   width: 44,
   height: 44,
   borderRadius: 12,
-  border: "1px solid rgba(255,255,255,0.08)",
+  border: "1px solid rgba(255,255,255,0.18)",
   backgroundColor: "var(--agentic-control-bg)",
   color: "var(--agentic-contrast)",
   display: "inline-flex",
@@ -594,9 +600,9 @@ const trackMoreStyle: React.CSSProperties = {
 const bottomIconStyle: React.CSSProperties = {
   width: 42,
   height: 42,
-  borderRadius: 10,
-  border: "none",
-  backgroundColor: "transparent",
+  borderRadius: 12,
+  border: "1px solid var(--agentic-border)",
+  backgroundColor: "var(--agentic-elevated)",
   color: "var(--agentic-control-text)",
   display: "inline-flex",
   alignItems: "center",
@@ -606,9 +612,9 @@ const bottomIconStyle: React.CSSProperties = {
 const transportStyle: React.CSSProperties = {
   width: 50,
   height: 50,
-  borderRadius: 12,
-  border: "none",
-  backgroundColor: "transparent",
+  borderRadius: 14,
+  border: "1px solid var(--agentic-border)",
+  backgroundColor: "var(--agentic-elevated)",
   color: "var(--agentic-foreground)",
   display: "inline-flex",
   alignItems: "center",
@@ -618,12 +624,12 @@ const transportStyle: React.CSSProperties = {
 const bottomPillStyle: React.CSSProperties = {
   height: 38,
   padding: "0 13px",
-  borderRadius: 10,
-  border: "none",
-  backgroundColor: "var(--agentic-control-bg)",
+  borderRadius: 9999,
+  border: "1px solid var(--agentic-border)",
+  backgroundColor: "var(--agentic-elevated)",
   color: "var(--agentic-control-text)",
   fontSize: 14,
-  fontWeight: 600,
+  fontWeight: 500,
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",

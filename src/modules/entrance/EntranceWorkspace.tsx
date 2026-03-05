@@ -10,6 +10,7 @@ import { BottomBar } from "../../app/components/BottomBar";
 import { TopBar } from "../../app/components/TopBar";
 import { MainContent } from "../../app/components/MainContent";
 import { AgenticProducingPage } from "../../app/components/AgenticProducingPage";
+import { AiChatOverlay } from "../../app/components/AiChatOverlay";
 
 type SectionId = "create" | "loop" | "improvs";
 type FullscreenView = "agentic-producing" | null;
@@ -22,6 +23,7 @@ export function EntranceWorkspace() {
   const [barVisible, setBarVisible] = useState(true);
   const [activeSection, setActiveSection] = useState<SectionId>("create");
   const [fullscreenView, setFullscreenView] = useState<FullscreenView>(null);
+  const [aiChatOpen, setAiChatOpen] = useState(false);
 
   const handleNavigate = useCallback((id: SectionId) => {
     const refMap: Record<SectionId, RefObject<HTMLDivElement | null>> = {
@@ -80,7 +82,7 @@ export function EntranceWorkspace() {
   return (
     <div
       className="relative flex h-full w-full flex-col overflow-hidden bg-background"
-      style={{ fontFamily: "'Lava', sans-serif" }}
+      style={{ fontFamily: "var(--app-font-family)" }}
     >
       {fullscreenView === "agentic-producing" ? (
         <AgenticProducingPage onBack={() => setFullscreenView(null)} />
@@ -106,7 +108,9 @@ export function EntranceWorkspace() {
             visible={barVisible}
             activeSection={activeSection}
             onNavigate={handleNavigate}
+            onOpenAiChat={() => setAiChatOpen(true)}
           />
+          <AiChatOverlay open={aiChatOpen} onClose={() => setAiChatOpen(false)} />
         </>
       )}
     </div>

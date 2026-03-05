@@ -10,7 +10,7 @@ interface TutorialNoteProps {
   panelSide?: "left" | "right";
 }
 
-const FONT = "'Lava', sans-serif";
+const FONT = "var(--app-font-family)";
 
 export function TutorialNote({
   title,
@@ -165,11 +165,11 @@ export function TutorialNote({
             width: panelWidth,
             zIndex: PANEL_Z_INDEX,
             padding: "14px 14px 12px",
-            backgroundColor: "rgba(0,0,0,0.96)",
-            borderColor: "rgba(255,255,255,0.24)",
-            color: "#FFFFFF",
+            backgroundColor: "var(--float-surface)",
+            borderColor: "var(--border)",
+            color: "var(--foreground)",
             fontFamily: FONT,
-            boxShadow: "0 16px 48px rgba(0,0,0,0.5)",
+            boxShadow: "var(--float-shadow)",
           }}
         >
           <div className="flex items-start justify-between gap-3">
@@ -181,11 +181,11 @@ export function TutorialNote({
                   width: "100%",
                   minWidth: 0,
                   borderRadius: 8,
-                  border: "1px solid rgba(255,255,255,0.35)",
-                  backgroundColor: "rgba(255,255,255,0.08)",
-                  color: "#FFFFFF",
+                  border: "1px solid var(--border)",
+                  backgroundColor: "var(--float-surface-soft)",
+                  color: "var(--foreground)",
                   padding: "8px 10px",
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: "var(--font-weight-bold)",
                   lineHeight: 1.35,
                   fontFamily: FONT,
@@ -196,9 +196,9 @@ export function TutorialNote({
               <p
                 style={{
                   margin: 0,
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: "var(--font-weight-bold)",
-                  color: "#FFFFFF",
+                  color: "var(--foreground)",
                   lineHeight: 1.35,
                 }}
               >
@@ -224,10 +224,10 @@ export function TutorialNote({
                 style={{
                   width: 22,
                   height: 22,
-                  border: "1px solid rgba(255,255,255,0.32)",
+                  border: "1px solid var(--border)",
                   borderRadius: 6,
-                  background: "rgba(255,255,255,0.08)",
-                  color: "rgba(255,255,255,0.88)",
+                  background: "var(--icon-subtle-bg)",
+                  color: "var(--secondary)",
                 }}
               >
                 {isEditing ? <Lock size={12} strokeWidth={2} /> : <Pencil size={12} strokeWidth={2} />}
@@ -242,7 +242,7 @@ export function TutorialNote({
                   height: 20,
                   border: "none",
                   background: "transparent",
-                  color: "rgba(255,255,255,0.72)",
+                  color: "var(--muted-foreground)",
                 }}
               >
                 <X size={14} strokeWidth={2} />
@@ -259,9 +259,9 @@ export function TutorialNote({
                 width: "100%",
                 marginTop: 10,
                 borderRadius: 8,
-                border: "1px solid rgba(255,255,255,0.35)",
-                backgroundColor: "rgba(255,255,255,0.08)",
-                color: "#FFFFFF",
+                border: "1px solid var(--border)",
+                backgroundColor: "var(--float-surface-soft)",
+                color: "var(--foreground)",
                 padding: "10px 12px",
                 fontSize: 14,
                 lineHeight: 1.5,
@@ -279,7 +279,7 @@ export function TutorialNote({
                     margin: 0,
                     fontSize: 14,
                     lineHeight: 1.5,
-                    color: "rgba(255,255,255,0.92)",
+                    color: "var(--foreground)",
                   }}
                 >
                   {point}
@@ -295,7 +295,7 @@ export function TutorialNote({
                 marginTop: 8,
                 fontSize: 12,
                 lineHeight: 1.4,
-                color: "rgba(255,255,255,0.68)",
+                color: "var(--muted-foreground)",
               }}
             >
               多行会自动拆分为多条批注；点锁图标或关闭即完成并锁定。
@@ -321,11 +321,11 @@ export function TutorialNote({
             width: TRIGGER_SIZE,
             height: TRIGGER_SIZE,
             borderRadius: "9999px",
-            backgroundColor: "#FFFFFF",
-            border: "1px solid rgba(0,0,0,0.75)",
-            color: "#0B0B0B",
+            backgroundColor: "var(--float-surface-muted)",
+            border: "1px solid var(--border)",
+            color: "var(--foreground)",
             backdropFilter: "blur(10px)",
-            boxShadow: "0 8px 28px rgba(0,0,0,0.35)",
+            boxShadow: "var(--float-shadow)",
             zIndex: TRIGGER_Z_INDEX,
           }}
         >

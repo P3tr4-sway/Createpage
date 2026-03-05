@@ -18,7 +18,7 @@ export function PlayerCard({
   return (
     <div
       className="relative overflow-hidden rounded-card cursor-pointer group"
-      style={{ minHeight: 180, fontFamily: "'Lava', sans-serif" }}
+      style={{ minHeight: 180, fontFamily: "var(--app-font-family)" }}
       onClick={onClick}
     >
       <ImageWithFallback
@@ -33,7 +33,7 @@ export function PlayerCard({
             color: "var(--on-image-primary)",
             fontSize: "var(--text-base)",
             fontWeight: "var(--font-weight-bold)",
-            fontFamily: "'Lava', sans-serif",
+            fontFamily: "var(--app-font-family)",
             lineHeight: 1.3,
             maxWidth: "80%",
           }}
@@ -50,7 +50,7 @@ export function PlayerCard({
               color: "var(--on-image-primary)",
               fontSize: 12,
               fontWeight: "var(--font-weight-bold)",
-              fontFamily: "'Lava', sans-serif",
+              fontFamily: "var(--app-font-family)",
             }}
           >
             {avatarInitial}
@@ -60,7 +60,7 @@ export function PlayerCard({
               color: "var(--on-image-primary)",
               fontSize: 13,
               fontWeight: "var(--font-weight-medium)",
-              fontFamily: "'Lava', sans-serif",
+              fontFamily: "var(--app-font-family)",
             }}
           >
             {author}

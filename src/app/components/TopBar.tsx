@@ -9,7 +9,7 @@ export function TopBar() {
       style={{
         height: 56,
         minHeight: 56,
-        fontFamily: "'Lava', sans-serif",
+        fontFamily: "var(--app-font-family)",
         transform: `scale(${inverseScale})`,
         transformOrigin: "top right",
       }}
@@ -25,7 +25,7 @@ export function TopBar() {
           color: "var(--foreground)",
           fontSize: "var(--text-sm)",
           fontWeight: "var(--font-weight-medium)",
-          fontFamily: "'Lava', sans-serif",
+          fontFamily: "var(--app-font-family)",
         }}
       >
         Settings

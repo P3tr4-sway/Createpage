@@ -212,7 +212,7 @@ export function InstantBackingTrackPage({ onBack }: InstantBackingTrackPageProps
   const hiddenCount = Math.max(filteredTracks.length - INITIAL_VISIBLE_COUNT, 0);
 
   return (
-    <section className="w-full" style={{ fontFamily: "'Lava', sans-serif" }}>
+    <section className="w-full" style={{ fontFamily: "var(--app-font-family)" }}>
       <div className="mb-6 flex items-center justify-between">
         <button
           type="button"
@@ -363,7 +363,7 @@ export function InstantBackingTrackPage({ onBack }: InstantBackingTrackPageProps
               color: "var(--foreground)",
               fontSize: "var(--text-sm)",
               fontWeight: "var(--font-weight-medium)",
-              fontFamily: "'Lava', sans-serif",
+              fontFamily: "var(--app-font-family)",
               padding: "8px 24px",
               borderRadius: "var(--radius-full, 9999px)",
               border: "1px solid var(--border)",

@@ -126,7 +126,7 @@ const typeColorMap: Record<string, string> = {
   stem: "#A78BFA",
 };
 
-const FONT = "'Lava', sans-serif";
+const FONT = "var(--app-font-family)";
 
 interface ProjectsSheetProps {
   open: boolean;

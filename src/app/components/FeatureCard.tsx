@@ -33,7 +33,7 @@ export function FeatureCard({
       style={{
         backgroundColor: "var(--card)",
         minHeight: 180,
-        fontFamily: "'Lava', sans-serif",
+        fontFamily: "var(--app-font-family)",
       }}
     >
       {/* Icon removed */}
@@ -43,7 +43,7 @@ export function FeatureCard({
             color: "var(--foreground)",
             fontSize: "var(--text-xl)",
             fontWeight: "var(--font-weight-bold)",
-            fontFamily: "'Lava', sans-serif",
+            fontFamily: "var(--app-font-family)",
           }}
         >
           {title}
@@ -53,7 +53,7 @@ export function FeatureCard({
             color: "var(--secondary)",
             fontSize: "var(--text-sm)",
             fontWeight: "var(--font-weight-normal)",
-            fontFamily: "'Lava', sans-serif",
+            fontFamily: "var(--app-font-family)",
             lineHeight: 1.5,
           }}
         >

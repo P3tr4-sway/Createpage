@@ -344,7 +344,7 @@ function TopListColumn({ title, items, onItemClick, onOpenDetail }: TopListColum
             color: "var(--foreground)",
             fontSize: "var(--text-base)",
             fontWeight: "var(--font-weight-bold)",
-            fontFamily: "'Lava', sans-serif",
+            fontFamily: "var(--app-font-family)",
             letterSpacing: "0.01em",
           }}
         >
@@ -395,7 +395,7 @@ function TopListColumn({ title, items, onItemClick, onOpenDetail }: TopListColum
                       color: "var(--foreground)",
                       fontSize: "var(--text-sm)",
                       fontWeight: "var(--font-weight-medium)",
-                      fontFamily: "'Lava', sans-serif",
+                      fontFamily: "var(--app-font-family)",
                       lineHeight: 1.25,
                     }}
                   >
@@ -409,7 +409,7 @@ function TopListColumn({ title, items, onItemClick, onOpenDetail }: TopListColum
                       color: "var(--secondary)",
                       fontSize: "var(--text-xs)",
                       fontWeight: "var(--font-weight-normal)",
-                      fontFamily: "'Lava', sans-serif",
+                      fontFamily: "var(--app-font-family)",
                       lineHeight: 1.2,
                     }}
                   >
@@ -445,7 +445,7 @@ function TopBrowsePage({
   onItemClick,
 }: TopBrowsePageProps) {
   return (
-    <section style={{ fontFamily: "'Lava', sans-serif" }}>
+    <section style={{ fontFamily: "var(--app-font-family)" }}>
       <div className="mb-6 flex items-center justify-between">
         <button
           type="button"
@@ -652,7 +652,7 @@ export function MainContent({
       ref={scrollContainerRef}
       onScroll={onScroll}
       className="relative flex-1 overflow-y-auto px-8"
-      style={{ fontFamily: "'Lava', sans-serif", paddingBottom: "120px" }}
+      style={{ fontFamily: "var(--app-font-family)", paddingBottom: "120px" }}
     >
       {activeSubView === "looper" ? (
         <LooperPage onBack={() => setActiveSubView("home")} />
@@ -712,7 +712,7 @@ export function MainContent({
               color: "var(--background)",
               fontSize: "var(--text-sm)",
               fontWeight: "var(--font-weight-bold)",
-              fontFamily: "'Lava', sans-serif",
+              fontFamily: "var(--app-font-family)",
               padding: "6px 16px",
               borderRadius: "var(--radius-tooltip)",
               border: "none",
@@ -744,7 +744,7 @@ export function MainContent({
                 color: "var(--chip-text)",
                 fontSize: "var(--text-xs)",
                 fontWeight: "var(--font-weight-medium)",
-                fontFamily: "'Lava', sans-serif",
+                fontFamily: "var(--app-font-family)",
                 padding: "4px 12px",
                 borderRadius: "var(--radius-full, 9999px)",
                 border: "1px solid var(--chip-border)",
@@ -813,7 +813,7 @@ export function MainContent({
             color: "var(--foreground)",
             fontSize: "var(--text-2xl)",
             fontWeight: "var(--font-weight-bold)",
-            fontFamily: "'Lava', sans-serif",
+            fontFamily: "var(--app-font-family)",
           }}
         >
           Made by Players
@@ -858,7 +858,7 @@ export function MainContent({
                   color: "var(--foreground)",
                   fontSize: "var(--text-base)",
                   fontWeight: "var(--font-weight-bold)",
-                  fontFamily: "'Lava', sans-serif",
+                  fontFamily: "var(--app-font-family)",
                   letterSpacing: "0.01em",
                 }}
               >
@@ -870,7 +870,7 @@ export function MainContent({
                   marginTop: 2,
                   color: "var(--secondary)",
                   fontSize: "var(--text-xs)",
-                  fontFamily: "'Lava', sans-serif",
+                  fontFamily: "var(--app-font-family)",
                 }}
               >
                 Community guitar clips from players
@@ -920,7 +920,7 @@ export function MainContent({
                       fontSize: "var(--text-xs)",
                       fontWeight: "var(--font-weight-bold)",
                       lineHeight: 1.3,
-                      fontFamily: "'Lava', sans-serif",
+                      fontFamily: "var(--app-font-family)",
                     }}
                   >
                     {clip.title}
@@ -933,7 +933,7 @@ export function MainContent({
                         fontSize: "12px",
                         fontWeight: "var(--font-weight-medium)",
                         maxWidth: "72%",
-                        fontFamily: "'Lava', sans-serif",
+                        fontFamily: "var(--app-font-family)",
                       }}
                     >
                       {clip.guitarist}
@@ -944,7 +944,7 @@ export function MainContent({
                         fontSize: "11px",
                         fontWeight: "var(--font-weight-bold)",
                         letterSpacing: "0.03em",
-                        fontFamily: "'Lava', sans-serif",
+                        fontFamily: "var(--app-font-family)",
                       }}
                     >
                       {clip.duration}

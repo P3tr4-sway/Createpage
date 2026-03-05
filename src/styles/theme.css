@@ -1,6 +1,8 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  --app-font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-size: 16px;
   /* Typography font sizes */
   --text-3xl: 48px;
@@ -11,9 +13,9 @@
   --text-sm: 16px;
   --text-xs: 14px;
   /* The default background color for the application. */
-  --background: rgba(246, 247, 249, 1);
+  --background: rgba(247, 248, 250, 1);
   /* The default color for elements or text that appears on top of the background. */
-  --foreground: rgba(17, 24, 39, 1);
+  --foreground: rgba(23, 23, 23, 1);
   /* The background color for cards, modals, and other containers. */
   --card: rgba(255, 255, 255, 1);
   /* The default color for text or elements that appear on top of cards, modals and other background containers. */
@@ -23,19 +25,19 @@
   /* The default color for text or elements that appear on top of dropdowns and tooltips. */
   --popover-foreground: rgba(31, 41, 55, 1);
   /* The primary color used for buttons, links, and other interactive elements. */
-  --primary: rgba(43, 154, 252, 1.00);
+  --primary: rgba(23, 23, 23, 1);
   /* The default color for text or elements that appear on top of primary colored elements. */
   --primary-foreground: rgba(255, 255, 255, 1.00);
   /* The secondary color used for secondary(but NOT-DESTRUCTIVE) buttons and interactive elements. */
-  --secondary: rgba(75, 85, 104, 1);
+  --secondary: rgba(82, 82, 91, 1);
   /* The default color for text or elements that appear on top of secondary colored elements. */
   --secondary-foreground: rgba(17, 24, 39, 1);
   /* The muted color used for less prominent elements, such as disabled buttons or disabled text. */
-  --muted: rgba(17, 24, 39, 0.08);
+  --muted: rgba(15, 23, 42, 0.06);
   /* The default color for text or elements that appear on top of muted colored elements. */
-  --muted-foreground: rgba(86, 96, 114, 1);
+  --muted-foreground: rgba(100, 116, 139, 1);
   /* The accent color used for highlights, links, and other interactive elements. */
-  --accent: rgba(43, 154, 252, 1.00);
+  --accent: rgba(23, 23, 23, 1);
   /* The default color for text or elements that appear on top of accent colored elements. */
   --accent-foreground: rgba(255, 255, 255, 1.00);
   /* The color used for background in destructive actions, such as delete buttons or error messages. */
@@ -43,7 +45,7 @@
   /* The default color for text or elements that appear on top of destructive colored elements. */
   --destructive-foreground: rgba(255, 255, 255, 1.00);
   /* The default border color for elements such as inputs, buttons, and other containers. */
-  --border: rgba(17, 24, 39, 0.14);
+  --border: rgba(15, 23, 42, 0.14);
   /* The default background color for input fields once the text has been filled. Should be either transparent or match the input-background. */
   --input: rgba(255, 255, 255, 1);
   /* The default background color for input fields, text areas, and other input elements. */
@@ -55,9 +57,9 @@
   /* The default font weight for bold text. */
   --font-weight-bold: 700;
   /* The color for focus rings, outlines, and other focus indicators. */
-  --ring: rgba(43, 154, 252, 1.00);
+  --ring: rgba(23, 23, 23, 0.3);
   /* Shadow for small elevations, such as cards or modals. */
-  --elevation-sm: 0px 12px 32px 0px rgba(17, 24, 39, 0.16);
+  --elevation-sm: 0 10px 28px 0 rgba(15, 23, 42, 0.14);
   /* The color for chart elements, such as a bar or line in a chart. */
   --chart-1: rgba(43, 154, 252, 1.00);
   /* The color for another chart element, such as a bar or line in a chart. */
@@ -69,17 +71,17 @@
   /* The color for another chart element, such as a bar or line in a chart. */
   --chart-5: rgba(198, 198, 202, 1.00);
   /* The default border radius for elements such as buttons, tooltip, and other containers. */
-  --radius: 16px;
+  --radius: 12px;
   /* The border radius for card-like containers. */
-  --radius-card: 24px;
+  --radius-card: 20px;
   /* The border radius for tooltips and popovers. */
-  --radius-tooltip: 32px;
+  --radius-tooltip: 20px;
   /* The background color for sidebars, navigation menus, and other persistent elements. */
   --sidebar: rgba(242, 243, 245, 1);
   /* The default color for text or elements that appear on top of sidebars, navigation menus, and other persistent elements. */
   --sidebar-foreground: rgba(17, 24, 39, 1);
   /* The primary color used for buttons, links, and other interactive elements in sidebars and navigation menus. */
-  --sidebar-primary: rgba(43, 154, 252, 1.00);
+  --sidebar-primary: rgba(23, 23, 23, 1);
   /* The default color for text or elements that appear on top of primary colored elements in sidebars and navigation menus. */
   --sidebar-primary-foreground: rgba(255, 255, 255, 1.00);
   /* The accent color used for highlights, links, and other interactive elements in sidebars and navigation menus. */
@@ -89,7 +91,7 @@
   /* The default border color for elements in sidebars and navigation menus. */
   --sidebar-border: rgba(17, 24, 39, 0.14);
   /* The default color for focus rings, outlines, and other focus indicators in sidebars and navigation menus. */
-  --sidebar-ring: rgba(43, 154, 252, 1);
+  --sidebar-ring: rgba(23, 23, 23, 0.28);
   --sidebar-surface-top: rgba(250, 250, 251, 1);
   --sidebar-surface-card: rgba(255, 255, 255, 0.78);
   --sidebar-surface-card-strong: rgba(255, 255, 255, 0.92);
@@ -100,16 +102,31 @@
   --sidebar-accent-coral: rgba(244, 109, 109, 1);
   --sidebar-accent-lilac: rgba(159, 140, 240, 1);
   /* Shared semantic tokens */
-  --surface-glass: rgba(255, 255, 255, 0.9);
-  --surface-glass-strong: rgba(255, 255, 255, 0.96);
-  --chip-bg: rgba(17, 24, 39, 0.08);
-  --chip-border: rgba(17, 24, 39, 0.16);
-  --chip-active-bg: rgba(43, 154, 252, 0.95);
-  --chip-active-border: rgba(43, 154, 252, 0.6);
+  --surface-glass: rgba(255, 255, 255, 0.86);
+  --surface-glass-strong: rgba(255, 255, 255, 0.95);
+  --chip-bg: rgba(15, 23, 42, 0.05);
+  --chip-border: rgba(15, 23, 42, 0.14);
+  --chip-active-bg: rgba(17, 24, 39, 0.94);
+  --chip-active-border: rgba(17, 24, 39, 0.28);
   --chip-active-text: rgba(255, 255, 255, 1);
-  --chip-text: rgba(17, 24, 39, 0.9);
-  --soft-surface: rgba(17, 24, 39, 0.04);
-  --soft-surface-strong: rgba(17, 24, 39, 0.08);
+  --chip-text: rgba(17, 24, 39, 0.88);
+  --soft-surface: rgba(15, 23, 42, 0.03);
+  --soft-surface-strong: rgba(15, 23, 42, 0.07);
+  --overlay-scrim: rgba(15, 23, 42, 0.3);
+  --float-surface: rgba(255, 255, 255, 0.98);
+  --float-surface-muted: rgba(255, 255, 255, 0.92);
+  --float-surface-soft: rgba(15, 23, 42, 0.03);
+  --float-shadow: 0 22px 72px rgba(15, 23, 42, 0.22);
+  --icon-subtle-bg: rgba(15, 23, 42, 0.03);
+  --solid-button-bg: rgba(17, 24, 39, 1);
+  --solid-button-fg: rgba(255, 255, 255, 1);
+  --solid-button-border: rgba(17, 24, 39, 0.2);
+  --chat-user-bg: rgba(17, 24, 39, 0.96);
+  --chat-user-fg: rgba(255, 255, 255, 1);
+  --chat-user-border: rgba(17, 24, 39, 0.96);
+  --chat-agent-bg: rgba(255, 255, 255, 0.98);
+  --chat-agent-fg: rgba(23, 23, 23, 1);
+  --chat-agent-border: rgba(15, 23, 42, 0.14);
   --image-overlay-card: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0.12) 0%,
@@ -122,23 +139,31 @@
   --on-image-muted: rgba(255, 255, 255, 0.66);
   --on-image-control-bg: rgba(0, 0, 0, 0.42);
   --on-image-control-border: rgba(255, 255, 255, 0.22);
-  --agentic-bg: #f1f2f4;
+  --agentic-bg: #f5f6f8;
   --agentic-topbar: #fcfcfd;
-  --agentic-surface: #eceef1;
-  --agentic-grid: #e3e5e9;
-  --agentic-border: rgba(17, 24, 39, 0.14);
-  --agentic-border-strong: rgba(17, 24, 39, 0.22);
-  --agentic-foreground: #141827;
-  --agentic-muted: rgba(20, 24, 39, 0.64);
-  --agentic-contrast: #f7f8fc;
-  --agentic-track-title: #f7f8fc;
-  --agentic-track-gradient: linear-gradient(90deg, #ff6a00 0%, #c1541a 26%, #845246 100%);
-  --agentic-slider-track: rgba(20, 24, 39, 0.28);
-  --agentic-slider-thumb: #141827;
-  --agentic-marker: #ffffff;
-  --agentic-control-bg: rgba(20, 24, 39, 0.1);
-  --agentic-control-text: #2d3447;
+  --agentic-surface: #f0f2f5;
+  --agentic-grid: #e7ebf0;
+  --agentic-border: rgba(15, 23, 42, 0.12);
+  --agentic-border-strong: rgba(15, 23, 42, 0.2);
+  --agentic-foreground: #111827;
+  --agentic-muted: rgba(17, 24, 39, 0.62);
+  --agentic-contrast: #f8fafc;
+  --agentic-track-title: #f8fafc;
+  --agentic-track-gradient: #1f2937;
+  --agentic-slider-track: rgba(17, 24, 39, 0.22);
+  --agentic-slider-thumb: #111827;
+  --agentic-marker: #111827;
+  --agentic-control-bg: rgba(17, 24, 39, 0.08);
+  --agentic-control-text: #1f2937;
   --agentic-danger: #ff4e46;
+  --agentic-elevated: rgba(255, 255, 255, 0.9);
+  --agentic-elevated-strong: rgba(255, 255, 255, 0.96);
+  --agentic-chat-user-bg: rgba(17, 24, 39, 0.96);
+  --agentic-chat-user-fg: rgba(255, 255, 255, 1);
+  --agentic-chat-user-border: rgba(17, 24, 39, 0.96);
+  --agentic-chat-agent-bg: rgba(255, 255, 255, 0.98);
+  --agentic-chat-agent-fg: rgba(17, 24, 39, 1);
+  --agentic-chat-agent-border: rgba(15, 23, 42, 0.14);
   --radius-full: 9999px;
 }
 
@@ -156,7 +181,7 @@
   /* The default color for text or elements that appear on top of dropdowns and tooltips. */
   --popover-foreground: rgba(229, 229, 234, 1);
   /* The secondary color used for secondary(but NOT-DESTRUCTIVE) buttons and interactive elements. */
-  --secondary: rgba(188, 194, 205, 1);
+  --secondary: rgba(161, 161, 170, 1);
   /* The default color for text or elements that appear on top of secondary colored elements. */
   --secondary-foreground: rgba(17, 17, 20, 1);
   /* The muted color used for less prominent elements, such as disabled buttons or disabled text. */
@@ -164,13 +189,13 @@
   /* The default color for text or elements that appear on top of muted colored elements. */
   --muted-foreground: rgba(156, 163, 175, 1);
   /* The default border color for elements such as inputs, buttons, and other containers. */
-  --border: rgba(255, 255, 255, 0.12);
+  --border: rgba(255, 255, 255, 0.16);
   /* The default background color for input fields once the text has been filled. Should be either transparent or match the input-background. */
   --input: rgba(26, 26, 30, 1);
   /* The default background color for input fields, text areas, and other input elements. */
   --input-background: rgba(26, 26, 30, 1);
   /* Shadow for small elevations, such as cards or modals. */
-  --elevation-sm: 0px 12px 40px 0px rgba(0, 0, 0, 0.48);
+  --elevation-sm: 0 10px 28px 0 rgba(0, 0, 0, 0.46);
   /* The background color for sidebars, navigation menus, and other persistent elements. */
   --sidebar: rgba(20, 20, 23, 1);
   /* The default color for text or elements that appear on top of sidebars, navigation menus, and other persistent elements. */
@@ -191,16 +216,31 @@
   --sidebar-accent-coral: rgba(255, 133, 133, 1);
   --sidebar-accent-lilac: rgba(182, 167, 245, 1);
   /* Shared semantic tokens */
-  --surface-glass: rgba(23, 24, 28, 0.92);
-  --surface-glass-strong: rgba(23, 24, 28, 0.98);
+  --surface-glass: rgba(21, 21, 25, 0.92);
+  --surface-glass-strong: rgba(21, 21, 25, 0.98);
   --chip-bg: rgba(255, 255, 255, 0.1);
-  --chip-border: rgba(255, 255, 255, 0.2);
-  --chip-active-bg: rgba(43, 154, 252, 0.95);
-  --chip-active-border: rgba(43, 154, 252, 0.6);
-  --chip-active-text: rgba(255, 255, 255, 1);
+  --chip-border: rgba(255, 255, 255, 0.18);
+  --chip-active-bg: rgba(244, 244, 245, 0.95);
+  --chip-active-border: rgba(244, 244, 245, 0.38);
+  --chip-active-text: rgba(23, 23, 23, 1);
   --chip-text: rgba(255, 255, 255, 1);
   --soft-surface: rgba(255, 255, 255, 0.05);
   --soft-surface-strong: rgba(255, 255, 255, 0.1);
+  --overlay-scrim: rgba(2, 6, 23, 0.62);
+  --float-surface: rgba(22, 22, 26, 0.98);
+  --float-surface-muted: rgba(31, 32, 37, 0.92);
+  --float-surface-soft: rgba(255, 255, 255, 0.06);
+  --float-shadow: 0 18px 54px rgba(0, 0, 0, 0.58);
+  --icon-subtle-bg: rgba(255, 255, 255, 0.08);
+  --solid-button-bg: rgba(244, 244, 245, 1);
+  --solid-button-fg: rgba(17, 17, 20, 1);
+  --solid-button-border: rgba(244, 244, 245, 0.45);
+  --chat-user-bg: rgba(244, 244, 245, 0.98);
+  --chat-user-fg: rgba(17, 17, 20, 1);
+  --chat-user-border: rgba(244, 244, 245, 0.45);
+  --chat-agent-bg: rgba(31, 32, 37, 0.95);
+  --chat-agent-fg: rgba(241, 245, 249, 1);
+  --chat-agent-border: rgba(255, 255, 255, 0.14);
   --agentic-bg: #121214;
   --agentic-topbar: #15161a;
   --agentic-surface: #1b1c21;
@@ -211,13 +251,21 @@
   --agentic-muted: rgba(255, 255, 255, 0.68);
   --agentic-contrast: #f7f8fc;
   --agentic-track-title: #f7f8fc;
-  --agentic-track-gradient: linear-gradient(90deg, #ff6a00 0%, #4a1b0a 22%, #2a1310 100%);
+  --agentic-track-gradient: #334155;
   --agentic-slider-track: rgba(255, 255, 255, 0.32);
   --agentic-slider-thumb: #d8dbe7;
   --agentic-marker: #f5f6fa;
   --agentic-control-bg: rgba(255, 255, 255, 0.12);
   --agentic-control-text: #f1f3f9;
   --agentic-danger: #ff4e46;
+  --agentic-elevated: rgba(255, 255, 255, 0.12);
+  --agentic-elevated-strong: rgba(35, 36, 41, 0.96);
+  --agentic-chat-user-bg: rgba(244, 244, 245, 0.96);
+  --agentic-chat-user-fg: rgba(17, 17, 20, 1);
+  --agentic-chat-user-border: rgba(244, 244, 245, 0.45);
+  --agentic-chat-agent-bg: rgba(35, 36, 41, 0.96);
+  --agentic-chat-agent-fg: rgba(241, 245, 249, 1);
+  --agentic-chat-agent-border: rgba(255, 255, 255, 0.14);
 }
 
 @theme inline {
@@ -269,7 +317,7 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Lava', sans-serif;
+    font-family: var(--app-font-family);
   }
 }
 
@@ -279,59 +327,59 @@
 @layer base {
   :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
     h1 {
-      font-family: 'Lava', sans-serif;
+      font-family: var(--app-font-family);
       font-size: var(--text-3xl);
       font-weight: var(--font-weight-bold);
-      line-height: 1.5;
+      line-height: 1.25;
     }
 
     h2 {
-      font-family: 'Lava', sans-serif;
+      font-family: var(--app-font-family);
       font-size: var(--text-2xl);
       font-weight: var(--font-weight-bold);
-      line-height: 1.5;
+      line-height: 1.3;
     }
 
     h3 {
-      font-family: 'Lava', sans-serif;
+      font-family: var(--app-font-family);
       font-size: var(--text-xl);
       font-weight: var(--font-weight-bold);
-      line-height: 1.5;
+      line-height: 1.35;
     }
 
     h4 {
-      font-family: 'Lava', sans-serif;
+      font-family: var(--app-font-family);
       font-size: var(--text-lg);
       font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      line-height: 1.4;
     }
 
     p {
-      font-family: 'Lava', sans-serif;
+      font-family: var(--app-font-family);
       font-size: var(--text-base);
       font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      line-height: 1.45;
     }
 
     label {
-      font-family: 'Lava', sans-serif;
+      font-family: var(--app-font-family);
       font-size: var(--text-sm);
       font-weight: var(--font-weight-bold);
-      line-height: 1.5;
+      line-height: 1.35;
     }
 
     button {
-      font-family: 'Lava', sans-serif;
-      font-size: var(--text-base);
+      font-family: var(--app-font-family);
+      font-size: var(--text-sm);
       font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      line-height: 1.35;
     }
 
     input {
-      font-family: 'Lava', sans-serif;
-      font-size: var(--text-base);
+      font-family: var(--app-font-family);
+      font-size: var(--text-sm);
       font-weight: var(--font-weight-normal);
-      line-height: 1.5;
+      line-height: 1.35;
     }
   }
 }

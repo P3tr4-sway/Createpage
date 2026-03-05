@@ -48,7 +48,7 @@ export function JamWithAI() {
               color: "var(--foreground)",
               fontSize: "var(--text-xl)",
               fontWeight: "var(--font-weight-bold)",
-              fontFamily: "'Lava', sans-serif",
+              fontFamily: "var(--app-font-family)",
             }}
           >
             Jam with AI
@@ -63,7 +63,7 @@ export function JamWithAI() {
           color: "var(--secondary)",
           fontSize: "var(--text-sm)",
           fontWeight: "var(--font-weight-normal)",
-          fontFamily: "'Lava', sans-serif",
+          fontFamily: "var(--app-font-family)",
         }}
       >
         Describe a sound. We generate it. You play.
@@ -93,7 +93,7 @@ export function JamWithAI() {
               color: "var(--foreground)",
               fontSize: "var(--text-sm)",
               fontWeight: "var(--font-weight-normal)",
-              fontFamily: "'Lava', sans-serif",
+              fontFamily: "var(--app-font-family)",
             }}
           />
         </div>
@@ -104,7 +104,7 @@ export function JamWithAI() {
             color: "var(--background)",
             fontSize: "var(--text-sm)",
             fontWeight: "var(--font-weight-bold)",
-            fontFamily: "'Lava', sans-serif",
+            fontFamily: "var(--app-font-family)",
             padding: "6px 16px",
             borderRadius: "var(--radius-tooltip)",
             border: "none",
@@ -126,7 +126,7 @@ export function JamWithAI() {
             color: "var(--secondary)",
             fontSize: "var(--text-sm)",
             fontWeight: "var(--font-weight-normal)",
-            fontFamily: "'Lava', sans-serif",
+            fontFamily: "var(--app-font-family)",
             opacity: 0.5,
           }}
           className="flex items-center mr-1"
@@ -143,7 +143,7 @@ export function JamWithAI() {
               color: "var(--secondary)",
               fontSize: "var(--text-sm)",
               fontWeight: "var(--font-weight-normal)",
-              fontFamily: "'Lava', sans-serif",
+              fontFamily: "var(--app-font-family)",
               backgroundColor: "transparent",
               opacity: 0.7,
             }}

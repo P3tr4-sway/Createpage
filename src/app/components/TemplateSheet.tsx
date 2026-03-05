@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
-const FONT = "'Lava', sans-serif";
+const FONT = "var(--app-font-family)";
 
 interface TemplateData {
   title: string;

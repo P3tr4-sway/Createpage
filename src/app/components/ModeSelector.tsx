@@ -57,7 +57,7 @@ export function ModeSelector({ modes, onCardClick }: ModeSelectorProps) {
                 boxShadow: isSelected
                   ? "inset 0 0 0 1px var(--on-image-primary), 0 0 32px rgba(0,0,0,0.18)"
                   : "none",
-                fontFamily: "'Lava', sans-serif",
+                fontFamily: "var(--app-font-family)",
               }}
             >
               {/* Background image — zooms on hover via variant propagation */}
@@ -97,7 +97,7 @@ export function ModeSelector({ modes, onCardClick }: ModeSelectorProps) {
                     color: "var(--on-image-primary)",
                     fontSize: "clamp(34px, 2.2vw, 44px)",
                     fontWeight: "var(--font-weight-bold)",
-                    fontFamily: "'Lava', sans-serif",
+                    fontFamily: "var(--app-font-family)",
                     marginBottom: "var(--spacing-3, 12px)",
                     lineHeight: 1.1,
                   }}
@@ -109,7 +109,7 @@ export function ModeSelector({ modes, onCardClick }: ModeSelectorProps) {
                     color: "var(--on-image-secondary)",
                     fontSize: "var(--text-base)",
                     fontWeight: "var(--font-weight-normal)",
-                    fontFamily: "'Lava', sans-serif",
+                    fontFamily: "var(--app-font-family)",
                     lineHeight: 1.45,
                     maxWidth: "85%",
                   }}

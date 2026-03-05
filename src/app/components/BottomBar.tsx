@@ -27,9 +27,15 @@ interface BottomBarProps {
   visible: boolean;
   activeSection?: "create" | "loop" | "improvs";
   onNavigate?: (id: "create" | "loop" | "improvs") => void;
+  onOpenAiChat?: () => void;
 }
 
-export function BottomBar({ visible, activeSection = "create", onNavigate }: BottomBarProps) {
+export function BottomBar({
+  visible,
+  activeSection = "create",
+  onNavigate,
+  onOpenAiChat,
+}: BottomBarProps) {
   void activeSection;
 
   const inverseScale = "var(--workbench-inverse-scale, 1)";
@@ -58,7 +64,7 @@ export function BottomBar({ visible, activeSection = "create", onNavigate }: Bot
         transitionDuration: "350ms",
         transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
         zIndex: 30,
-        fontFamily: "'Lava', sans-serif",
+        fontFamily: "var(--app-font-family)",
       }}
     >
       <TutorialNote
@@ -91,9 +97,9 @@ export function BottomBar({ visible, activeSection = "create", onNavigate }: Bot
               borderRadius: "9999px",
               height: navPillHeight,
               padding: "8px",
-              boxShadow: "var(--elevation-sm), 0 0 0 1px var(--border)",
-              backdropFilter: "blur(24px)",
-              WebkitBackdropFilter: "blur(24px)",
+              boxShadow: "0 8px 24px rgba(15, 23, 42, 0.12)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
             }}
           >
             {tabs.map((tab) => {
@@ -111,9 +117,9 @@ export function BottomBar({ visible, activeSection = "create", onNavigate }: Bot
                     padding: isActive ? "0 18px" : "0 10px",
                     backgroundColor: isActive ? "var(--chip-active-bg)" : "transparent",
                     color: isActive ? "var(--chip-active-text)" : "var(--secondary)",
-                    fontSize: isActive ? "18px" : "15px",
-                    fontWeight: "var(--font-weight-bold)",
-                    fontFamily: "'Lava', sans-serif",
+                    fontSize: isActive ? "16px" : "14px",
+                    fontWeight: isActive ? 700 : 600,
+                    fontFamily: "var(--app-font-family)",
                     whiteSpace: "nowrap",
                     cursor: "pointer",
                   }}
@@ -134,8 +140,10 @@ export function BottomBar({ visible, activeSection = "create", onNavigate }: Bot
             whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 380, damping: 22 }}
             className="relative flex items-center justify-center border border-border cursor-pointer overflow-hidden"
+            type="button"
+            onClick={onOpenAiChat}
             style={{
-              backgroundColor: "var(--surface-glass)",
+              backgroundColor: "var(--float-surface-muted)",
               borderRadius: "9999px",
               width: aiButtonWidth,
               height: navPillHeight,
@@ -144,51 +152,18 @@ export function BottomBar({ visible, activeSection = "create", onNavigate }: Bot
               boxShadow: "var(--elevation-sm)",
               borderColor: "var(--border)",
               borderWidth: 1,
-              backdropFilter: "blur(24px)",
-              WebkitBackdropFilter: "blur(24px)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
             }}
           >
-            {/* Pulse ring */}
-            <motion.span
-              className="absolute inset-0"
-              style={{ borderRadius: "9999px" }}
-              animate={{
-                boxShadow: [
-                  "0 0 0 0px rgba(43,154,252,0.24)",
-                  "0 0 0 8px rgba(43,154,252,0)",
-                ],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeOut",
-              }}
-            />
-
-            {/* Shimmer sweep */}
-            <motion.span
-              className="absolute inset-0 pointer-events-none overflow-hidden"
-              style={{ borderRadius: "9999px" }}
-            >
-              <motion.span
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background:
-                    "linear-gradient(105deg, transparent 30%, var(--muted) 50%, transparent 70%)",
-                }}
-                animate={{ x: ["100%", "-100%"] }}
-                transition={{ duration: 3.5, repeat: Infinity, ease: "linear" }}
-              />
-            </motion.span>
-
             <span
               className="relative z-10"
               style={{
                 color: "var(--foreground)",
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: "var(--font-weight-bold)",
                 letterSpacing: "0.01em",
-                fontFamily: "'Lava', sans-serif",
+                fontFamily: "var(--app-font-family)",
               }}
             >
               AI Agent
