@@ -1,7 +1,17 @@
 :root {
+  --workbench-bg-1: #eef4ff;
+  --workbench-bg-2: #dce6f7;
+  --workbench-border: #2b9afc33;
+  --workbench-glow-1: #2b9afc24;
+  --workbench-glow-2: #22c55e22;
+}
+
+.dark {
   --workbench-bg-1: #0f1218;
   --workbench-bg-2: #141b23;
   --workbench-border: #2b9afc44;
+  --workbench-glow-1: #2b9afc22;
+  --workbench-glow-2: #3ddc9740;
 }
 
 html,
@@ -24,8 +34,8 @@ body {
   padding: 24px;
   box-sizing: border-box;
   background:
-    radial-gradient(circle at 10% 20%, #2b9afc22 0%, transparent 42%),
-    radial-gradient(circle at 85% 85%, #3ddc9740 0%, transparent 35%),
+    radial-gradient(circle at 10% 20%, var(--workbench-glow-1) 0%, transparent 42%),
+    radial-gradient(circle at 85% 85%, var(--workbench-glow-2) 0%, transparent 35%),
     linear-gradient(140deg, var(--workbench-bg-1), var(--workbench-bg-2));
 }
 

@@ -117,9 +117,9 @@ export function TemplateSheet({ open, onClose, template }: TemplateSheetProps) {
                     width: 56,
                     height: 56,
                     borderRadius: "50%",
-                    backgroundColor: "rgba(0,0,0,0.45)",
-                    border: "1px solid var(--border)",
-                    color: "var(--foreground)",
+                    backgroundColor: "var(--on-image-control-bg)",
+                    border: "1px solid var(--on-image-control-border)",
+                    color: "var(--on-image-primary)",
                     backdropFilter: "blur(8px)",
                   }}
                 >
@@ -135,9 +135,9 @@ export function TemplateSheet({ open, onClose, template }: TemplateSheetProps) {
                   width: 36,
                   height: 36,
                   borderRadius: "50%",
-                  backgroundColor: "rgba(0,0,0,0.4)",
+                  backgroundColor: "var(--on-image-control-bg)",
                   border: "none",
-                  color: "var(--foreground)",
+                  color: "var(--on-image-primary)",
                   backdropFilter: "blur(8px)",
                 }}
               >
@@ -148,7 +148,7 @@ export function TemplateSheet({ open, onClose, template }: TemplateSheetProps) {
               <div className="absolute bottom-0 left-0 right-0 px-8 pb-6">
                 <p
                   style={{
-                    color: "var(--secondary)",
+                    color: "var(--on-image-secondary)",
                     fontSize: "var(--text-sm)",
                     fontWeight: "var(--font-weight-medium)",
                     fontFamily: FONT,
@@ -162,7 +162,7 @@ export function TemplateSheet({ open, onClose, template }: TemplateSheetProps) {
                 </p>
                 <h3
                   style={{
-                    color: "var(--foreground)",
+                    color: "var(--on-image-primary)",
                     fontSize: "var(--text-xl)",
                     fontWeight: "var(--font-weight-bold)",
                     fontFamily: FONT,

@@ -1,8 +1,10 @@
-import { Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Moon, Sparkles, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 import { TutorialNote } from "./TutorialNote";
 
 const stats = {
-  songs:   { value: 12,  total: 20,   color: "#ffffff",  label: "Songs Created",  unit: "tracks" },
+  songs:   { value: 12,  total: 20,   color: "var(--sidebar-foreground)",  label: "Songs Created",  unit: "tracks" },
   jammed:  { value: 8.5, total: 10,   color: "#4ECDC4",  label: "Hours Jammed",   unit: "hrs"    },
   remixes: { value: 3,   total: 5,    color: "#FF6B6B",  label: "Remixes",         unit: "mix"    },
   stems:   { value: 4,   total: null, color: "#A78BFA",  label: "Stem Splits",     unit: "files"  },
@@ -128,6 +130,13 @@ interface SidebarProps {
 export function Sidebar({ activeSection, onNavigate }: SidebarProps) {
   const creditsRemaining = stats.credits.total - stats.credits.used;
   const creditsPercent   = creditsRemaining / stats.credits.total;
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const isDark = mounted ? theme !== "light" : true;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <aside
@@ -270,6 +279,68 @@ export function Sidebar({ activeSection, onNavigate }: SidebarProps) {
         opacity: 0.6,
       }} />
 
+      {/* ── Theme toggle ── */}
+      <div style={{ padding: "12px 20px 8px" }}>
+        <div
+          className="flex items-center justify-between rounded-lg border"
+          style={{
+            padding: "10px 12px",
+            backgroundColor: "var(--surface-glass)",
+            borderColor: "var(--border)",
+          }}
+        >
+          <div className="flex items-center gap-2">
+            {isDark ? (
+              <Moon size={14} strokeWidth={1.8} style={{ color: "var(--sidebar-foreground)" }} />
+            ) : (
+              <Sun size={14} strokeWidth={1.8} style={{ color: "var(--sidebar-foreground)" }} />
+            )}
+            <span
+              style={{
+                color: "var(--sidebar-foreground)",
+                fontSize: 12,
+                fontWeight: "var(--font-weight-medium)",
+                letterSpacing: "0.05em",
+                textTransform: "uppercase",
+              }}
+            >
+              {isDark ? "Dark Mode" : "Light Mode"}
+            </span>
+          </div>
+          <button
+            type="button"
+            aria-label="Toggle color theme"
+            role="switch"
+            aria-checked={isDark}
+            onClick={() => setTheme(isDark ? "light" : "dark")}
+            className="cursor-pointer"
+            style={{
+              width: 44,
+              height: 24,
+              borderRadius: "var(--radius-full)",
+              border: "1px solid var(--border)",
+              backgroundColor: isDark ? "rgba(43,154,252,0.34)" : "rgba(15,23,42,0.18)",
+              position: "relative",
+              transition: "all 200ms ease",
+            }}
+          >
+            <span
+              style={{
+                position: "absolute",
+                top: 1,
+                left: isDark ? 21 : 1,
+                width: 20,
+                height: 20,
+                borderRadius: "50%",
+                backgroundColor: "var(--card)",
+                border: "1px solid var(--border)",
+                transition: "all 200ms ease",
+              }}
+            />
+          </button>
+        </div>
+      </div>
+
       {/* ── Lava AI Credits ── */}
       <div style={{ padding: "var(--spacing-4, 16px) var(--spacing-6, 24px)", marginTop: "auto" }}>
         <div className="flex items-center justify-between" style={{ marginBottom: 8 }}>
@@ -301,7 +372,7 @@ export function Sidebar({ activeSection, onNavigate }: SidebarProps) {
 
         <div style={{
           width: "100%", height: 4,
-          backgroundColor: "rgba(255,255,255,0.08)",
+          backgroundColor: "var(--soft-surface-strong)",
           borderRadius: "var(--radius-full, 9999px)",
           overflow: "hidden",
         }}>

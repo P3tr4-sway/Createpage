@@ -88,38 +88,43 @@ export function BottomBar({ visible, activeSection = "create", onNavigate }: Bot
           <nav
             className="flex items-center gap-1 border border-border flex-1"
             style={{
-              backgroundColor: "rgba(32, 32, 34, 0.55)",
+              backgroundColor: "var(--surface-glass)",
               borderRadius: "9999px",
               padding: "10px",
-              boxShadow: "var(--elevation-sm), 0 0 0 1px rgba(255,255,255,0.06)",
+              boxShadow: "var(--elevation-sm), 0 0 0 1px var(--border)",
               backdropFilter: "blur(24px)",
               WebkitBackdropFilter: "blur(24px)",
             }}
           >
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                className="flex items-center justify-center gap-3 cursor-pointer transition-all flex-1"
-                type="button"
-                onClick={() => handleTabSelect(tab)}
-                style={{
-                  borderRadius: "9999px",
-                  padding: "14px 0",
-                  backgroundColor: activeTabId === tab.id ? "var(--muted)" : "transparent",
-                  color: activeTabId === tab.id
-                    ? "var(--foreground)"
-                    : "var(--secondary)",
-                  fontSize: "var(--text-sm)",
-                  fontWeight: "var(--font-weight-bold)",
-                  fontFamily: "'Lava', sans-serif",
-                  whiteSpace: "nowrap",
-                  cursor: "pointer",
-                }}
-              >
-                <tab.icon size={24} strokeWidth={1.8} />
-                {activeTabId === tab.id && <span>{tab.label}</span>}
-              </button>
-            ))}
+            {tabs.map((tab) => {
+              const isActive = activeTabId === tab.id;
+
+              return (
+                <button
+                  key={tab.id}
+                  className="flex items-center justify-center gap-3 cursor-pointer transition-all flex-1"
+                  type="button"
+                  onClick={() => handleTabSelect(tab)}
+                  style={{
+                    borderRadius: "9999px",
+                    padding: "14px 0",
+                    backgroundColor: isActive ? "var(--chip-active-bg)" : "transparent",
+                    color: isActive ? "var(--chip-active-text)" : "var(--secondary)",
+                    fontSize: isActive ? "var(--text-base)" : "var(--text-sm)",
+                    fontWeight: "var(--font-weight-bold)",
+                    fontFamily: "'Lava', sans-serif",
+                    whiteSpace: "nowrap",
+                    cursor: "pointer",
+                  }}
+                >
+                  {isActive ? (
+                    <span>{tab.label}</span>
+                  ) : (
+                    <tab.icon size={24} strokeWidth={1.8} />
+                  )}
+                </button>
+              );
+            })}
           </nav>
 
           {/* AI Magic Button - separate pill */}
@@ -129,7 +134,7 @@ export function BottomBar({ visible, activeSection = "create", onNavigate }: Bot
             transition={{ type: "spring", stiffness: 380, damping: 22 }}
             className="relative flex items-center justify-center border border-border cursor-pointer overflow-hidden"
             style={{
-              backgroundColor: "rgba(32, 32, 34, 0.55)",
+              backgroundColor: "var(--surface-glass)",
               borderRadius: "50%",
               width: 72,
               height: 72,
@@ -148,8 +153,8 @@ export function BottomBar({ visible, activeSection = "create", onNavigate }: Bot
               style={{ borderRadius: "50%" }}
               animate={{
                 boxShadow: [
-                  "0 0 0 0px rgba(0,0,0,0.08)",
-                  "0 0 0 10px rgba(0,0,0,0)",
+                  "0 0 0 0px rgba(43,154,252,0.24)",
+                  "0 0 0 10px rgba(43,154,252,0)",
                 ],
               }}
               transition={{

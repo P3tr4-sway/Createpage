@@ -225,7 +225,7 @@ export function InstantBackingTrackPage({ onBack }: InstantBackingTrackPageProps
             padding: "6px 10px",
             borderRadius: 10,
             border: "1px solid var(--border)",
-            backgroundColor: "rgba(255,255,255,0.03)",
+            backgroundColor: "var(--soft-surface)",
           }}
         >
           <ArrowLeft size={16} strokeWidth={1.8} />
@@ -260,9 +260,9 @@ export function InstantBackingTrackPage({ onBack }: InstantBackingTrackPageProps
               style={{
                 padding: "9px 18px",
                 borderRadius: 12,
-                border: isActive ? "1px solid rgba(255,255,255,0.2)" : "1px solid var(--border)",
-                backgroundColor: isActive ? "#F6F7F9" : "rgba(255,255,255,0.06)",
-                color: isActive ? "#111217" : "var(--foreground)",
+                border: isActive ? "1px solid var(--chip-active-border)" : "1px solid var(--border)",
+                backgroundColor: isActive ? "var(--chip-active-bg)" : "var(--chip-bg)",
+                color: isActive ? "var(--chip-active-text)" : "var(--chip-text)",
                 fontSize: "var(--text-sm)",
                 fontWeight: isActive ? 700 : 500,
                 lineHeight: 1.1,
@@ -280,8 +280,8 @@ export function InstantBackingTrackPage({ onBack }: InstantBackingTrackPageProps
             padding: "9px 16px",
             borderRadius: 12,
             border: "1px solid var(--border)",
-            backgroundColor: "rgba(255,255,255,0.06)",
-            color: "var(--foreground)",
+            backgroundColor: "var(--chip-bg)",
+            color: "var(--chip-text)",
             fontSize: "var(--text-sm)",
             fontWeight: 500,
             lineHeight: 1.1,
@@ -301,7 +301,7 @@ export function InstantBackingTrackPage({ onBack }: InstantBackingTrackPageProps
             style={{
               borderRadius: "var(--radius-card)",
               minHeight: 250,
-              border: "1px solid rgba(255,255,255,0.08)",
+              border: "1px solid var(--border)",
               backgroundColor: track.cardColor,
               isolation: "isolate",
             }}
@@ -327,7 +327,7 @@ export function InstantBackingTrackPage({ onBack }: InstantBackingTrackPageProps
             >
               <h3
                 style={{
-                  color: "#F2F3F5",
+                  color: "var(--on-image-primary)",
                   fontSize: "var(--text-xl)",
                   fontWeight: "var(--font-weight-bold)",
                   lineHeight: 1.15,
@@ -338,7 +338,7 @@ export function InstantBackingTrackPage({ onBack }: InstantBackingTrackPageProps
               </h3>
               <p
                 style={{
-                  color: "rgba(242,243,245,0.78)",
+                  color: "var(--on-image-secondary)",
                   fontSize: "var(--text-sm)",
                   fontWeight: "var(--font-weight-medium)",
                   lineHeight: 1.2,

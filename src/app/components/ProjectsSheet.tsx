@@ -230,11 +230,11 @@ export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
               style={{
                 backgroundColor:
                   activeFilter === f
-                    ? "rgba(255,255,255,0.12)"
+                    ? "var(--chip-active-bg)"
                     : "transparent",
                 color:
                   activeFilter === f
-                    ? "var(--foreground)"
+                    ? "var(--chip-active-text)"
                     : "var(--secondary)",
                 fontSize: "var(--text-sm)",
                 fontWeight: "var(--font-weight-medium)",
@@ -243,7 +243,7 @@ export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
                 borderRadius: "var(--radius-tooltip)",
                 border: `1px solid ${
                   activeFilter === f
-                    ? "rgba(255,255,255,0.18)"
+                    ? "var(--chip-active-border)"
                     : "var(--border)"
                 }`,
                 textTransform: "capitalize",

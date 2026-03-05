@@ -293,14 +293,14 @@ export function MainContent({
               key={project.id}
               className="cursor-pointer transition-colors hover:opacity-80"
               style={{
-                backgroundColor: "rgba(255,255,255,0.12)",
-                color: "var(--foreground)",
+                backgroundColor: "var(--chip-bg)",
+                color: "var(--chip-text)",
                 fontSize: "var(--text-xs)",
                 fontWeight: "var(--font-weight-medium)",
                 fontFamily: "'Lava', sans-serif",
                 padding: "4px 12px",
                 borderRadius: "var(--radius-full, 9999px)",
-                border: "1px solid rgba(255,255,255,0.18)",
+                border: "1px solid var(--chip-border)",
                 backdropFilter: "blur(6px)",
                 letterSpacing: "0.04em",
                 whiteSpace: "nowrap",

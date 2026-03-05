@@ -144,11 +144,11 @@ export function JamWithAI() {
               fontSize: "var(--text-sm)",
               fontWeight: "var(--font-weight-normal)",
               fontFamily: "'Lava', sans-serif",
-              backgroundColor: "rgba(255, 255, 255, 0)",
+              backgroundColor: "transparent",
               opacity: 0.7,
             }}
             whileHover={{
-              backgroundColor: "rgba(255, 255, 255, 0.05)",
+              backgroundColor: "var(--soft-surface-strong)",
               color: "var(--foreground)",
               opacity: 1,
             }}

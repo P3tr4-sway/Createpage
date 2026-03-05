@@ -185,7 +185,7 @@ export function LooperPage({ onBack }: LooperPageProps) {
             padding: "6px 10px",
             borderRadius: 10,
             border: "1px solid var(--border)",
-            backgroundColor: "rgba(255,255,255,0.03)",
+            backgroundColor: "var(--soft-surface)",
           }}
         >
           <ArrowLeft size={16} strokeWidth={1.8} />
@@ -221,9 +221,9 @@ export function LooperPage({ onBack }: LooperPageProps) {
               style={{
                 padding: "9px 18px",
                 borderRadius: 12,
-                border: isActive ? "1px solid rgba(255,255,255,0.2)" : "1px solid var(--border)",
-                backgroundColor: isActive ? "#F6F7F9" : "rgba(255,255,255,0.06)",
-                color: isActive ? "#111217" : "var(--foreground)",
+                border: isActive ? "1px solid var(--chip-active-border)" : "1px solid var(--border)",
+                backgroundColor: isActive ? "var(--chip-active-bg)" : "var(--chip-bg)",
+                color: isActive ? "var(--chip-active-text)" : "var(--chip-text)",
                 fontSize: "var(--text-sm)",
                 fontWeight: isActive ? 700 : 500,
                 lineHeight: 1.1,
@@ -242,8 +242,8 @@ export function LooperPage({ onBack }: LooperPageProps) {
             padding: "9px 16px",
             borderRadius: 12,
             border: "1px solid var(--border)",
-            backgroundColor: "rgba(255,255,255,0.06)",
-            color: "var(--foreground)",
+            backgroundColor: "var(--chip-bg)",
+            color: "var(--chip-text)",
             fontSize: "var(--text-sm)",
             fontWeight: 500,
             lineHeight: 1.1,
@@ -263,8 +263,8 @@ export function LooperPage({ onBack }: LooperPageProps) {
             style={{
               borderRadius: "var(--radius-card)",
               minHeight: 250,
-              border: "1px solid rgba(255,255,255,0.08)",
-              backgroundColor: "#14181f",
+              border: "1px solid var(--border)",
+              backgroundColor: "var(--card)",
               isolation: "isolate",
             }}
           >
@@ -278,13 +278,13 @@ export function LooperPage({ onBack }: LooperPageProps) {
               className="absolute inset-x-0 bottom-0 z-10"
               style={{
                 padding: "16px 20px",
-                backgroundColor: "rgba(10,12,18,0.48)",
+                backgroundColor: "var(--image-overlay-footer)",
                 backdropFilter: "blur(2px)",
               }}
             >
               <h3
                 style={{
-                  color: "#F2F3F5",
+                  color: "var(--on-image-primary)",
                   fontSize: "clamp(30px, 1.8vw, 40px)",
                   fontWeight: "var(--font-weight-bold)",
                   lineHeight: 1.08,
@@ -295,7 +295,7 @@ export function LooperPage({ onBack }: LooperPageProps) {
               </h3>
               <p
                 style={{
-                  color: "rgba(242,243,245,0.78)",
+                  color: "var(--on-image-secondary)",
                   fontSize: "var(--text-sm)",
                   fontWeight: "var(--font-weight-medium)",
                   lineHeight: 1.2,

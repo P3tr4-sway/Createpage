@@ -30,7 +30,7 @@ export function PlayerCard({
       <div className="relative flex flex-col justify-between h-full p-5" style={{ minHeight: 180 }}>
         <h4
           style={{
-            color: "var(--foreground)",
+            color: "var(--on-image-primary)",
             fontSize: "var(--text-base)",
             fontWeight: "var(--font-weight-bold)",
             fontFamily: "'Lava', sans-serif",
@@ -47,7 +47,7 @@ export function PlayerCard({
               width: 28,
               height: 28,
               backgroundColor: "var(--secondary)",
-              color: "var(--secondary-foreground)",
+              color: "var(--on-image-primary)",
               fontSize: 12,
               fontWeight: "var(--font-weight-bold)",
               fontFamily: "'Lava', sans-serif",
@@ -57,7 +57,7 @@ export function PlayerCard({
           </div>
           <span
             style={{
-              color: "var(--foreground)",
+              color: "var(--on-image-primary)",
               fontSize: 13,
               fontWeight: "var(--font-weight-medium)",
               fontFamily: "'Lava', sans-serif",

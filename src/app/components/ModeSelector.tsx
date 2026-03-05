@@ -53,9 +53,9 @@ export function ModeSelector({ modes, onCardClick }: ModeSelectorProps) {
               className="relative flex flex-col justify-end items-start text-left rounded-card border cursor-pointer overflow-hidden"
               style={{
                 height: 390,
-                borderColor: isSelected ? "var(--foreground)" : "var(--border)",
+                borderColor: isSelected ? "var(--on-image-primary)" : "var(--border)",
                 boxShadow: isSelected
-                  ? "inset 0 0 0 1px var(--foreground), 0 0 32px rgba(255,255,255,0.06)"
+                  ? "inset 0 0 0 1px var(--on-image-primary), 0 0 32px rgba(0,0,0,0.18)"
                   : "none",
                 fontFamily: "'Lava', sans-serif",
               }}
@@ -83,8 +83,7 @@ export function ModeSelector({ modes, onCardClick }: ModeSelectorProps) {
               <div
                 className="absolute inset-0"
                 style={{
-                  background:
-                    "linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.52) 55%, rgba(0,0,0,0.92) 100%)",
+                  background: "var(--image-overlay-card)",
                 }}
               />
 
@@ -95,7 +94,7 @@ export function ModeSelector({ modes, onCardClick }: ModeSelectorProps) {
               >
                 <h3
                   style={{
-                    color: "var(--foreground)",
+                    color: "var(--on-image-primary)",
                     fontSize: "clamp(34px, 2.2vw, 44px)",
                     fontWeight: "var(--font-weight-bold)",
                     fontFamily: "'Lava', sans-serif",
@@ -107,7 +106,7 @@ export function ModeSelector({ modes, onCardClick }: ModeSelectorProps) {
                 </h3>
                 <p
                   style={{
-                    color: "var(--secondary)",
+                    color: "var(--on-image-secondary)",
                     fontSize: "var(--text-base)",
                     fontWeight: "var(--font-weight-normal)",
                     fontFamily: "'Lava', sans-serif",
@@ -131,7 +130,7 @@ export function ModeSelector({ modes, onCardClick }: ModeSelectorProps) {
                   <ChevronDown
                     size={20}
                     strokeWidth={1.5}
-                    style={{ color: "var(--secondary)" }}
+                    style={{ color: "var(--on-image-secondary)" }}
                   />
                 </motion.div>
               </div>
