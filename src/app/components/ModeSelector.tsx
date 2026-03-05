@@ -21,9 +21,10 @@ interface ModeOption {
 
 interface ModeSelectorProps {
   modes: ModeOption[];
+  onCardClick?: (modeId: string, card: FeatureCardData) => void;
 }
 
-export function ModeSelector({ modes }: ModeSelectorProps) {
+export function ModeSelector({ modes, onCardClick }: ModeSelectorProps) {
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
 
   const handleSelect = (id: string) => {
@@ -51,7 +52,7 @@ export function ModeSelector({ modes }: ModeSelectorProps) {
               transition={{ duration: 0.25, ease: "easeOut" }}
               className="relative flex flex-col justify-end items-start text-left rounded-card border cursor-pointer overflow-hidden"
               style={{
-                height: 300,
+                height: 390,
                 borderColor: isSelected ? "var(--foreground)" : "var(--border)",
                 boxShadow: isSelected
                   ? "inset 0 0 0 1px var(--foreground), 0 0 32px rgba(255,255,255,0.06)"
@@ -68,7 +69,7 @@ export function ModeSelector({ modes }: ModeSelectorProps) {
                   backgroundImage: `url(${
                     (
                       {
-                        daw: "https://images.unsplash.com/photo-1601389926382-bcf545a238ab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZWNvcmRpbmclMjBzdHVkaW8lMjBkYXJrJTIwcHJvZmVzc2lvbmFsJTIwbXVzaWMlMjBwcm9kdWN0aW9ufGVufDF8fHx8MTc3MjYxNjQ5Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+                        daw: "https://images.unsplash.com/photo-1700166269606-b5ea327d0540?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaXhpbmclMjBjb25zb2xlJTIwYXVkaW8lMjBmYWRlcnMlMjBzdHVkaW98ZW58MXx8fHwxNzcyNjE3MzM5fDA&ixlib=rb-4.1.0&q=80&w=1080",
                         loop: "https://images.unsplash.com/photo-1768885514740-d64d25ac9a64?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsaXZlJTIwbG9vcCUyMHBlcmZvcm1hbmNlJTIwZWxlY3Ryb25pYyUyMG11c2ljJTIwZGFyayUyMHN0YWdlfGVufDF8fHx8MTc3MjYxNjQ5Nnww&ixlib=rb-4.1.0&q=80&w=1080",
                       } as Record<string, string>
                     )[mode.id]
@@ -83,43 +84,23 @@ export function ModeSelector({ modes }: ModeSelectorProps) {
                 className="absolute inset-0"
                 style={{
                   background:
-                    "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.88) 100%)",
+                    "linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.52) 55%, rgba(0,0,0,0.92) 100%)",
                 }}
               />
-
-              {/* Pill tag — top left */}
-              <div className="absolute top-5 left-6">
-                <span
-                  style={{
-                    backgroundColor: "rgba(255,255,255,0.12)",
-                    color: "var(--foreground)",
-                    fontSize: "var(--text-xs)",
-                    fontWeight: "var(--font-weight-medium)",
-                    fontFamily: "'Lava', sans-serif",
-                    padding: "4px 12px",
-                    borderRadius: "var(--radius-full, 9999px)",
-                    border: "1px solid rgba(255,255,255,0.18)",
-                    backdropFilter: "blur(6px)",
-                    letterSpacing: "0.04em",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {mode.id === "daw" ? "Studio Mode" : "Live Mode"}
-                </span>
-              </div>
 
               {/* Bottom content */}
               <div
                 className="relative z-10 w-full"
-                style={{ padding: "var(--spacing-8, 32px)" }}
+                style={{ padding: "var(--spacing-10, 40px)" }}
               >
                 <h3
                   style={{
                     color: "var(--foreground)",
-                    fontSize: "var(--text-2xl)",
+                    fontSize: "clamp(34px, 2.2vw, 44px)",
                     fontWeight: "var(--font-weight-bold)",
                     fontFamily: "'Lava', sans-serif",
-                    marginBottom: "var(--spacing-2, 8px)",
+                    marginBottom: "var(--spacing-3, 12px)",
+                    lineHeight: 1.1,
                   }}
                 >
                   {mode.label}
@@ -127,10 +108,11 @@ export function ModeSelector({ modes }: ModeSelectorProps) {
                 <p
                   style={{
                     color: "var(--secondary)",
-                    fontSize: "var(--text-sm)",
+                    fontSize: "var(--text-base)",
                     fontWeight: "var(--font-weight-normal)",
                     fontFamily: "'Lava', sans-serif",
-                    lineHeight: 1.5,
+                    lineHeight: 1.45,
+                    maxWidth: "85%",
                   }}
                 >
                   {mode.tagline}
@@ -142,8 +124,8 @@ export function ModeSelector({ modes }: ModeSelectorProps) {
                   transition={{ duration: 0.25, ease: "easeOut" }}
                   className="absolute"
                   style={{
-                    bottom: "var(--spacing-8, 32px)",
-                    right: "var(--spacing-8, 32px)",
+                    bottom: "var(--spacing-10, 40px)",
+                    right: "var(--spacing-10, 40px)",
                   }}
                 >
                   <ChevronDown
@@ -186,6 +168,11 @@ export function ModeSelector({ modes }: ModeSelectorProps) {
                     description={card.description}
                     subDescription={card.subDescription}
                     icon={card.icon}
+                    onClick={() => {
+                      if (selectedMode) {
+                        onCardClick?.(selectedMode, card);
+                      }
+                    }}
                   />
                 ))}
             </div>

@@ -17,6 +17,8 @@ import { JamWithAI } from "./JamWithAI";
 import { ProjectsSheet, recentProjects } from "./ProjectsSheet";
 import { TemplateSheet } from "./TemplateSheet";
 import { TutorialNote } from "./TutorialNote";
+import { InstantBackingTrackPage } from "./InstantBackingTrackPage";
+import { LooperPage } from "./LooperPage";
 
 const dawCards = [
   {
@@ -47,9 +49,9 @@ const loopCards = [
     icon: Music,
   },
   {
-    title: "Instant Groove",
-    description: "Pick a feel. Play along.",
-    subDescription: "Choose from the library and drop in.",
+    title: "Instant Backing Track",
+    description: "Pick a style. Get a backing track instantly.",
+    subDescription: "Choose from the library and start jamming.",
     icon: Disc3,
   },
 ];
@@ -57,14 +59,14 @@ const loopCards = [
 const modeOptions = [
   {
     id: "daw",
-    label: "Produce a Song",
+    label: "Studio Mode",
     tagline: "Build, remix, or start from a stem. Your session, your rules.",
     icon: Piano,
     cards: dawCards,
   },
   {
     id: "loop",
-    label: "Loop & Jam",
+    label: "Live Mode",
     tagline: "A groove, ready when you are. Record and layer as you go.",
     icon: Repeat,
     cards: loopCards,
@@ -187,9 +189,18 @@ interface MainContentProps {
   };
   onScroll?: (e: React.UIEvent<HTMLDivElement>) => void;
   scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
+  onOpenAgenticProducing?: () => void;
 }
 
-export function MainContent({ sectionRefs, onScroll, scrollContainerRef }: MainContentProps) {
+export function MainContent({
+  sectionRefs,
+  onScroll,
+  scrollContainerRef,
+  onOpenAgenticProducing,
+}: MainContentProps) {
+  const [activeSubView, setActiveSubView] = useState<
+    "home" | "instant-backing-track" | "looper"
+  >("home");
   const [showAll, setShowAll] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [templateOpen, setTemplateOpen] = useState(false);
@@ -206,6 +217,19 @@ export function MainContent({ sectionRefs, onScroll, scrollContainerRef }: MainC
     setTemplateOpen(true);
   };
 
+  const handleModeCardClick = (modeId: string, card: { title: string }) => {
+    if (modeId === "daw" && card.title === "Agentic Producing") {
+      onOpenAgenticProducing?.();
+      return;
+    }
+    if (modeId === "loop" && card.title === "Looper") {
+      setActiveSubView("looper");
+    }
+    if (modeId === "loop" && card.title === "Instant Backing Track") {
+      setActiveSubView("instant-backing-track");
+    }
+  };
+
   return (
     <div
       ref={scrollContainerRef}
@@ -213,6 +237,12 @@ export function MainContent({ sectionRefs, onScroll, scrollContainerRef }: MainC
       className="relative flex-1 overflow-y-auto px-8"
       style={{ fontFamily: "'Lava', sans-serif", paddingBottom: "120px" }}
     >
+      {activeSubView === "looper" ? (
+        <LooperPage onBack={() => setActiveSubView("home")} />
+      ) : activeSubView === "instant-backing-track" ? (
+        <InstantBackingTrackPage onBack={() => setActiveSubView("home")} />
+      ) : (
+        <>
       {/* Quick actions */}
       <div className="relative mb-8">
         <TutorialNote
@@ -300,12 +330,11 @@ export function MainContent({ sectionRefs, onScroll, scrollContainerRef }: MainC
           panelWidth={340}
           panelSide="left"
         />
-        <div ref={sectionRefs.loop} />
-        <ModeSelector modes={modeOptions} />
+        <ModeSelector modes={modeOptions} onCardClick={handleModeCardClick} />
       </section>
 
       {/* Improv Section -- AI Chat */}
-      <section ref={sectionRefs.improvs} className="relative mb-10">
+      <section ref={sectionRefs.loop} className="relative mb-10">
         <TutorialNote
         title="Jam with AI 的定位"
         points={[
@@ -320,7 +349,7 @@ export function MainContent({ sectionRefs, onScroll, scrollContainerRef }: MainC
       </section>
 
       {/* Create by Players */}
-      <section className="relative">
+      <section ref={sectionRefs.improvs} className="relative">
         <TutorialNote
         title="Made by Players 的作用"
         points={[
@@ -383,6 +412,8 @@ export function MainContent({ sectionRefs, onScroll, scrollContainerRef }: MainC
         onClose={() => setTemplateOpen(false)}
         template={selectedTemplate}
       />
+        </>
+      )}
     </div>
   );
 }

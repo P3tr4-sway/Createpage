@@ -5,6 +5,7 @@ interface FeatureCardProps {
   description: string;
   subDescription?: string;
   icon?: LucideIcon;
+  onClick?: () => void;
 }
 
 export function FeatureCard({
@@ -12,9 +13,22 @@ export function FeatureCard({
   description,
   subDescription,
   icon: Icon,
+  onClick,
 }: FeatureCardProps) {
+  const isInteractive = typeof onClick === "function";
+
   return (
     <div
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (!isInteractive) return;
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
+      role={isInteractive ? "button" : undefined}
+      tabIndex={isInteractive ? 0 : undefined}
       className="relative flex flex-col justify-end p-6 rounded-card border border-border cursor-pointer transition-all hover:border-secondary/30"
       style={{
         backgroundColor: "var(--card)",
