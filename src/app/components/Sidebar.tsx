@@ -1,4 +1,5 @@
 import { Sparkles } from "lucide-react";
+import { TutorialNote } from "./TutorialNote";
 
 const stats = {
   songs:   { value: 12,  total: 20,   color: "#ffffff",  label: "Songs Created",  unit: "tracks" },
@@ -132,14 +133,26 @@ export function Sidebar({ activeSection, onNavigate }: SidebarProps) {
     <aside
       className="flex flex-col border-r"
       style={{
+        position: "relative",
         width: 240, minWidth: 240,
         height: "100%",
         fontFamily: FONT,
         backgroundColor: "var(--sidebar)",
         borderColor: "var(--sidebar-border, var(--border))",
-        overflow: "hidden",
+        overflow: "visible",
       }}
     >
+      <TutorialNote
+        title="左侧状态区的设计逻辑"
+        points={[
+          "这里先展示你的产出和进度，让用户一进来就知道当前状态，不会空白焦虑。",
+          "AI Credits 常驻是为了提醒资源边界，帮助用户更有计划地使用 AI 功能。",
+        ]}
+        style={{ top: 14, right: -14 }}
+        panelWidth={300}
+        panelSide="right"
+      />
+
       {/* ── Header ── */}
       <div style={{ padding: "14px 20px 6px" }}>
         <p style={{

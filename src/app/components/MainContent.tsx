@@ -16,6 +16,7 @@ import { ModeSelector } from "./ModeSelector";
 import { JamWithAI } from "./JamWithAI";
 import { ProjectsSheet, recentProjects } from "./ProjectsSheet";
 import { TemplateSheet } from "./TemplateSheet";
+import { TutorialNote } from "./TutorialNote";
 
 const dawCards = [
   {
@@ -209,85 +210,127 @@ export function MainContent({ sectionRefs, onScroll, scrollContainerRef }: MainC
     <div
       ref={scrollContainerRef}
       onScroll={onScroll}
-      className="flex-1 overflow-y-auto px-8"
+      className="relative flex-1 overflow-y-auto px-8"
       style={{ fontFamily: "'Lava', sans-serif", paddingBottom: "120px" }}
     >
       {/* Quick actions */}
-      <div className="flex gap-3 mb-8 items-center">
-        {/* My Projects sheet opener */}
-        <button
-          onClick={() => setSheetOpen(true)}
-          className="flex items-center gap-2 cursor-pointer transition-colors hover:opacity-80"
-          style={{
-            backgroundColor: "var(--foreground)",
-            color: "var(--background)",
-            fontSize: "var(--text-sm)",
-            fontWeight: "var(--font-weight-bold)",
-            fontFamily: "'Lava', sans-serif",
-            padding: "6px 16px",
-            borderRadius: "var(--radius-tooltip)",
-            border: "none",
-            whiteSpace: "nowrap",
-            letterSpacing: "0.04em",
-          }}
-        >
-          <FolderOpen size={14} strokeWidth={1.5} />
-          My Projects
-        </button>
-
-        {/* Divider */}
-        <div
-          style={{
-            width: 1,
-            height: 20,
-            backgroundColor: "var(--border)",
-            flexShrink: 0,
-          }}
+      <div className="relative mb-8">
+        <TutorialNote
+        title="这块为什么放在最上面"
+        points={[
+          "这块优先服务“继续上次工作”，老用户进入后可以最快回到项目。",
+          "Recent chips 把历史内容直接露出，减少搜索和记忆成本。",
+        ]}
+          style={{ top: -8, right: 0 }}
+          panelWidth={320}
+          panelSide="left"
         />
-
-        {/* Recent project chips */}
-        {recentProjects.map((project) => (
+        <div className="flex gap-3 items-center">
+          {/* My Projects sheet opener */}
           <button
-            key={project.id}
-            className="cursor-pointer transition-colors hover:opacity-80"
+            onClick={() => setSheetOpen(true)}
+            className="flex items-center gap-2 cursor-pointer transition-colors hover:opacity-80"
             style={{
-              backgroundColor: "rgba(255,255,255,0.12)",
-              color: "var(--foreground)",
-              fontSize: "var(--text-xs)",
-              fontWeight: "var(--font-weight-medium)",
+              backgroundColor: "var(--foreground)",
+              color: "var(--background)",
+              fontSize: "var(--text-sm)",
+              fontWeight: "var(--font-weight-bold)",
               fontFamily: "'Lava', sans-serif",
-              padding: "4px 12px",
-              borderRadius: "var(--radius-full, 9999px)",
-              border: "1px solid rgba(255,255,255,0.18)",
-              backdropFilter: "blur(6px)",
-              letterSpacing: "0.04em",
+              padding: "6px 16px",
+              borderRadius: "var(--radius-tooltip)",
+              border: "none",
               whiteSpace: "nowrap",
-              maxWidth: 220,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
+              letterSpacing: "0.04em",
             }}
           >
-            {project.title}
+            <FolderOpen size={14} strokeWidth={1.5} />
+            My Projects
           </button>
-        ))}
+
+          {/* Divider */}
+          <div
+            style={{
+              width: 1,
+              height: 20,
+              backgroundColor: "var(--border)",
+              flexShrink: 0,
+            }}
+          />
+
+          {/* Recent project chips */}
+          {recentProjects.map((project) => (
+            <button
+              key={project.id}
+              className="cursor-pointer transition-colors hover:opacity-80"
+              style={{
+                backgroundColor: "rgba(255,255,255,0.12)",
+                color: "var(--foreground)",
+                fontSize: "var(--text-xs)",
+                fontWeight: "var(--font-weight-medium)",
+                fontFamily: "'Lava', sans-serif",
+                padding: "4px 12px",
+                borderRadius: "var(--radius-full, 9999px)",
+                border: "1px solid rgba(255,255,255,0.18)",
+                backdropFilter: "blur(6px)",
+                letterSpacing: "0.04em",
+                whiteSpace: "nowrap",
+                maxWidth: 220,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {project.title}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Projects Sheet */}
       <ProjectsSheet open={sheetOpen} onOpenChange={setSheetOpen} />
 
       {/* miniDAW & Loop -- Two-Step Progressive Disclosure */}
-      <section ref={sectionRefs.create} className="mb-10">
+      <section ref={sectionRefs.create} className="relative mb-10">
+        <TutorialNote
+        title="模式卡片为什么是第一屏核心"
+        points={[
+          "先让用户选“做歌”还是“即兴”，先定方向再给功能，选择更轻松。",
+          "展开后再看细项，属于渐进披露，能明显降低第一屏的信息压力。",
+        ]}
+          style={{ top: 10, right: 0 }}
+          panelWidth={340}
+          panelSide="left"
+        />
         <div ref={sectionRefs.loop} />
         <ModeSelector modes={modeOptions} />
       </section>
 
       {/* Improv Section -- AI Chat */}
-      <section ref={sectionRefs.improvs} className="mb-10">
+      <section ref={sectionRefs.improvs} className="relative mb-10">
+        <TutorialNote
+        title="Jam with AI 的定位"
+        points={[
+          "这是“没灵感也能开工”的入口，用户一句话就能启动创作。",
+          "建议词把空白输入变成可点选动作，主要目标是提升激活率。",
+        ]}
+          style={{ top: 8, right: 0 }}
+          panelWidth={320}
+          panelSide="left"
+        />
         <JamWithAI />
       </section>
 
       {/* Create by Players */}
-      <section>
+      <section className="relative">
+        <TutorialNote
+        title="Made by Players 的作用"
+        points={[
+          "这里用真实作品做示例，让用户快速理解这个产品能做出什么结果。",
+          "点卡片就能进入详情并尝试，形成“看灵感-立刻动手”的闭环。",
+        ]}
+          style={{ top: 0, right: 0 }}
+          panelWidth={320}
+          panelSide="left"
+        />
         <h2
           className="mb-5"
           style={{

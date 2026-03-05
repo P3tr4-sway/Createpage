@@ -7,6 +7,7 @@ import {
   Speaker,
   Users,
 } from "lucide-react";
+import { TutorialNote } from "./TutorialNote";
 
 type TabDefinition = {
   id: "sounds" | "community" | "create" | "learn" | "more";
@@ -62,6 +63,17 @@ export function BottomBar({ visible, activeSection = "create", onNavigate }: Bot
         fontFamily: "'Lava', sans-serif",
       }}
     >
+      <TutorialNote
+        title="底部导航的产品职责"
+        points={[
+          "底部导航负责全局快速切换，不抢主视觉，但要保证随时可达。",
+          "滚动到底会自动隐藏减少遮挡，按钮尺寸固定确保不同屏幕下操作一致。",
+        ]}
+        style={{ top: -24, right: -24 }}
+        panelWidth={320}
+        panelSide="left"
+      />
+
       <div
         style={{
           transform: `scale(${inverseScale})`,
