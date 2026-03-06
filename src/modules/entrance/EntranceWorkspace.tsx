@@ -7,7 +7,9 @@ import {
   Disc3,
   FolderKanban,
   FolderOpen,
+  LibraryBig,
   ListFilter,
+  MessageSquareQuote,
   Moon,
   Music,
   Repeat,
@@ -73,12 +75,6 @@ type GuitarClip = BrowseItem & {
   email: string;
   comments: ShowcaseComment[];
 };
-
-const railSections: Array<{ id: SectionId; label: string; icon: LucideIcon }> = [
-  { id: "studio", label: "DAW", icon: Bot },
-  { id: "launch", label: "Launch", icon: Sparkles },
-  { id: "community", label: "Community", icon: Users },
-];
 
 const launchGroups: Array<{
   title: string;
@@ -308,19 +304,13 @@ export function EntranceWorkspace() {
 
   const shellTone = useMemo(
     () => ({
-      appBg: isDark
-        ? "radial-gradient(circle at top left, rgba(56,189,248,0.14), transparent 24%), radial-gradient(circle at bottom right, rgba(251,146,60,0.12), transparent 30%), linear-gradient(180deg, #07090c 0%, #0b0f14 100%)"
-        : "radial-gradient(circle at top left, rgba(56,189,248,0.12), transparent 28%), radial-gradient(circle at bottom right, rgba(251,146,60,0.1), transparent 32%), linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%)",
-      railBg: isDark
-        ? "linear-gradient(180deg, rgba(4,6,10,0.98) 0%, rgba(7,10,15,0.96) 100%)"
-        : "linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(244,247,251,0.96) 100%)",
+      appBg: isDark ? "#111315" : "#f3f4f6",
+      railBg: isDark ? "#16181c" : "#f7f7f8",
       railSurface: isDark ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.78)",
       railSurfaceStrong: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.92)",
       railBorder: isDark ? "rgba(255,255,255,0.08)" : "rgba(15,23,42,0.08)",
-      mainHeaderBg: isDark ? "rgba(13,17,22,0.78)" : "rgba(248,250,252,0.76)",
-      heroScrim: isDark
-        ? "linear-gradient(180deg, rgba(5,7,10,0.04) 0%, rgba(5,7,10,0.58) 100%)"
-        : "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(248,250,252,0.5) 58%, rgba(248,250,252,0.92) 100%)",
+      mainHeaderBg: isDark ? "#171a1f" : "#f8f8f9",
+      heroScrim: isDark ? "rgba(10,12,16,0.32)" : "rgba(255,255,255,0.48)",
       heroFrameBg: isDark ? "rgba(5,8,12,0.96)" : "rgba(255,255,255,0.92)",
       chipBg: isDark ? "rgba(255,255,255,0.06)" : "rgba(15,23,42,0.04)",
       mutedText: isDark ? "rgba(255,255,255,0.58)" : "rgba(71,85,105,0.86)",
@@ -411,6 +401,69 @@ export function EntranceWorkspace() {
     }
   }, [handleScrollTo, openSong]);
 
+  const startActions = [
+    {
+      label: "Open DAW",
+      meta: "Go fullscreen",
+      icon: Bot,
+      onClick: () => setFullscreenView("agentic-producing"),
+    },
+    {
+      label: "Use Template",
+      meta: "Browse starters",
+      icon: LibraryBig,
+      onClick: () => setActiveSubView("top-templates"),
+    },
+    {
+      label: "Jam with AI",
+      meta: "Prompt first",
+      icon: Sparkles,
+      onClick: () => handleScrollTo("launch"),
+    },
+  ];
+
+  const toolActions = [
+    {
+      label: "Looper",
+      meta: "Record + layer",
+      icon: Repeat,
+      onClick: () => setActiveSubView("looper"),
+    },
+    {
+      label: "Backing Track",
+      meta: "Pick a style",
+      icon: Disc3,
+      onClick: () => setActiveSubView("instant-backing-track"),
+    },
+    {
+      label: "Stem Split",
+      meta: "Open source track",
+      icon: ListFilter,
+      onClick: () => openSong(topSongs[0]),
+    },
+  ];
+
+  const exploreActions = [
+    {
+      label: "Top Songs",
+      meta: "Community picks",
+      icon: Music,
+      onClick: () => setActiveSubView("top-songs"),
+    },
+    {
+      label: "Top Templates",
+      meta: "Reusable starts",
+      icon: Bookmark,
+      onClick: () => setActiveSubView("top-templates"),
+    },
+    {
+      label: "Backing Track",
+      meta: "Style library",
+      icon: Disc3,
+      onClick: () => setActiveSubView("instant-backing-track"),
+    },
+  ];
+
   const contentTitle =
     activeSubView === "home"
       ? "Create"
@@ -421,8 +474,10 @@ export function EntranceWorkspace() {
           : activeSubView === "top-songs"
             ? "Top Songs"
             : activeSubView === "top-templates"
-              ? "Top Templates"
+            ? "Top Templates"
               : "Guitar Showcase";
+  const workspaceEyebrow = activeSubView === "home" ? "Agentic Producing" : "Main Workspace";
+  const homePreviewScale = 0.8;
 
   if (fullscreenView === "agentic-producing") {
     return <AgenticProducingPage onBack={() => setFullscreenView(null)} />;
@@ -441,7 +496,7 @@ export function EntranceWorkspace() {
         style={{
           width: 326,
           minWidth: 326,
-          padding: "22px 18px 18px",
+          padding: "22px 18px 14px",
           background: shellTone.railBg,
           borderRight: `1px solid ${shellTone.railBorder}`,
           boxShadow: isDark ? "24px 0 80px rgba(0,0,0,0.28)" : "24px 0 64px rgba(15,23,42,0.08)",
@@ -450,11 +505,11 @@ export function EntranceWorkspace() {
       >
         <div className="flex items-center justify-between" style={{ marginBottom: 18 }}>
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl" style={brandOrbStyle}>
+            <div className="flex h-11 w-11 items-center justify-center" style={plainSidebarIconWrapStyle}>
               <Disc3 size={18} strokeWidth={1.8} />
             </div>
             <div>
-              <p style={eyebrowStyle}>Entrance</p>
+              <p style={eyebrowStyle}>Start or continue</p>
               <h1 style={railHeadingStyle}>LavaDAW</h1>
             </div>
           </div>
@@ -469,108 +524,74 @@ export function EntranceWorkspace() {
           </button>
         </div>
 
-        <div className="flex flex-col gap-2" style={{ marginBottom: 18 }}>
-          {railSections.map((section) => (
-            <button
-              key={section.id}
-              type="button"
-              onClick={() => handleScrollTo(section.id)}
-              className="flex items-center justify-between text-left"
-              style={{
-                ...railNavButtonStyle,
-                backgroundColor:
-                  activeSection === section.id ? shellTone.railSurfaceStrong : "transparent",
-                borderColor:
-                  activeSection === section.id ? shellTone.railBorder : "transparent",
-              }}
-            >
-              <span className="flex items-center gap-3">
-                <span
-                  className="flex h-9 w-9 items-center justify-center rounded-2xl"
-                  style={{
-                    backgroundColor: shellTone.railSurface,
-                    color: "var(--foreground)",
-                  }}
-                >
-                  <section.icon size={16} strokeWidth={1.8} />
-                </span>
-                <span style={railNavLabelStyle}>{section.label}</span>
-              </span>
-              <ChevronRight size={17} strokeWidth={1.8} style={{ color: shellTone.mutedText }} />
-            </button>
-          ))}
-        </div>
-
-        <RailCard title="项目管理" icon={FolderKanban} tone={shellTone}>
-          <button
-            type="button"
-            onClick={() => setProjectsOpen(true)}
-            className="flex items-center justify-between"
-            style={railPrimaryButtonStyle}
-          >
-            <span className="inline-flex items-center gap-2">
-              <FolderOpen size={15} strokeWidth={1.9} />
-              My Projects
-            </span>
-            <ChevronRight size={16} strokeWidth={1.8} />
-          </button>
-
-          <div className="flex flex-wrap gap-2" style={{ marginTop: 12 }}>
-            {recentProjects.slice(0, 4).map((project) => (
-              <button
-                key={project.id}
-                type="button"
-                onClick={() => setProjectsOpen(true)}
-                className="truncate"
-                style={railChipStyle}
-                title={project.title}
-              >
-                {project.title}
-              </button>
-            ))}
-          </div>
-        </RailCard>
-
-        <RailCard title="Loop 资源" icon={Waves} tone={shellTone} style={{ marginTop: 14 }}>
-          <div className="flex flex-col gap-2.5">
-            <button type="button" onClick={() => setActiveSubView("looper")} style={miniActionButtonStyle}>
-              <span className="inline-flex items-center gap-2">
-                <Music size={15} strokeWidth={1.9} />
-                Looper
-              </span>
-              <ChevronRight size={15} strokeWidth={1.8} />
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveSubView("instant-backing-track")}
-              style={miniActionButtonStyle}
-            >
-              <span className="inline-flex items-center gap-2">
-                <Disc3 size={15} strokeWidth={1.9} />
-                Instant Backing Track
-              </span>
-              <ChevronRight size={15} strokeWidth={1.8} />
-            </button>
-            <button type="button" onClick={() => handleScrollTo("launch")} style={miniActionButtonStyle}>
-              <span className="inline-flex items-center gap-2">
-                <Sparkles size={15} strokeWidth={1.9} />
-                Jam with AI
-              </span>
-              <ChevronRight size={15} strokeWidth={1.8} />
-            </button>
-          </div>
-        </RailCard>
-
         <div
-          className="mt-auto rounded-[26px]"
-          style={{
-            padding: "16px 16px 15px",
-            background: shellTone.railSurface,
-            border: `1px solid ${shellTone.railBorder}`,
-          }}
+          className="min-h-0 flex-1 overflow-y-auto"
+          style={{ paddingRight: 2, paddingBottom: 8 }}
         >
-          <p style={eyebrowStyle}>Flow</p>
-          <p style={railFooterStyle}>Empty project, scroll for ideas, then enter fullscreen DAW.</p>
+          <div className="flex flex-col gap-14">
+            <RailCard title="Continue" icon={FolderKanban} tone={shellTone}>
+              <div className="flex flex-col gap-3">
+                <TouchActionRow
+                  label="My Projects"
+                  meta="Open recent work"
+                  icon={FolderOpen}
+                  onClick={() => setProjectsOpen(true)}
+                />
+
+                <div className="flex flex-col gap-2">
+                  {recentProjects.slice(0, 2).map((project) => (
+                    <button
+                      key={project.id}
+                      type="button"
+                      onClick={() => setProjectsOpen(true)}
+                      className="truncate text-left"
+                      style={recentProjectRowStyle}
+                      title={project.title}
+                    >
+                      {project.title}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </RailCard>
+
+            <RailCard title="Start" icon={Sparkles} tone={shellTone}>
+              <div className="flex flex-col gap-2.5">
+                {startActions.map((action) => (
+                  <TouchActionRow
+                    key={action.label}
+                    label={action.label}
+                    meta={action.meta}
+                    icon={action.icon}
+                    onClick={action.onClick}
+                  />
+                ))}
+              </div>
+            </RailCard>
+
+            <RailCard title="Explore" icon={Users} tone={shellTone}>
+              <div className="flex flex-col gap-2.5">
+                {toolActions.slice(0, 2).map((action) => (
+                  <TouchActionRow
+                    key={action.label}
+                    label={action.label}
+                    meta={action.meta}
+                    icon={action.icon}
+                    onClick={action.onClick}
+                  />
+                ))}
+                {exploreActions.map((action) => (
+                  <TouchActionRow
+                    key={action.label}
+                    label={action.label}
+                    meta={action.meta}
+                    icon={action.icon}
+                    onClick={action.onClick}
+                  />
+                ))}
+              </div>
+            </RailCard>
+          </div>
         </div>
       </aside>
 
@@ -578,8 +599,8 @@ export function EntranceWorkspace() {
         <div
           className="flex items-center justify-between"
           style={{
-            height: 80,
-            minHeight: 80,
+            height: 72,
+            minHeight: 72,
             padding: "0 30px 0 32px",
             backgroundColor: shellTone.mainHeaderBg,
             borderBottom: `1px solid ${shellTone.railBorder}`,
@@ -587,7 +608,7 @@ export function EntranceWorkspace() {
           }}
         >
           <div>
-            <p style={eyebrowStyle}>Agentic Producing Entrance</p>
+            <p style={eyebrowStyle}>{workspaceEyebrow}</p>
             <h2 style={topTitleStyle}>{contentTitle}</h2>
           </div>
 
@@ -619,67 +640,85 @@ export function EntranceWorkspace() {
           <div
             ref={scrollContainerRef}
             onScroll={handleScroll}
-            className="min-h-0 flex-1 overflow-y-auto"
+            className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
             style={{ scrollBehavior: "smooth" }}
           >
-            <div style={{ padding: "24px 30px 42px" }}>
-              <section ref={studioRef} style={sectionStyle}>
-                <div className="mb-4 flex items-center justify-between">
-                  <div>
-                    <p style={eyebrowStyle}>Studio</p>
-                    <h3 style={sectionTitleStyle}>Right side starts with the DAW.</h3>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Pill tone={shellTone}>Empty project</Pill>
-                    <Pill tone={shellTone}>Scroll for templates</Pill>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setFullscreenView("agentic-producing")}
-                  className="relative block w-full overflow-hidden rounded-[34px] text-left"
+            <section
+              ref={studioRef}
+              style={{
+                ...sectionStyle,
+                minHeight: "clamp(640px, calc(100vh - 148px), 780px)",
+                marginLeft: -30,
+                marginRight: -30,
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setFullscreenView("agentic-producing")}
+                className="relative block w-full overflow-hidden text-left"
+                style={{
+                  height: "clamp(640px, calc(100vh - 148px), 780px)",
+                  backgroundColor: shellTone.heroFrameBg,
+                  borderTop: `1px solid ${shellTone.railBorder}`,
+                  borderBottom: `1px solid ${shellTone.railBorder}`,
+                }}
+              >
+                <div
                   style={{
-                    height: 774,
-                    border: `1px solid ${shellTone.railBorder}`,
-                    backgroundColor: shellTone.heroFrameBg,
-                    boxShadow: isDark ? "0 28px 96px rgba(0,0,0,0.34)" : "0 24px 80px rgba(15,23,42,0.12)",
+                    position: "absolute",
+                    inset: 0,
+                    overflow: "hidden",
                   }}
                 >
-                  <div style={{ position: "absolute", inset: 0 }}>
-                    <AgenticProducingPage onBack={() => setFullscreenView(null)} />
-                  </div>
                   <div
-                    className="absolute inset-0"
-                    style={{ background: shellTone.heroScrim }}
-                  />
-                  <div
-                    className="absolute left-6 top-6 inline-flex items-center gap-2 rounded-full"
-                    style={heroBadgeStyle}
+                    style={{
+                      position: "absolute",
+                      left: "50%",
+                      top: 0,
+                      width: `${100 / homePreviewScale}%`,
+                      height: `${100 / homePreviewScale}%`,
+                      transform: `translateX(-50%) scale(${homePreviewScale})`,
+                      transformOrigin: "top center",
+                    }}
                   >
-                    <Sparkles size={14} strokeWidth={1.8} />
-                    Empty project
+                    <AgenticProducingPage previewMode />
                   </div>
-                  <div
-                    className="absolute left-7 right-7 bottom-7 flex items-end justify-between gap-6 rounded-[28px]"
-                    style={heroPanelStyle}
-                  >
-                    <div>
-                      <p style={eyebrowStyle}>Agentic Producing</p>
-                      <h3 style={heroTitleStyle}>Click anywhere to go fullscreen.</h3>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Pill tone={shellTone}>Timeline</Pill>
-                      <Pill tone={shellTone}>Agent chat</Pill>
-                      <span className="inline-flex items-center gap-2 rounded-full" style={primaryButtonStyle}>
-                        <CirclePlay size={15} strokeWidth={1.9} />
-                        Open
+                </div>
+                <div
+                  className="absolute inset-0"
+                  style={{ background: shellTone.heroScrim }}
+                />
+                <div
+                  className="absolute inline-flex items-center gap-2 rounded-full"
+                  style={{ ...heroBadgeStyle, left: 30, top: 22 }}
+                >
+                  <Sparkles size={14} strokeWidth={1.8} />
+                  Empty project
+                </div>
+                <div
+                  className="absolute flex items-center gap-5"
+                  style={{ ...heroBottomDockStyle, left: 30, right: 30, bottom: 22 }}
+                >
+                  <div className="flex w-full max-w-[820px] flex-1">
+                    <div className="flex w-full items-center gap-3 rounded-full" style={heroChatFieldStyle}>
+                      <MessageSquareQuote size={18} strokeWidth={1.8} style={{ color: "var(--secondary)" }} />
+                      <span style={heroChatPlaceholderStyle}>
+                        Ask AI agent to arrange, mix, or automate...
+                      </span>
+                      <span
+                        className="inline-flex items-center gap-2 rounded-full"
+                        style={heroChatSendStyle}
+                      >
+                        <CirclePlay size={14} strokeWidth={1.9} />
+                        Send
                       </span>
                     </div>
                   </div>
-                </button>
-              </section>
+                </div>
+              </button>
+            </section>
 
+            <div style={{ padding: "22px 30px 42px" }}>
               <section ref={launchRef} style={sectionStyle}>
                 <div className="mb-4 flex items-center justify-between">
                   <div>
@@ -818,8 +857,7 @@ export function EntranceWorkspace() {
                           <div
                             className="absolute inset-0"
                             style={{
-                              background:
-                                "linear-gradient(180deg, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.58) 100%)",
+                              backgroundColor: "rgba(0,0,0,0.36)",
                             }}
                           />
                           <div className="absolute bottom-0 left-0 right-0" style={{ padding: 14 }}>
@@ -920,7 +958,7 @@ function RailCard({
       }}
     >
       <div className="mb-3 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl" style={brandOrbStyle}>
+        <div className="flex h-10 w-10 items-center justify-center" style={plainSidebarIconWrapStyle}>
           <Icon size={16} strokeWidth={1.8} />
         </div>
         <p style={railCardTitleStyle}>{title}</p>
@@ -930,27 +968,39 @@ function RailCard({
   );
 }
 
-function Pill({
-  children,
-  tone,
+function TouchActionRow({
+  label,
+  meta,
+  icon: Icon,
+  onClick,
 }: {
-  children: ReactNode;
-  tone: { chipBg: string };
+  label: string;
+  meta: string;
+  icon: LucideIcon;
+  onClick: () => void;
 }) {
   return (
-    <span
-      className="inline-flex items-center gap-2 rounded-full"
-      style={{
-        padding: "10px 14px",
-        backgroundColor: tone.chipBg,
-        border: "1px solid var(--border)",
-        color: "var(--foreground)",
-        fontSize: 13,
-        fontWeight: 600,
-      }}
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex items-center justify-between text-left"
+      style={touchRowStyle}
     >
-      {children}
-    </span>
+      <span className="flex min-w-0 items-center gap-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center" style={plainSidebarIconWrapStyle}>
+          <Icon size={16} strokeWidth={1.9} />
+        </span>
+        <span className="min-w-0">
+          <span style={touchLabelStyle}>{label}</span>
+          <span style={touchMetaStyle}>{meta}</span>
+        </span>
+      </span>
+      <ChevronRight
+        size={16}
+        strokeWidth={1.9}
+        style={{ color: "var(--secondary)" }}
+      />
+    </button>
   );
 }
 
@@ -980,8 +1030,7 @@ function CompactImageCard({
       <div
         className="absolute inset-0"
         style={{
-          background:
-            "linear-gradient(180deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.54) 100%)",
+          backgroundColor: "rgba(0,0,0,0.32)",
         }}
       />
       <div className="absolute bottom-0 left-0 right-0" style={{ padding: 14 }}>
@@ -1099,8 +1148,7 @@ function TopBrowsePage({
             <div
               className="absolute inset-0"
               style={{
-                background:
-                  "linear-gradient(180deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.68) 100%)",
+                backgroundColor: "rgba(0,0,0,0.38)",
               }}
             />
             <div className="absolute bottom-0 left-0 right-0" style={{ padding: 18 }}>
@@ -1114,18 +1162,15 @@ function TopBrowsePage({
   );
 }
 
-const brandOrbStyle: CSSProperties = {
-  background:
-    "radial-gradient(circle at 30% 30%, rgba(56,189,248,0.24), transparent 55%), var(--surface-glass)",
-  border: "1px solid var(--border)",
+const plainSidebarIconWrapStyle: CSSProperties = {
   color: "var(--foreground)",
 };
 
 const eyebrowStyle: CSSProperties = {
   margin: 0,
   color: "var(--secondary)",
-  fontSize: 11,
-  letterSpacing: "0.16em",
+  fontSize: 12,
+  letterSpacing: "0.14em",
   textTransform: "uppercase",
   fontWeight: 700,
 };
@@ -1133,7 +1178,7 @@ const eyebrowStyle: CSSProperties = {
 const railHeadingStyle: CSSProperties = {
   margin: "3px 0 0",
   color: "var(--foreground)",
-  fontSize: 23,
+  fontSize: 26,
   lineHeight: 1.02,
   letterSpacing: "-0.03em",
   fontWeight: 700,
@@ -1142,72 +1187,63 @@ const railHeadingStyle: CSSProperties = {
 const iconButtonStyle: CSSProperties = {
   width: 38,
   height: 38,
-  borderRadius: 14,
-  border: "1px solid var(--border)",
-  backgroundColor: "var(--surface-glass)",
+  borderRadius: 999,
+  border: "none",
+  backgroundColor: "transparent",
   color: "var(--foreground)",
   cursor: "pointer",
-};
-
-const railNavButtonStyle: CSSProperties = {
-  width: "100%",
-  padding: "9px 10px",
-  borderRadius: 20,
-  border: "1px solid transparent",
-  cursor: "pointer",
-};
-
-const railNavLabelStyle: CSSProperties = {
-  color: "var(--foreground)",
-  fontSize: 14,
-  fontWeight: 600,
 };
 
 const railCardTitleStyle: CSSProperties = {
   margin: 0,
   color: "var(--foreground)",
-  fontSize: 15,
-  fontWeight: 600,
+  fontSize: 16,
+  fontWeight: 700,
 };
 
-const railPrimaryButtonStyle: CSSProperties = {
+const touchRowStyle: CSSProperties = {
   width: "100%",
-  height: 44,
+  minHeight: 64,
   padding: "0 14px",
   borderRadius: 18,
   border: "1px solid var(--border)",
-  backgroundColor: "var(--foreground)",
-  color: "var(--background)",
+  backgroundColor: "var(--surface-glass)",
+  color: "var(--foreground)",
   fontSize: 14,
-  fontWeight: 700,
-  cursor: "pointer",
-};
-
-const railChipStyle: CSSProperties = {
-  maxWidth: "100%",
-  padding: "7px 11px",
-  borderRadius: 999,
-  border: "1px solid var(--border)",
-  backgroundColor: "var(--surface-glass)",
-  color: "var(--foreground)",
-  fontSize: 12,
-  fontWeight: 500,
-  cursor: "pointer",
-};
-
-const miniActionButtonStyle: CSSProperties = {
-  width: "100%",
-  height: 42,
-  padding: "0 12px",
-  borderRadius: 18,
-  border: "1px solid var(--border)",
-  backgroundColor: "var(--surface-glass)",
-  color: "var(--foreground)",
-  fontSize: 13,
   fontWeight: 600,
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
+  cursor: "pointer",
+};
+
+const touchLabelStyle: CSSProperties = {
+  display: "block",
+  color: "inherit",
+  fontSize: 15,
+  fontWeight: 700,
+  lineHeight: 1.2,
+};
+
+const touchMetaStyle: CSSProperties = {
+  display: "block",
+  marginTop: 4,
+  color: "var(--secondary)",
+  fontSize: 13,
+  fontWeight: 500,
+  lineHeight: 1.2,
+};
+
+const recentProjectRowStyle: CSSProperties = {
+  width: "100%",
+  minHeight: 56,
+  padding: "0 16px",
+  borderRadius: 18,
+  border: "1px solid var(--border)",
+  backgroundColor: "var(--surface-glass)",
+  color: "var(--foreground)",
+  fontSize: 14,
+  fontWeight: 600,
   cursor: "pointer",
 };
 
@@ -1221,7 +1257,7 @@ const railFooterStyle: CSSProperties = {
 const topTitleStyle: CSSProperties = {
   margin: "4px 0 0",
   color: "var(--foreground)",
-  fontSize: 28,
+  fontSize: 26,
   fontWeight: 700,
   letterSpacing: "-0.02em",
 };
@@ -1232,7 +1268,7 @@ const primaryButtonStyle: CSSProperties = {
   border: "1px solid var(--border)",
   backgroundColor: "var(--foreground)",
   color: "var(--background)",
-  fontSize: 14,
+  fontSize: 15,
   fontWeight: 700,
   cursor: "pointer",
 };
@@ -1243,7 +1279,7 @@ const secondaryButtonStyle: CSSProperties = {
   border: "1px solid var(--border)",
   backgroundColor: "var(--surface-glass)",
   color: "var(--foreground)",
-  fontSize: 14,
+  fontSize: 15,
   fontWeight: 600,
   cursor: "pointer",
 };
@@ -1255,7 +1291,7 @@ const sectionStyle: CSSProperties = {
 const sectionTitleStyle: CSSProperties = {
   margin: "6px 0 0",
   color: "var(--foreground)",
-  fontSize: 34,
+  fontSize: 38,
   fontWeight: 700,
   letterSpacing: "-0.03em",
 };
@@ -1269,19 +1305,38 @@ const heroBadgeStyle: CSSProperties = {
   fontWeight: 700,
 };
 
-const heroPanelStyle: CSSProperties = {
-  padding: "22px 24px",
-  border: "1px solid var(--border)",
-  backgroundColor: "var(--surface-glass-strong)",
-  backdropFilter: "blur(20px)",
+const heroBottomDockStyle: CSSProperties = {
+  padding: "0 0 0 0",
+  minHeight: 74,
 };
 
-const heroTitleStyle: CSSProperties = {
-  margin: "8px 0 0",
-  color: "var(--foreground)",
-  fontSize: 30,
+const heroChatFieldStyle: CSSProperties = {
+  minHeight: 62,
+  padding: "0 10px 0 18px",
+  border: "1px solid var(--border)",
+  backgroundColor: "var(--card)",
+  boxShadow: "0 10px 28px rgba(15,23,42,0.08)",
+};
+
+const heroChatPlaceholderStyle: CSSProperties = {
+  flex: 1,
+  minWidth: 0,
+  color: "var(--secondary)",
+  fontSize: 15,
+  fontWeight: 500,
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+};
+
+const heroChatSendStyle: CSSProperties = {
+  height: 46,
+  padding: "0 18px",
+  border: "1px solid var(--border)",
+  backgroundColor: "var(--foreground)",
+  color: "var(--background)",
+  fontSize: 14,
   fontWeight: 700,
-  letterSpacing: "-0.03em",
 };
 
 const panelStyle: CSSProperties = {
@@ -1294,7 +1349,7 @@ const panelStyle: CSSProperties = {
 const miniSectionTitleStyle: CSSProperties = {
   margin: 0,
   color: "var(--foreground)",
-  fontSize: 16,
+  fontSize: 17,
   fontWeight: 700,
 };
 
@@ -1319,7 +1374,7 @@ const launchCardStyle: CSSProperties = {
 const launchLabelStyle: CSSProperties = {
   margin: 0,
   color: "var(--foreground)",
-  fontSize: 17,
+  fontSize: 18,
   fontWeight: 700,
   lineHeight: 1.25,
 };
@@ -1327,28 +1382,28 @@ const launchLabelStyle: CSSProperties = {
 const launchMetaStyle: CSSProperties = {
   margin: "6px 0 0",
   color: "var(--secondary)",
-  fontSize: 13,
+  fontSize: 14,
   fontWeight: 500,
 };
 
 const listTitleStyle: CSSProperties = {
   margin: 0,
   color: "var(--foreground)",
-  fontSize: 14,
+  fontSize: 15,
   fontWeight: 600,
 };
 
 const listMetaStyle: CSSProperties = {
   margin: "4px 0 0",
   color: "var(--secondary)",
-  fontSize: 12,
+  fontSize: 13,
   fontWeight: 500,
 };
 
 const imageCardTitleStyle: CSSProperties = {
   margin: 0,
   color: "var(--on-image-primary)",
-  fontSize: 14,
+  fontSize: 15,
   fontWeight: 700,
   lineHeight: 1.3,
 };
@@ -1356,6 +1411,6 @@ const imageCardTitleStyle: CSSProperties = {
 const imageCardMetaStyle: CSSProperties = {
   margin: "4px 0 0",
   color: "var(--on-image-secondary)",
-  fontSize: 12,
+  fontSize: 13,
   fontWeight: 500,
 };
