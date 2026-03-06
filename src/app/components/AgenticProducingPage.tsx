@@ -114,10 +114,10 @@ export function AgenticProducingPage({
             <button
               type="button"
               onClick={onBack}
-              className="inline-flex items-center justify-center cursor-pointer"
+              className="tablet-icon-target tablet-pressable inline-flex items-center justify-center"
               style={{
-                width: 36,
-                height: 36,
+                width: 44,
+                height: 44,
                 borderRadius: 10,
                 color: "var(--agentic-foreground)",
                 backgroundColor: "transparent",
@@ -146,15 +146,15 @@ export function AgenticProducingPage({
           )}
 
           <div className="flex items-center gap-2">
-            <button type="button" className="inline-flex items-center justify-center" style={toolbarIconStyle}>
+            <button type="button" className="tablet-icon-target tablet-pressable inline-flex items-center justify-center" style={toolbarIconStyle}>
               <Undo2 size={16} strokeWidth={1.8} />
             </button>
-            <button type="button" className="inline-flex items-center justify-center" style={toolbarIconStyle}>
+            <button type="button" className="tablet-icon-target tablet-pressable inline-flex items-center justify-center" style={toolbarIconStyle}>
               <Upload size={16} strokeWidth={1.8} />
             </button>
             <button
               type="button"
-              className="inline-flex items-center gap-2 cursor-pointer"
+              className="tablet-touch-target tablet-pressable inline-flex items-center gap-2"
               style={{
                 height: 42,
                 padding: "0 14px",
@@ -188,7 +188,7 @@ export function AgenticProducingPage({
             >
               <button
                 type="button"
-                className="inline-flex items-center gap-2 cursor-pointer"
+                className="tablet-touch-target tablet-pressable inline-flex items-center gap-2"
                 style={{
                 width: "100%",
                 height: addTrackRowHeight,
@@ -510,9 +510,9 @@ export function AgenticProducingPage({
                   key={prompt}
                   type="button"
                   onClick={() => sendMessage(prompt)}
-                  className="inline-flex items-center gap-1.5"
+                  className="tablet-touch-target tablet-pressable inline-flex items-center gap-1.5"
                   style={{
-                    height: 30,
+                    minHeight: 40,
                     padding: "0 11px",
                     borderRadius: 12,
                     border: "1px solid var(--agentic-border)",
@@ -602,7 +602,7 @@ export function AgenticProducingPage({
                 <button
                   type="button"
                   onClick={() => sendMessage()}
-                  className="inline-flex items-center justify-center"
+                  className="tablet-icon-target tablet-pressable inline-flex items-center justify-center"
                   style={{
                     width: 40,
                     height: 40,
@@ -625,8 +625,8 @@ export function AgenticProducingPage({
 }
 
 const toolbarIconStyle: React.CSSProperties = {
-  width: 38,
-  height: 38,
+  width: 44,
+  height: 44,
   borderRadius: 12,
   border: "1px solid var(--agentic-border)",
   backgroundColor: "var(--agentic-elevated)",
@@ -660,8 +660,8 @@ const trackMoreStyle: React.CSSProperties = {
 };
 
 const bottomIconStyle: React.CSSProperties = {
-  width: 42,
-  height: 42,
+  width: 44,
+  height: 44,
   borderRadius: 12,
   border: "1px solid var(--agentic-border)",
   backgroundColor: "var(--agentic-elevated)",
@@ -684,7 +684,7 @@ const transportStyle: React.CSSProperties = {
 };
 
 const bottomPillStyle: React.CSSProperties = {
-  height: 38,
+  height: 44,
   padding: "0 13px",
   borderRadius: 9999,
   border: "1px solid var(--agentic-border)",

@@ -220,13 +220,14 @@ export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
         {/* Filter chips */}
         <div
           className="flex gap-2"
-          style={{ padding: "0 var(--spacing-4, 16px)" }}
+          style={{ padding: "0 var(--spacing-4, 16px)", WebkitOverflowScrolling: "touch" }}
         >
           {filters.map((f) => (
             <button
+              type="button"
               key={f}
               onClick={() => setActiveFilter(f)}
-              className="cursor-pointer transition-colors"
+              className="tablet-touch-target tablet-pressable whitespace-nowrap"
               style={{
                 backgroundColor:
                   activeFilter === f
@@ -239,7 +240,7 @@ export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
                 fontSize: "var(--text-sm)",
                 fontWeight: "var(--font-weight-medium)",
                 fontFamily: FONT,
-                padding: "4px 14px",
+                padding: "0 14px",
                 borderRadius: "var(--radius-tooltip)",
                 border: `1px solid ${
                   activeFilter === f
@@ -263,7 +264,8 @@ export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
           {filtered.map((project) => (
             <button
               key={project.id}
-              className="flex items-center gap-4 w-full text-left rounded-lg cursor-pointer transition-colors hover:bg-muted"
+              type="button"
+              className="tablet-touch-target tablet-pressable tablet-hover-soft flex w-full items-center gap-4 rounded-lg text-left"
               style={{
                 padding: "10px 12px",
                 fontFamily: FONT,

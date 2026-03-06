@@ -16,20 +16,16 @@ export function FeatureCard({
   onClick,
 }: FeatureCardProps) {
   const isInteractive = typeof onClick === "function";
+  const Comp = isInteractive ? "button" : "div";
 
   return (
-    <div
-      onClick={onClick}
-      onKeyDown={(e) => {
-        if (!isInteractive) return;
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onClick?.();
-        }
-      }}
-      role={isInteractive ? "button" : undefined}
-      tabIndex={isInteractive ? 0 : undefined}
-      className="relative flex flex-col justify-end p-6 rounded-card border border-border cursor-pointer transition-all hover:border-secondary/30"
+    <Comp
+      {...(isInteractive ? { type: "button" as const, onClick } : {})}
+      className={`relative flex flex-col justify-end rounded-card border border-border p-6 text-left ${
+        isInteractive
+          ? "tablet-touch-target tablet-pressable cursor-pointer"
+          : ""
+      }`}
       style={{
         backgroundColor: "var(--card)",
         minHeight: 180,
@@ -66,6 +62,6 @@ export function FeatureCard({
           )}
         </p>
       </div>
-    </div>
+    </Comp>
   );
 }

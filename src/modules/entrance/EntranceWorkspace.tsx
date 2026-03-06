@@ -448,6 +448,7 @@ export function EntranceWorkspace() {
           <button
             type="button"
             onClick={() => setTheme(isDark ? "light" : "dark")}
+            className="tablet-icon-target tablet-pressable"
             style={iconButtonStyle}
             aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
           >
@@ -475,7 +476,7 @@ export function EntranceWorkspace() {
                       key={project.id}
                       type="button"
                       onClick={() => setProjectsOpen(true)}
-                      className="truncate text-left"
+                      className="tablet-touch-target tablet-pressable truncate text-left"
                       style={recentProjectRowStyle}
                       title={project.title}
                     >
@@ -537,7 +538,7 @@ export function EntranceWorkspace() {
             <button
               type="button"
               onClick={() => setActiveSubView("home")}
-              className="inline-flex items-center gap-2 rounded-full"
+              className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-full"
               style={secondaryButtonStyle}
             >
               <ArrowLeft size={15} strokeWidth={1.9} />
@@ -567,6 +568,7 @@ export function EntranceWorkspace() {
               <div
                 role="button"
                 tabIndex={0}
+                data-touch-target="true"
                 onClick={() => setFullscreenView("agentic-producing")}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
@@ -574,7 +576,8 @@ export function EntranceWorkspace() {
                     setFullscreenView("agentic-producing");
                   }
                 }}
-                className="relative block w-full overflow-hidden text-left"
+                aria-label="Open full workspace"
+                className="tablet-pressable relative block w-full overflow-hidden text-left"
                 style={{
                   height: "clamp(520px, calc(100vh - 248px), 620px)",
                   backgroundColor: shellTone.heroFrameBg,
@@ -618,7 +621,7 @@ export function EntranceWorkspace() {
                       <button
                         type="button"
                         onClick={(event) => event.stopPropagation()}
-                        className="flex-1 bg-transparent text-left"
+                        className="tablet-touch-target flex-1 bg-transparent text-left"
                         style={heroChatGhostButtonStyle}
                       >
                         <span style={heroChatPlaceholderStyle}>
@@ -628,7 +631,7 @@ export function EntranceWorkspace() {
                       <button
                         type="button"
                         onClick={(event) => event.stopPropagation()}
-                        className="inline-flex items-center gap-2 rounded-full"
+                        className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-full"
                         style={heroChatSendStyle}
                       >
                         Start
@@ -668,6 +671,7 @@ export function EntranceWorkspace() {
                       <button
                         type="button"
                         onClick={() => setActiveSubView("top-templates")}
+                        className="tablet-touch-target tablet-pressable"
                         style={inlineLinkButtonStyle}
                       >
                         See all
@@ -714,6 +718,7 @@ export function EntranceWorkspace() {
                       <button
                         type="button"
                         onClick={() => setActiveSubView("guitar-showcase")}
+                        className="tablet-touch-target tablet-pressable"
                         style={inlineLinkButtonStyle}
                       >
                         See all
@@ -726,7 +731,7 @@ export function EntranceWorkspace() {
                           key={clip.id}
                           type="button"
                           onClick={() => openGuitar(clip)}
-                          className="relative overflow-hidden rounded-[22px] text-left"
+                          className="tablet-pressable relative overflow-hidden rounded-[22px] text-left"
                           style={{
                             minHeight: 168,
                             border: `1px solid ${shellTone.railBorder}`,
@@ -891,7 +896,7 @@ function LoopLaunchPanel({
     <button
       type="button"
       onClick={() => onLaunch("looper")}
-      className="relative flex h-full w-full flex-col overflow-hidden rounded-card border border-border p-6 text-left transition-colors hover:bg-[var(--soft-surface)]"
+      className="tablet-touch-target tablet-pressable tablet-hover-soft relative flex h-full w-full flex-col overflow-hidden rounded-card border border-border p-6 text-left"
       style={loopLaunchPanelStyle}
     >
       <div className="mb-2 flex items-center justify-between">
@@ -969,7 +974,7 @@ function TouchActionRow({
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center justify-between text-left"
+      className="tablet-touch-target tablet-pressable flex items-center justify-between text-left"
       style={touchRowStyle}
     >
       <span className="flex min-w-0 items-center gap-3">
@@ -1001,7 +1006,7 @@ function CompactImageCard({
     <button
       type="button"
       onClick={onClick}
-      className="relative overflow-hidden rounded-[22px] text-left"
+      className="tablet-pressable relative overflow-hidden rounded-[22px] text-left"
       style={{
         minHeight: 150,
         border: "1px solid var(--border)",
@@ -1038,7 +1043,7 @@ function TemplateShortcutCard({
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center gap-3 rounded-[20px] text-left transition-transform hover:-translate-y-0.5"
+      className="tablet-touch-target tablet-pressable tablet-hover-lift flex items-center gap-3 rounded-[20px] text-left"
       style={templateShortcutCardStyle}
     >
       <div
@@ -1079,7 +1084,7 @@ function TopListColumn({
     <div className="rounded-[30px]" style={panelStyle}>
       <div className="mb-3 flex items-center justify-between">
         <p style={miniSectionTitleStyle}>{title}</p>
-        <button type="button" onClick={onOpenDetail} style={inlineLinkButtonStyle}>
+        <button type="button" onClick={onOpenDetail} className="tablet-touch-target tablet-pressable" style={inlineLinkButtonStyle}>
           See all
         </button>
       </div>
@@ -1090,7 +1095,7 @@ function TopListColumn({
             key={item.title}
             type="button"
             onClick={() => onItemClick(item)}
-            className="flex items-center gap-3 rounded-[20px] text-left"
+            className="tablet-touch-target tablet-pressable flex items-center gap-3 rounded-[20px] text-left"
             style={{
               padding: "10px 10px 10px 12px",
               border: "1px solid var(--border)",
@@ -1140,7 +1145,7 @@ function TopBrowsePage({
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex items-center gap-2 rounded-full"
+          className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-full"
           style={secondaryButtonStyle}
         >
           <ArrowLeft size={15} strokeWidth={1.9} />
@@ -1156,7 +1161,7 @@ function TopBrowsePage({
             key={`${item.title}-${item.author}`}
             type="button"
             onClick={() => onItemClick(item)}
-            className="relative overflow-hidden rounded-[28px] text-left"
+            className="tablet-pressable relative overflow-hidden rounded-[28px] text-left"
             style={{
               minHeight: 220,
               border: "1px solid var(--border)",
@@ -1208,8 +1213,8 @@ const railHeadingStyle: CSSProperties = {
 };
 
 const iconButtonStyle: CSSProperties = {
-  width: 38,
-  height: 38,
+  width: 44,
+  height: 44,
   borderRadius: 999,
   border: "none",
   backgroundColor: "transparent",
@@ -1226,7 +1231,7 @@ const railCardTitleStyle: CSSProperties = {
 
 const touchRowStyle: CSSProperties = {
   width: "100%",
-  minHeight: 64,
+  minHeight: 72,
   padding: "0 14px",
   borderRadius: 18,
   border: "1px solid var(--border)",
@@ -1259,7 +1264,7 @@ const touchMetaStyle: CSSProperties = {
 
 const recentProjectRowStyle: CSSProperties = {
   width: "100%",
-  minHeight: 56,
+  minHeight: 60,
   padding: "0 16px",
   borderRadius: 18,
   border: "1px solid var(--border)",
@@ -1297,8 +1302,8 @@ const primaryButtonStyle: CSSProperties = {
 };
 
 const secondaryButtonStyle: CSSProperties = {
-  height: 42,
-  padding: "0 16px",
+  height: 46,
+  padding: "0 18px",
   border: "1px solid var(--border)",
   backgroundColor: "var(--surface-glass)",
   color: "var(--foreground)",
@@ -1332,7 +1337,7 @@ const heroBottomDockStyle: CSSProperties = {
 };
 
 const heroChatFieldStyle: CSSProperties = {
-  minHeight: 74,
+  minHeight: 80,
   padding: "0 12px 0 20px",
   border: "1px solid var(--border)",
   backgroundColor: "var(--card)",
@@ -1396,6 +1401,8 @@ const miniSectionTitleStyle: CSSProperties = {
 
 const inlineLinkButtonStyle: CSSProperties = {
   border: "none",
+  minHeight: 44,
+  padding: "0 6px",
   background: "transparent",
   color: "var(--secondary)",
   fontSize: 13,

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Send } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
+import { useHasCoarsePointer } from "./ui/use-mobile";
 
 const promptSuggestions = [
   "Lo-fi 75 bpm",
@@ -12,6 +13,7 @@ export function JamWithAI() {
   const [inputValue, setInputValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+  const hasCoarsePointer = useHasCoarsePointer();
 
   const handleSuggestionClick = (suggestion: string) => {
     setInputValue(suggestion);
@@ -141,6 +143,7 @@ export function JamWithAI() {
         <div
           className="flex-1 flex items-center gap-3 px-4 py-3 rounded-lg border transition-colors"
           style={{
+            minHeight: "var(--touch-target-comfortable)",
             backgroundColor: "var(--input-background)",
             borderColor: isFocused
               ? "var(--secondary)"
@@ -164,20 +167,22 @@ export function JamWithAI() {
           />
         </div>
         <motion.button
-          className="flex items-center gap-2 cursor-pointer"
+          type="button"
+          className="tablet-touch-target tablet-pressable flex items-center gap-2"
           style={{
             backgroundColor: "var(--foreground)",
             color: "var(--background)",
             fontSize: "var(--text-sm)",
             fontWeight: "var(--font-weight-bold)",
             fontFamily: "var(--app-font-family)",
-            padding: "6px 16px",
+            minWidth: 96,
+            padding: "0 18px",
             borderRadius: "var(--radius-tooltip)",
             border: "none",
             whiteSpace: "nowrap",
             letterSpacing: "0.04em",
           }}
-          whileHover={{ scale: 1.03 }}
+          whileHover={hasCoarsePointer ? undefined : { scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
         >
           Jam
@@ -189,8 +194,9 @@ export function JamWithAI() {
         {promptSuggestions.map((suggestion) => (
           <motion.button
             key={suggestion}
+            type="button"
             onClick={() => handleSuggestionClick(suggestion)}
-            className="px-3 py-1 rounded-full border cursor-pointer"
+            className="tablet-touch-target tablet-pressable rounded-full border px-4"
             style={{
               borderColor: "var(--border)",
               color: "var(--secondary)",
@@ -200,11 +206,15 @@ export function JamWithAI() {
               backgroundColor: "transparent",
               opacity: 0.85,
             }}
-            whileHover={{
-              backgroundColor: "var(--soft-surface-strong)",
-              color: "var(--foreground)",
-              opacity: 1,
-            }}
+            whileHover={
+              hasCoarsePointer
+                ? undefined
+                : {
+                    backgroundColor: "var(--soft-surface-strong)",
+                    color: "var(--foreground)",
+                    opacity: 1,
+                  }
+            }
             whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.2 }}
           >

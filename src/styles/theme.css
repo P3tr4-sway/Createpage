@@ -165,6 +165,9 @@
   --agentic-chat-agent-fg: rgba(17, 24, 39, 1);
   --agentic-chat-agent-border: rgba(15, 23, 42, 0.14);
   --radius-full: 9999px;
+  --touch-target-min: 44px;
+  --touch-target-comfortable: 52px;
+  --touch-press-scale: 0.985;
 }
 
 .dark {
@@ -319,6 +322,24 @@
     @apply bg-background text-foreground;
     font-family: var(--app-font-family);
   }
+
+  button,
+  [role="button"],
+  a,
+  input,
+  textarea,
+  select,
+  summary {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button,
+  [role="button"],
+  a {
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }
 
 /**
@@ -386,4 +407,62 @@
 
 html {
   font-size: var(--font-size);
+}
+
+@layer utilities {
+  .tablet-touch-target {
+    min-width: var(--touch-target-min);
+    min-height: var(--touch-target-comfortable);
+  }
+
+  .tablet-icon-target {
+    min-width: var(--touch-target-min);
+    min-height: var(--touch-target-min);
+  }
+
+  .tablet-pressable {
+    transition:
+      transform 140ms ease,
+      opacity 180ms ease,
+      background-color 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease;
+  }
+
+  .tablet-pressable:active {
+    transform: scale(var(--touch-press-scale));
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .tablet-hover-fade:hover {
+      opacity: 0.82;
+    }
+
+    .tablet-hover-soft:hover {
+      background-color: var(--soft-surface);
+    }
+
+    .tablet-hover-lift:hover {
+      transform: translateY(-2px);
+    }
+
+    .tablet-image-zoom:hover [data-tablet-image] {
+      transform: scale(1.05);
+    }
+  }
+
+  @media (pointer: coarse), (hover: none) {
+    button,
+    [role="button"],
+    [data-touch-target="true"] {
+      min-width: var(--touch-target-min);
+      min-height: var(--touch-target-min);
+    }
+
+    input,
+    textarea,
+    select {
+      font-size: 16px;
+    }
+  }
 }

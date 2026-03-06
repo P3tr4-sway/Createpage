@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import type { LucideIcon } from "lucide-react";
 import { ChevronDown } from "lucide-react";
 import { FeatureCard } from "./FeatureCard";
+import { useHasCoarsePointer } from "./ui/use-mobile";
 
 interface FeatureCardData {
   title: string;
@@ -26,6 +27,7 @@ interface ModeSelectorProps {
 
 export function ModeSelector({ modes, onCardClick }: ModeSelectorProps) {
   const [selectedMode, setSelectedMode] = useState<string | null>(null);
+  const hasCoarsePointer = useHasCoarsePointer();
 
   const handleSelect = (id: string) => {
     setSelectedMode((prev) => (prev === id ? null : id));
@@ -38,21 +40,21 @@ export function ModeSelector({ modes, onCardClick }: ModeSelectorProps) {
         {modes.map((mode) => {
           const isSelected = selectedMode === mode.id;
           const isOther = selectedMode !== null && !isSelected;
-          const Icon = mode.icon;
 
           return (
             <motion.button
               key={mode.id}
+              type="button"
               onClick={() => handleSelect(mode.id)}
               animate={{
                 opacity: isOther ? 0.35 : 1,
                 scale: isOther ? 0.97 : 1,
               }}
-              whileHover="hovered"
+              whileHover={hasCoarsePointer ? undefined : "hovered"}
               transition={{ duration: 0.25, ease: "easeOut" }}
-              className="relative flex flex-col justify-end items-start text-left rounded-card border cursor-pointer overflow-hidden"
+              className="tablet-touch-target tablet-pressable relative flex flex-col items-start justify-end overflow-hidden rounded-card border text-left"
               style={{
-                height: 390,
+                height: hasCoarsePointer ? 408 : 390,
                 borderColor: isSelected ? "var(--on-image-primary)" : "var(--border)",
                 boxShadow: isSelected
                   ? "inset 0 0 0 1px var(--on-image-primary), 0 0 32px rgba(0,0,0,0.18)"
@@ -62,7 +64,7 @@ export function ModeSelector({ modes, onCardClick }: ModeSelectorProps) {
             >
               {/* Background image — zooms on hover via variant propagation */}
               <motion.div
-                variants={{ hovered: { scale: 1.06 } }}
+                variants={hasCoarsePointer ? undefined : { hovered: { scale: 1.06 } }}
                 transition={{ duration: 0.55, ease: "easeOut" }}
                 className="absolute inset-0 w-full h-full"
                 style={{

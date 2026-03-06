@@ -162,7 +162,9 @@ export function TemplateSheet({
                 }}
               >
                 <button
-                  className="flex items-center justify-center cursor-pointer transition-opacity hover:opacity-80"
+                  type="button"
+                  aria-label={isSong ? "Play song preview" : isGuitar ? "Play guitar clip preview" : "Play template preview"}
+                  className="tablet-icon-target tablet-pressable tablet-hover-fade flex items-center justify-center"
                   style={{
                     width: 56,
                     height: 56,
@@ -179,8 +181,10 @@ export function TemplateSheet({
 
               {/* Close button */}
               <button
+                type="button"
                 onClick={onClose}
-                className="absolute top-4 right-4 flex items-center justify-center cursor-pointer transition-opacity hover:opacity-70"
+                aria-label="Close detail sheet"
+                className="tablet-icon-target tablet-pressable tablet-hover-fade absolute top-4 right-4 flex items-center justify-center"
                 style={{
                   width: 36,
                   height: 36,
@@ -287,7 +291,9 @@ export function TemplateSheet({
                 {/* Action icons */}
                 <div className="flex items-center gap-2">
                   <button
-                    className="flex items-center justify-center cursor-pointer transition-opacity hover:opacity-70"
+                    type="button"
+                    aria-label="Like item"
+                    className="tablet-icon-target tablet-pressable tablet-hover-fade flex items-center justify-center"
                     style={{
                       width: 40,
                       height: 40,
@@ -300,7 +306,9 @@ export function TemplateSheet({
                     <Heart size={18} strokeWidth={1.5} />
                   </button>
                   <button
-                    className="flex items-center justify-center cursor-pointer transition-opacity hover:opacity-70"
+                    type="button"
+                    aria-label="Save item"
+                    className="tablet-icon-target tablet-pressable tablet-hover-fade flex items-center justify-center"
                     style={{
                       width: 40,
                       height: 40,
@@ -366,14 +374,16 @@ export function TemplateSheet({
 
               {/* Remix CTA */}
               <button
-                className="w-full flex items-center justify-center gap-3 cursor-pointer transition-opacity hover:opacity-90"
+                type="button"
+                className="tablet-touch-target tablet-pressable tablet-hover-fade flex w-full items-center justify-center gap-3"
                 style={{
                   backgroundColor: "var(--foreground)",
                   color: "var(--background)",
                   fontSize: "var(--text-base)",
                   fontWeight: "var(--font-weight-bold)",
                   fontFamily: FONT,
-                  padding: "14px 0",
+                  padding: "0 18px",
+                  minHeight: "var(--touch-target-comfortable)",
                   borderRadius: "var(--radius-tooltip)",
                   border: "none",
                   letterSpacing: "0.04em",
@@ -467,13 +477,13 @@ export function TemplateSheet({
                     {albumArt.map((src, i) => (
                       <div
                         key={i}
-                        className="relative overflow-hidden aspect-square cursor-pointer group"
+                        className="relative aspect-square overflow-hidden"
                         style={{ borderRadius: "var(--radius)" }}
                       >
                         <ImageWithFallback
                           src={src}
                           alt={`Album art ${i + 1}`}
-                          className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105"
+                          className="absolute inset-0 h-full w-full object-cover"
                         />
                       </div>
                     ))}

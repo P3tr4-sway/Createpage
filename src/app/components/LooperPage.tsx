@@ -177,12 +177,12 @@ export function LooperPage({ onBack }: LooperPageProps) {
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex items-center gap-2 cursor-pointer transition-opacity hover:opacity-80"
+          className="tablet-touch-target tablet-pressable tablet-hover-fade inline-flex items-center gap-2"
           style={{
             color: "var(--foreground)",
             fontSize: "var(--text-sm)",
             fontWeight: "var(--font-weight-medium)",
-            padding: "6px 10px",
+            padding: "0 14px",
             borderRadius: 10,
             border: "1px solid var(--border)",
             backgroundColor: "var(--soft-surface)",
@@ -205,7 +205,7 @@ export function LooperPage({ onBack }: LooperPageProps) {
         <div style={{ width: 60 }} />
       </div>
 
-      <div className="mb-6 flex items-center gap-2.5 overflow-x-auto pb-1">
+      <div className="mb-6 flex items-center gap-2.5 overflow-x-auto pb-1" style={{ WebkitOverflowScrolling: "touch" }}>
         {filters.map((filter) => {
           const isActive = activeFilter === filter;
           const isDrumless = filter === "Drumless Loop";
@@ -217,9 +217,9 @@ export function LooperPage({ onBack }: LooperPageProps) {
                 setActiveFilter(filter);
                 setShowAll(false);
               }}
-              className="cursor-pointer transition-all whitespace-nowrap inline-flex items-center gap-1.5"
+              className="tablet-touch-target tablet-pressable inline-flex items-center gap-1.5 whitespace-nowrap"
               style={{
-                padding: "9px 18px",
+                padding: "0 18px",
                 borderRadius: 12,
                 border: isActive ? "1px solid var(--chip-active-border)" : "1px solid var(--border)",
                 backgroundColor: isActive ? "var(--chip-active-bg)" : "var(--chip-bg)",
@@ -237,9 +237,9 @@ export function LooperPage({ onBack }: LooperPageProps) {
 
         <button
           type="button"
-          className="ml-auto inline-flex items-center gap-2 cursor-pointer whitespace-nowrap"
+          className="tablet-touch-target tablet-pressable ml-auto inline-flex items-center gap-2 whitespace-nowrap"
           style={{
-            padding: "9px 16px",
+            padding: "0 16px",
             borderRadius: 12,
             border: "1px solid var(--border)",
             backgroundColor: "var(--chip-bg)",
@@ -259,7 +259,7 @@ export function LooperPage({ onBack }: LooperPageProps) {
           <button
             key={track.id}
             type="button"
-            className="relative overflow-hidden text-left cursor-pointer transition-opacity hover:opacity-95"
+            className="tablet-pressable tablet-hover-fade relative overflow-hidden text-left"
             style={{
               borderRadius: "var(--radius-card)",
               minHeight: 250,
@@ -314,14 +314,14 @@ export function LooperPage({ onBack }: LooperPageProps) {
           <button
             type="button"
             onClick={() => setShowAll((prev) => !prev)}
-            className="cursor-pointer transition-opacity hover:opacity-70"
+            className="tablet-touch-target tablet-pressable tablet-hover-fade"
             style={{
               backgroundColor: "transparent",
               color: "var(--foreground)",
               fontSize: "var(--text-sm)",
               fontWeight: "var(--font-weight-medium)",
               fontFamily: "var(--app-font-family)",
-              padding: "8px 24px",
+              padding: "0 24px",
               borderRadius: "var(--radius-full, 9999px)",
               border: "1px solid var(--border)",
               letterSpacing: "0.04em",

@@ -19,3 +19,18 @@ export function useIsMobile() {
 
   return !!isMobile;
 }
+
+export function useHasCoarsePointer() {
+  const [hasCoarsePointer, setHasCoarsePointer] = React.useState(false);
+
+  React.useEffect(() => {
+    const mql = window.matchMedia("(pointer: coarse), (hover: none)");
+    const onChange = () => setHasCoarsePointer(mql.matches);
+
+    onChange();
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
+
+  return hasCoarsePointer;
+}
