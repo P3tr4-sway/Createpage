@@ -697,9 +697,16 @@ export function EntranceWorkspace() {
                 </div>
                 <div
                   className="absolute flex items-center gap-5"
-                  style={{ ...heroBottomDockStyle, left: 30, right: 30, bottom: 22 }}
+                  style={{
+                    ...heroBottomDockStyle,
+                    left: "50%",
+                    top: "61.8%",
+                    width: "66.666%",
+                    maxWidth: 980,
+                    transform: "translate(-50%, -50%)",
+                  }}
                 >
-                  <div className="flex w-full max-w-[820px] flex-1">
+                  <div className="flex w-full">
                     <div className="flex w-full items-center gap-3 rounded-full" style={heroChatFieldStyle}>
                       <MessageSquareQuote size={18} strokeWidth={1.8} style={{ color: "var(--secondary)" }} />
                       <span style={heroChatPlaceholderStyle}>
@@ -1307,12 +1314,12 @@ const heroBadgeStyle: CSSProperties = {
 
 const heroBottomDockStyle: CSSProperties = {
   padding: "0 0 0 0",
-  minHeight: 74,
+  minHeight: 88,
 };
 
 const heroChatFieldStyle: CSSProperties = {
-  minHeight: 62,
-  padding: "0 10px 0 18px",
+  minHeight: 74,
+  padding: "0 12px 0 24px",
   border: "1px solid var(--border)",
   backgroundColor: "var(--card)",
   boxShadow: "0 10px 28px rgba(15,23,42,0.08)",
@@ -1322,7 +1329,7 @@ const heroChatPlaceholderStyle: CSSProperties = {
   flex: 1,
   minWidth: 0,
   color: "var(--secondary)",
-  fontSize: 15,
+  fontSize: 18,
   fontWeight: 500,
   whiteSpace: "nowrap",
   overflow: "hidden",
@@ -1330,12 +1337,12 @@ const heroChatPlaceholderStyle: CSSProperties = {
 };
 
 const heroChatSendStyle: CSSProperties = {
-  height: 46,
-  padding: "0 18px",
+  height: 56,
+  padding: "0 24px",
   border: "1px solid var(--border)",
   backgroundColor: "var(--foreground)",
   color: "var(--background)",
-  fontSize: 14,
+  fontSize: 16,
   fontWeight: 700,
 };
 
