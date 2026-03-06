@@ -3,11 +3,11 @@ import {
   Bookmark,
   Bot,
   ChevronRight,
-  FolderOpen,
   LibraryBig,
   Moon,
   Music,
   Repeat,
+  Search,
   Sparkles,
   Sun,
   Waves,
@@ -31,7 +31,7 @@ import { ImageWithFallback } from "../../app/components/figma/ImageWithFallback"
 import { InstantBackingTrackPage } from "../../app/components/InstantBackingTrackPage";
 import { JamWithAI } from "../../app/components/JamWithAI";
 import { LooperPage } from "../../app/components/LooperPage";
-import { ProjectsSheet, recentProjects } from "../../app/components/ProjectsSheet";
+import { ProjectsSheet } from "../../app/components/ProjectsSheet";
 import { TemplateSheet } from "../../app/components/TemplateSheet";
 
 type SectionId = "studio" | "launch" | "community";
@@ -73,6 +73,27 @@ type QuickAction = {
   tag: string;
   imageUrl: string;
   onClick: () => void;
+};
+
+type SidebarAction = {
+  label: string;
+  meta?: string;
+  icon: LucideIcon;
+  accent: string;
+  onClick: () => void;
+};
+
+type SidebarProject = {
+  id: string;
+  title: string;
+  meta: string;
+  status: string;
+  onClick: () => void;
+};
+
+type SidebarProjectGroup = {
+  label: string;
+  items: SidebarProject[];
 };
 
 const topSongs: BrowseItem[] = [
@@ -404,6 +425,9 @@ export function EntranceWorkspace() {
   const shellTone = useMemo(
     () => ({
       appBg: isDark ? "#111315" : "#f3f4f6",
+      homeBg: isDark
+        ? "radial-gradient(circle at 18% 0%, rgba(99,102,241,0.18), transparent 30%), radial-gradient(circle at 88% 12%, rgba(45,212,191,0.14), transparent 26%), linear-gradient(180deg, #111315 0%, #151920 34%, #111315 100%)"
+        : "radial-gradient(circle at 16% 0%, rgba(99,102,241,0.08), transparent 28%), radial-gradient(circle at 86% 12%, rgba(45,212,191,0.08), transparent 24%), linear-gradient(180deg, #f7f8fb 0%, #edf2f8 34%, #f3f4f6 100%)",
       railBg: isDark ? "#16181c" : "#f7f7f8",
       railSurface: isDark ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.78)",
       railSurfaceStrong: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.92)",
@@ -412,7 +436,12 @@ export function EntranceWorkspace() {
       heroScrim: isDark
         ? "linear-gradient(180deg, rgba(6,8,12,0.18) 0%, rgba(6,8,12,0.36) 48%, rgba(6,8,12,0.6) 100%)"
         : "linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.28) 48%, rgba(248,250,252,0.68) 100%)",
+      heroBridge: isDark
+        ? "linear-gradient(180deg, rgba(17,19,21,0) 0%, rgba(17,19,21,0.18) 36%, rgba(17,19,21,0.82) 100%)"
+        : "linear-gradient(180deg, rgba(243,244,246,0) 0%, rgba(243,244,246,0.42) 36%, rgba(243,244,246,0.95) 100%)",
       heroFrameBg: isDark ? "rgba(5,8,12,0.96)" : "rgba(255,255,255,0.92)",
+      heroHintBg: isDark ? "rgba(10,14,20,0.74)" : "rgba(255,255,255,0.8)",
+      heroHintBorder: isDark ? "rgba(255,255,255,0.12)" : "rgba(15,23,42,0.08)",
       chipBg: isDark ? "rgba(255,255,255,0.06)" : "rgba(15,23,42,0.04)",
       mutedText: isDark ? "rgba(255,255,255,0.58)" : "rgba(71,85,105,0.86)",
     }),
@@ -487,47 +516,155 @@ export function EntranceWorkspace() {
     }
   }, []);
 
-  const startActions = [
-    {
-      label: "New Session",
-      meta: "Open the full workspace",
-      icon: Bot,
-      onClick: () => setFullscreenView("agentic-producing"),
-    },
-    {
-      label: "From Template",
-      meta: "Start from a proven setup",
-      icon: LibraryBig,
-      onClick: () => setActiveSubView("top-templates"),
-    },
-    {
-      label: "Jam with AI",
-      meta: "Describe the vibe first",
-      icon: Sparkles,
-      onClick: () => handleScrollTo("launch"),
-    },
-  ];
+  const createActions = useMemo<SidebarAction[]>(
+    () => [
+      {
+        label: "Song",
+        meta: "Full sketch",
+        icon: Bot,
+        accent: "rgba(99, 102, 241, 0.18)",
+        onClick: () => setFullscreenView("agentic-producing"),
+      },
+      {
+        label: "Loop",
+        meta: "Fast groove",
+        icon: Repeat,
+        accent: "rgba(20, 184, 166, 0.18)",
+        onClick: () => {
+          setLooperInitialFilter("Hot");
+          setActiveSubView("looper");
+        },
+      },
+      {
+        label: "Jam",
+        meta: "Start loose",
+        icon: Sparkles,
+        accent: "rgba(244, 114, 182, 0.18)",
+        onClick: () => handleScrollTo("launch"),
+      },
+    ],
+    [handleScrollTo],
+  );
 
-  const exploreActions = [
-    {
-      label: "Top Songs",
-      meta: "Best recent community sessions",
-      icon: Music,
-      onClick: () => setActiveSubView("top-songs"),
-    },
-    {
-      label: "Top Templates",
-      meta: "Reusable starting points",
-      icon: Bookmark,
-      onClick: () => setActiveSubView("top-templates"),
-    },
-    {
-      label: "Guitar Showcase",
-      meta: "Player takes worth studying",
-      icon: Waves,
-      onClick: () => setActiveSubView("guitar-showcase"),
-    },
-  ];
+  const workspaceActions = useMemo<SidebarAction[]>(
+    () => [
+      {
+        label: "Search",
+        meta: "All drafts",
+        icon: Search,
+        accent: "rgba(250, 204, 21, 0.2)",
+        onClick: () => setProjectsOpen(true),
+      },
+      {
+        label: "Templates",
+        meta: "Starter kits",
+        icon: LibraryBig,
+        accent: "rgba(59, 130, 246, 0.18)",
+        onClick: () => setActiveSubView("top-templates"),
+      },
+      {
+        label: "Explore",
+        meta: "Best picks",
+        icon: Music,
+        accent: "rgba(249, 115, 22, 0.18)",
+        onClick: () => handleScrollTo("community"),
+      },
+    ],
+    [handleScrollTo],
+  );
+
+  const inProgressGroups = useMemo<SidebarProjectGroup[]>(
+    () => [
+      {
+        label: "DAW",
+        items: [
+          {
+            id: "daw-1",
+            title: "Late Night Arrangement",
+            meta: "Edited 2h ago",
+            status: "Editing",
+            onClick: () => setFullscreenView("agentic-producing"),
+          },
+          {
+            id: "daw-2",
+            title: "Neo Soul Draft v4",
+            meta: "Verse and chorus blocked",
+            status: "Structuring",
+            onClick: () => setFullscreenView("agentic-producing"),
+          },
+          {
+            id: "daw-3",
+            title: "Vocal Mix Cleanup",
+            meta: "Mix notes waiting",
+            status: "Mixing",
+            onClick: () => setFullscreenView("agentic-producing"),
+          },
+        ],
+      },
+      {
+        label: "Looper",
+        items: [
+          {
+            id: "loop-1",
+            title: "Rock Loop 128",
+            meta: "Driving riff set",
+            status: "Looping",
+            onClick: () => {
+              setLooperInitialFilter("Rock");
+              setActiveSubView("looper");
+            },
+          },
+          {
+            id: "loop-2",
+            title: "Blues Pocket Jam",
+            meta: "Swing feel locked",
+            status: "Refining",
+            onClick: () => {
+              setLooperInitialFilter("Hot");
+              setActiveSubView("looper");
+            },
+          },
+          {
+            id: "loop-3",
+            title: "Funk Muting Study",
+            meta: "Pocket ideas saved",
+            status: "Looping",
+            onClick: () => {
+              setLooperInitialFilter("R&B");
+              setActiveSubView("looper");
+            },
+          },
+        ],
+      },
+      {
+        label: "Jams",
+        items: [
+          {
+            id: "jam-1",
+            title: "Ambient Jam in E",
+            meta: "Wide pads and delay",
+            status: "Jamming",
+            onClick: () => handleScrollTo("launch"),
+          },
+          {
+            id: "jam-2",
+            title: "Hip-Hop Bounce Test",
+            meta: "Beat prompt saved",
+            status: "Prompting",
+            onClick: () => openTemplate(hipHopStarterTemplate),
+          },
+          {
+            id: "jam-3",
+            title: "Guitar Call Response",
+            meta: "Lead phrases selected",
+            status: "Tracking",
+            onClick: () => openGuitar(guitarClips[0]),
+          },
+        ],
+      },
+    ],
+    [handleScrollTo, openGuitar, openTemplate],
+  );
 
   const quickActions = useMemo<QuickAction[]>(
     () => [
@@ -629,7 +766,9 @@ export function EntranceWorkspace() {
             minWidth: sidebarWidth,
             flexBasis: sidebarWidth,
             padding: `22px ${sidebarInlinePadding}px 14px`,
-            background: shellTone.railBg,
+            background: isDark
+              ? "radial-gradient(circle at top left, rgba(129,140,248,0.12), transparent 34%), radial-gradient(circle at 78% 18%, rgba(45,212,191,0.12), transparent 28%), linear-gradient(180deg, #14161c 0%, #101217 100%)"
+              : "radial-gradient(circle at top left, rgba(129,140,248,0.08), transparent 34%), radial-gradient(circle at 78% 18%, rgba(45,212,191,0.08), transparent 28%), linear-gradient(180deg, #f7f8fb 0%, #eef2f7 100%)",
             borderRight: `1px solid ${shellTone.railBorder}`,
             boxShadow: isDark ? "24px 0 80px rgba(0,0,0,0.28)" : "24px 0 64px rgba(15,23,42,0.08)",
             zIndex: 2,
@@ -655,56 +794,84 @@ export function EntranceWorkspace() {
           className="min-h-0 flex-1 overflow-y-auto"
           style={{ paddingRight: 2, paddingBottom: 8 }}
         >
-          <div className="flex flex-col gap-10">
-            <RailCard title="Continue" tone={shellTone}>
-              <div className="flex flex-col gap-3">
-                <TouchActionRow
-                  label="My Projects"
-                  meta="Open recent work"
-                  icon={FolderOpen}
-                  onClick={() => setProjectsOpen(true)}
-                />
-
-                <div className="flex flex-col gap-2">
-                  {recentProjects.slice(0, 2).map((project) => (
-                    <button
-                      key={project.id}
-                      type="button"
-                      onClick={() => setProjectsOpen(true)}
-                      className="tablet-touch-target tablet-pressable truncate text-left"
-                      style={recentProjectRowStyle}
-                      title={project.title}
-                    >
-                      {project.title}
-                    </button>
-                  ))}
-                </div>
+          <div className="flex flex-col gap-6">
+            <RailCard title="Create" tone={shellTone} style={createRailCardStyle}>
+              <div className="mb-4">
+                <p style={railIntroStyle}>
+                  Make something fun, fast.
+                </p>
               </div>
-            </RailCard>
 
-            <RailCard title="Start" tone={shellTone}>
               <div className="flex flex-col gap-2.5">
-                {startActions.map((action) => (
+                {createActions.map((action) => (
                   <TouchActionRow
                     key={action.label}
                     label={action.label}
                     meta={action.meta}
                     icon={action.icon}
+                    accent={action.accent}
+                    onClick={action.onClick}
+                  />
+                ))}
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                <MiniActionChip
+                  label="Guitar Riff"
+                  accent="rgba(250, 204, 21, 0.22)"
+                  onClick={() => openGuitar(guitarClips[0])}
+                />
+                <MiniActionChip
+                  label="Beat Sketch"
+                  accent="rgba(249, 115, 22, 0.18)"
+                  onClick={() => openTemplate(hipHopStarterTemplate)}
+                />
+                <MiniActionChip
+                  label="Starter Template"
+                  accent="rgba(59, 130, 246, 0.16)"
+                  onClick={() => setActiveSubView("top-templates")}
+                />
+              </div>
+            </RailCard>
+
+            <RailCard title="Workspace" tone={shellTone}>
+              <div className="flex flex-col gap-2.5">
+                {workspaceActions.map((action) => (
+                  <TouchActionRow
+                    key={action.label}
+                    label={action.label}
+                    meta={action.meta}
+                    icon={action.icon}
+                    accent={action.accent}
                     onClick={action.onClick}
                   />
                 ))}
               </div>
             </RailCard>
 
-            <RailCard title="Browse" tone={shellTone}>
-              <div className="flex flex-col gap-2.5">
-                {exploreActions.map((action) => (
-                  <TouchActionRow
-                    key={action.label}
-                    label={action.label}
-                    meta={action.meta}
-                    icon={action.icon}
-                    onClick={action.onClick}
+            <RailCard
+              title="In Progress"
+              tone={shellTone}
+              style={inProgressRailCardStyle}
+            >
+              <div className="mb-3 flex items-center justify-between">
+                <p style={railIntroStyle}>Pick up the good stuff.</p>
+                <button
+                  type="button"
+                  onClick={() => setProjectsOpen(true)}
+                  className="tablet-touch-target tablet-pressable"
+                  style={inlineLinkButtonStyle}
+                >
+                  See all
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                {inProgressGroups.map((group) => (
+                  <SidebarProjectCluster
+                    key={group.label}
+                    label={group.label}
+                    items={group.items}
                   />
                 ))}
               </div>
@@ -749,12 +916,14 @@ export function EntranceWorkspace() {
             ref={scrollContainerRef}
             onScroll={handleScroll}
             className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
-            style={{ scrollBehavior: "smooth" }}
+            style={{ scrollBehavior: "smooth", background: shellTone.homeBg }}
           >
             <section
               ref={studioRef}
                 style={{
                   ...sectionStyle,
+                  position: "relative",
+                  zIndex: 3,
                   minHeight: "clamp(520px, calc(100vh - 248px), 620px)",
                   marginLeft: -mainContentInlinePadding,
                   marginRight: -mainContentInlinePadding,
@@ -772,7 +941,7 @@ export function EntranceWorkspace() {
                   }
                 }}
                 aria-label="Open full workspace"
-                className="tablet-pressable relative block w-full overflow-hidden text-left"
+                className="tablet-pressable relative block w-full overflow-visible text-left"
                 style={{
                   height: "clamp(520px, calc(100vh - 248px), 620px)",
                   backgroundColor: shellTone.heroFrameBg,
@@ -801,14 +970,40 @@ export function EntranceWorkspace() {
                   style={{ background: shellTone.heroScrim }}
                 />
                 <div
+                  aria-hidden="true"
+                  className="absolute rounded-[22px]"
+                  style={{
+                    top: 28,
+                    right: 28,
+                    padding: "10px 14px 11px",
+                    background: shellTone.heroHintBg,
+                    border: `1px solid ${shellTone.heroHintBorder}`,
+                    backdropFilter: "blur(18px)",
+                    boxShadow: "0 18px 38px rgba(15,23,42,0.14)",
+                  }}
+                >
+                  <span style={heroPreviewHintEyebrowStyle}>Full DAW</span>
+                  <span style={heroPreviewHintLabelStyle}>Tap anywhere to open</span>
+                </div>
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-x-0 bottom-0"
+                  style={{
+                    height: 180,
+                    background: shellTone.heroBridge,
+                    pointerEvents: "none",
+                  }}
+                />
+                <div
                   className="absolute flex items-center gap-5"
                   style={{
                     ...heroBottomDockStyle,
                     left: "50%",
-                    top: "72%",
+                    bottom: 0,
                     width: "62%",
                     maxWidth: 860,
-                    transform: "translate(-50%, -50%)",
+                    transform: "translate(-50%, 50%)",
+                    zIndex: 4,
                   }}
                 >
                   <div className="flex w-full">
@@ -837,7 +1032,17 @@ export function EntranceWorkspace() {
               </div>
             </section>
 
-              <div style={{ padding: `22px ${mainContentInlinePadding}px 42px` }}>
+              <div
+                style={{
+                  position: "relative",
+                  zIndex: 1,
+                  marginTop: -24,
+                  padding: `92px ${mainContentInlinePadding}px 42px`,
+                  background: isDark
+                    ? "linear-gradient(180deg, rgba(17,19,21,0) 0%, rgba(17,19,21,0.82) 64px, rgba(17,19,21,0.96) 100%)"
+                    : "linear-gradient(180deg, rgba(243,244,246,0) 0%, rgba(243,244,246,0.92) 64px, rgba(243,244,246,0.96) 100%)",
+                }}
+              >
               <section ref={launchRef} style={sectionStyle}>
                 <div className="mb-4 flex items-center justify-between">
                   <div>
@@ -1260,11 +1465,13 @@ function TouchActionRow({
   label,
   meta,
   icon: Icon,
+  accent,
   onClick,
 }: {
   label: string;
-  meta: string;
+  meta?: string;
   icon: LucideIcon;
+  accent: string;
   onClick: () => void;
 }) {
   return (
@@ -1275,20 +1482,87 @@ function TouchActionRow({
       style={touchRowStyle}
     >
       <span className="flex min-w-0 items-center gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center" style={plainSidebarIconWrapStyle}>
+        <span
+          className="flex h-11 w-11 shrink-0 items-center justify-center"
+          style={{ ...sidebarActionIconStyle, backgroundColor: accent }}
+        >
           <Icon size={16} strokeWidth={1.9} />
         </span>
         <span className="min-w-0">
           <span style={touchLabelStyle}>{label}</span>
-          <span style={touchMetaStyle}>{meta}</span>
+          {meta ? <span style={touchMetaStyle}>{meta}</span> : null}
         </span>
       </span>
       <ChevronRight
-        size={16}
+        size={14}
         strokeWidth={1.9}
         style={{ color: "var(--secondary)" }}
       />
     </button>
+  );
+}
+
+function MiniActionChip({
+  label,
+  accent,
+  onClick,
+}: {
+  label: string;
+  accent: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-full"
+      style={{ ...miniActionChipStyle, backgroundColor: accent }}
+    >
+      {label}
+    </button>
+  );
+}
+
+function SidebarProjectCluster({
+  label,
+  items,
+}: {
+  label: string;
+  items: SidebarProject[];
+}) {
+  return (
+    <section>
+      <div className="mb-2 flex items-center justify-between">
+        <p style={sidebarClusterLabelStyle}>{label}</p>
+        <span style={sidebarClusterCountStyle}>{items.length}</span>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        {items.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={item.onClick}
+            className="tablet-touch-target tablet-pressable flex items-center gap-3 rounded-[18px] text-left"
+            style={sidebarProjectRowStyle}
+          >
+            <span className="min-w-0 flex-1">
+              <span className="truncate" style={sidebarProjectTitleStyle}>
+                {item.title}
+              </span>
+              <span style={sidebarProjectMetaStyle}>
+                {item.meta} · {item.status}
+              </span>
+            </span>
+            <ChevronRight
+              size={14}
+              strokeWidth={1.9}
+              style={{ color: "var(--secondary)", flexShrink: 0 }}
+            />
+          </button>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -1634,17 +1908,37 @@ const iconButtonStyle: CSSProperties = {
 const railCardTitleStyle: CSSProperties = {
   margin: 0,
   color: "var(--foreground)",
-  fontSize: 16,
+  fontSize: 17,
   fontWeight: 700,
+  letterSpacing: "-0.02em",
+};
+
+const railIntroStyle: CSSProperties = {
+  margin: 0,
+  color: "var(--secondary)",
+  fontSize: 12,
+  fontWeight: 600,
+  lineHeight: 1.35,
+};
+
+const createRailCardStyle: CSSProperties = {
+  background:
+    "linear-gradient(160deg, color-mix(in srgb, var(--surface-glass-strong) 84%, rgba(129,140,248,0.18) 16%) 0%, color-mix(in srgb, var(--surface-glass) 88%, rgba(45,212,191,0.12) 12%) 100%)",
+};
+
+const inProgressRailCardStyle: CSSProperties = {
+  paddingTop: 18,
+  background:
+    "linear-gradient(180deg, color-mix(in srgb, var(--surface-glass) 88%, rgba(255,255,255,0.06) 12%) 0%, var(--surface-glass-strong) 100%)",
 };
 
 const touchRowStyle: CSSProperties = {
   width: "100%",
-  minHeight: 72,
+  minHeight: 68,
   padding: "0 14px",
-  borderRadius: 18,
-  border: "1px solid var(--border)",
-  backgroundColor: "var(--surface-glass)",
+  borderRadius: 22,
+  border: "1px solid color-mix(in srgb, var(--border) 80%, transparent)",
+  backgroundColor: "color-mix(in srgb, var(--card) 78%, transparent)",
   color: "var(--foreground)",
   fontSize: 14,
   fontWeight: 600,
@@ -1652,43 +1946,95 @@ const touchRowStyle: CSSProperties = {
   alignItems: "center",
   justifyContent: "space-between",
   cursor: "pointer",
+  boxShadow: "0 10px 24px rgba(15,23,42,0.05)",
 };
 
 const touchLabelStyle: CSSProperties = {
   display: "block",
   color: "inherit",
-  fontSize: 15,
+  fontSize: 16,
   fontWeight: 700,
   lineHeight: 1.2,
 };
 
 const touchMetaStyle: CSSProperties = {
   display: "block",
-  marginTop: 4,
+  marginTop: 3,
   color: "var(--secondary)",
-  fontSize: 13,
-  fontWeight: 500,
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
   lineHeight: 1.2,
 };
 
-const recentProjectRowStyle: CSSProperties = {
-  width: "100%",
-  minHeight: 60,
-  padding: "0 16px",
-  borderRadius: 18,
-  border: "1px solid var(--border)",
-  backgroundColor: "var(--surface-glass)",
+const miniActionChipStyle: CSSProperties = {
+  height: 40,
+  padding: "0 14px",
+  border: "1px solid color-mix(in srgb, var(--border) 70%, transparent)",
   color: "var(--foreground)",
-  fontSize: 14,
-  fontWeight: 600,
-  cursor: "pointer",
+  fontSize: 12,
+  fontWeight: 700,
+  boxShadow: "0 8px 18px rgba(15,23,42,0.05)",
 };
 
-const railFooterStyle: CSSProperties = {
-  margin: "8px 0 0",
+const sidebarActionIconStyle: CSSProperties = {
   color: "var(--foreground)",
-  fontSize: 13,
-  lineHeight: 1.55,
+  borderRadius: 16,
+  border: "1px solid color-mix(in srgb, var(--border) 55%, transparent)",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.24)",
+};
+
+const sidebarClusterLabelStyle: CSSProperties = {
+  margin: 0,
+  color: "var(--foreground)",
+  fontSize: 12,
+  fontWeight: 700,
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+};
+
+const sidebarClusterCountStyle: CSSProperties = {
+  minWidth: 22,
+  height: 22,
+  padding: "0 7px",
+  borderRadius: 999,
+  border: "1px solid var(--border)",
+  color: "var(--secondary)",
+  fontSize: 11,
+  fontWeight: 700,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+const sidebarProjectRowStyle: CSSProperties = {
+  width: "100%",
+  minHeight: 60,
+  padding: "12px 14px",
+  borderRadius: 20,
+  border: "1px solid color-mix(in srgb, var(--border) 75%, transparent)",
+  backgroundColor: "color-mix(in srgb, var(--card) 74%, transparent)",
+  boxShadow: "none",
+};
+
+const sidebarProjectTitleStyle: CSSProperties = {
+  display: "block",
+  color: "var(--foreground)",
+  fontSize: 14,
+  fontWeight: 700,
+  lineHeight: 1.2,
+};
+
+const sidebarProjectMetaStyle: CSSProperties = {
+  display: "block",
+  marginTop: 3,
+  color: "var(--secondary)",
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.06em",
+  textTransform: "uppercase",
+  lineHeight: 1.25,
 };
 
 const topTitleStyle: CSSProperties = {
@@ -1743,6 +2089,25 @@ const sectionDescriptionStyle: CSSProperties = {
 const heroBottomDockStyle: CSSProperties = {
   padding: "0 0 0 0",
   minHeight: 88,
+};
+
+const heroPreviewHintEyebrowStyle: CSSProperties = {
+  display: "block",
+  color: "var(--secondary)",
+  fontSize: 10,
+  fontWeight: 700,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  lineHeight: 1.2,
+};
+
+const heroPreviewHintLabelStyle: CSSProperties = {
+  display: "block",
+  marginTop: 4,
+  color: "var(--foreground)",
+  fontSize: 14,
+  fontWeight: 700,
+  lineHeight: 1.2,
 };
 
 const heroChatFieldStyle: CSSProperties = {
