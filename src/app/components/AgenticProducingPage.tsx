@@ -94,76 +94,78 @@ export function AgenticProducingPage({
         fontFamily: "var(--app-font-family)",
       }}
     >
-      <div
-        className={`flex items-center ${previewMode ? "justify-end" : "justify-between"}`}
-        style={{
-          height: previewMode ? 60 : 72,
-          padding: "0 18px",
-          backgroundColor: "var(--agentic-topbar)",
-          borderBottom: "1px solid var(--agentic-border)",
-        }}
-      >
-        {!previewMode && (showBackButton ? (
-          <button
-            type="button"
-            onClick={onBack}
-            className="inline-flex items-center justify-center cursor-pointer"
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              color: "var(--agentic-foreground)",
-              backgroundColor: "transparent",
-              border: "none",
-            }}
-          >
-            <X size={22} strokeWidth={2} />
-          </button>
-        ) : (
-          <div style={{ width: 36, height: 36 }} />
-        ))}
+      {!previewMode ? (
+        <div
+          className="flex items-center justify-between"
+          style={{
+            height: 72,
+            padding: "0 18px",
+            backgroundColor: "var(--agentic-topbar)",
+            borderBottom: "1px solid var(--agentic-border)",
+          }}
+        >
+          {showBackButton ? (
+            <button
+              type="button"
+              onClick={onBack}
+              className="inline-flex items-center justify-center cursor-pointer"
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 10,
+                color: "var(--agentic-foreground)",
+                backgroundColor: "transparent",
+                border: "none",
+              }}
+            >
+              <X size={22} strokeWidth={2} />
+            </button>
+          ) : (
+            <div style={{ width: 36, height: 36 }} />
+          )}
 
-        {!previewMode && (showProjectTitle ? (
-          <h2
-            style={{
-              color: "var(--agentic-foreground)",
-              fontSize: previewMode ? 24 : 30,
-              fontWeight: 700,
-              letterSpacing: "0.01em",
-            }}
-          >
-            New Project 20250408
-          </h2>
-        ) : (
-          <div />
-        ))}
+          {showProjectTitle ? (
+            <h2
+              style={{
+                color: "var(--agentic-foreground)",
+                fontSize: 30,
+                fontWeight: 700,
+                letterSpacing: "0.01em",
+              }}
+            >
+              New Project 20250408
+            </h2>
+          ) : (
+            <div />
+          )}
 
-        <div className="flex items-center gap-2">
-          <button type="button" className="inline-flex items-center justify-center" style={toolbarIconStyle}>
-            <Undo2 size={16} strokeWidth={1.8} />
-          </button>
-          <button type="button" className="inline-flex items-center justify-center" style={toolbarIconStyle}>
-            <Upload size={16} strokeWidth={1.8} />
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 cursor-pointer"
-            style={{
-              height: previewMode ? 38 : 42,
-              padding: previewMode ? "0 12px" : "0 14px",
-              borderRadius: 9999,
-              border: "1px solid var(--agentic-border)",
-              color: "var(--background)",
-              backgroundColor: "var(--foreground)",
-              fontSize: previewMode ? 13 : 14,
-              fontWeight: 600,
-            }}
-          >
-            <Save size={14} strokeWidth={1.9} />
-            Save
-          </button>
+          <div className="flex items-center gap-2">
+            <button type="button" className="inline-flex items-center justify-center" style={toolbarIconStyle}>
+              <Undo2 size={16} strokeWidth={1.8} />
+            </button>
+            <button type="button" className="inline-flex items-center justify-center" style={toolbarIconStyle}>
+              <Upload size={16} strokeWidth={1.8} />
+            </button>
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 cursor-pointer"
+              style={{
+                height: 42,
+                padding: "0 14px",
+                borderRadius: 9999,
+                border: "1px solid var(--agentic-border)",
+                color: "var(--background)",
+                backgroundColor: "var(--foreground)",
+                fontSize: 14,
+                fontWeight: 600,
+              }}
+            >
+              <Save size={14} strokeWidth={1.9} />
+              Save
+            </button>
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <div className="flex flex-1 min-h-0 min-w-0" style={{ backgroundColor: "var(--agentic-bg)" }}>
         <div

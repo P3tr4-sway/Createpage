@@ -3,19 +3,13 @@ import {
   Bookmark,
   Bot,
   ChevronRight,
-  CirclePlay,
-  Disc3,
-  FolderKanban,
   FolderOpen,
   LibraryBig,
-  ListFilter,
-  MessageSquareQuote,
   Moon,
   Music,
   Repeat,
   Sparkles,
   Sun,
-  Users,
   Waves,
   type LucideIcon,
 } from "lucide-react";
@@ -49,13 +43,7 @@ type HomeSubView =
   | "top-templates"
   | "guitar-showcase";
 
-type ActionId =
-  | "agentic"
-  | "stems"
-  | "remix"
-  | "looper"
-  | "backing"
-  | "jam";
+type ActionId = "looper";
 
 type BrowseItem = {
   title: string;
@@ -75,28 +63,6 @@ type GuitarClip = BrowseItem & {
   email: string;
   comments: ShowcaseComment[];
 };
-
-const launchGroups: Array<{
-  title: string;
-  items: Array<{ id: ActionId; label: string; meta: string; icon: LucideIcon }>;
-}> = [
-  {
-    title: "Studio",
-    items: [
-      { id: "agentic", label: "Agentic Producing", meta: "Full DAW", icon: Bot },
-      { id: "stems", label: "Stems Separation", meta: "Open source track", icon: ListFilter },
-      { id: "remix", label: "Remix a Song", meta: "Browse songs", icon: Bookmark },
-    ],
-  },
-  {
-    title: "Loop",
-    items: [
-      { id: "looper", label: "Looper", meta: "Record + layer", icon: Repeat },
-      { id: "backing", label: "Instant Backing Track", meta: "Pick a style", icon: Disc3 },
-      { id: "jam", label: "Jam with AI", meta: "Prompt first", icon: Sparkles },
-    ],
-  },
-];
 
 const topSongs: BrowseItem[] = [
   {
@@ -310,7 +276,9 @@ export function EntranceWorkspace() {
       railSurfaceStrong: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.92)",
       railBorder: isDark ? "rgba(255,255,255,0.08)" : "rgba(15,23,42,0.08)",
       mainHeaderBg: isDark ? "#171a1f" : "#f8f8f9",
-      heroScrim: isDark ? "rgba(10,12,16,0.32)" : "rgba(255,255,255,0.48)",
+      heroScrim: isDark
+        ? "linear-gradient(180deg, rgba(6,8,12,0.18) 0%, rgba(6,8,12,0.36) 48%, rgba(6,8,12,0.6) 100%)"
+        : "linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.28) 48%, rgba(248,250,252,0.68) 100%)",
       heroFrameBg: isDark ? "rgba(5,8,12,0.96)" : "rgba(255,255,255,0.92)",
       chipBg: isDark ? "rgba(255,255,255,0.06)" : "rgba(15,23,42,0.04)",
       mutedText: isDark ? "rgba(255,255,255,0.58)" : "rgba(71,85,105,0.86)",
@@ -378,95 +346,59 @@ export function EntranceWorkspace() {
 
   const handleLaunch = useCallback((id: ActionId) => {
     switch (id) {
-      case "agentic":
-        setFullscreenView("agentic-producing");
-        return;
-      case "stems":
-        openSong(topSongs[0]);
-        return;
-      case "remix":
-        setActiveSubView("top-songs");
-        return;
       case "looper":
         setActiveSubView("looper");
-        return;
-      case "backing":
-        setActiveSubView("instant-backing-track");
-        return;
-      case "jam":
-        handleScrollTo("launch");
         return;
       default:
         return;
     }
-  }, [handleScrollTo, openSong]);
+  }, []);
 
   const startActions = [
     {
-      label: "Open DAW",
-      meta: "Go fullscreen",
+      label: "New Session",
+      meta: "Open the full workspace",
       icon: Bot,
       onClick: () => setFullscreenView("agentic-producing"),
     },
     {
-      label: "Use Template",
-      meta: "Browse starters",
+      label: "From Template",
+      meta: "Start from a proven setup",
       icon: LibraryBig,
       onClick: () => setActiveSubView("top-templates"),
     },
     {
       label: "Jam with AI",
-      meta: "Prompt first",
+      meta: "Describe the vibe first",
       icon: Sparkles,
       onClick: () => handleScrollTo("launch"),
-    },
-  ];
-
-  const toolActions = [
-    {
-      label: "Looper",
-      meta: "Record + layer",
-      icon: Repeat,
-      onClick: () => setActiveSubView("looper"),
-    },
-    {
-      label: "Backing Track",
-      meta: "Pick a style",
-      icon: Disc3,
-      onClick: () => setActiveSubView("instant-backing-track"),
-    },
-    {
-      label: "Stem Split",
-      meta: "Open source track",
-      icon: ListFilter,
-      onClick: () => openSong(topSongs[0]),
     },
   ];
 
   const exploreActions = [
     {
       label: "Top Songs",
-      meta: "Community picks",
+      meta: "Best recent community sessions",
       icon: Music,
       onClick: () => setActiveSubView("top-songs"),
     },
     {
       label: "Top Templates",
-      meta: "Reusable starts",
+      meta: "Reusable starting points",
       icon: Bookmark,
       onClick: () => setActiveSubView("top-templates"),
     },
     {
-      label: "Backing Track",
-      meta: "Style library",
-      icon: Disc3,
-      onClick: () => setActiveSubView("instant-backing-track"),
+      label: "Guitar Showcase",
+      meta: "Player takes worth studying",
+      icon: Waves,
+      onClick: () => setActiveSubView("guitar-showcase"),
     },
   ];
 
   const contentTitle =
     activeSubView === "home"
-      ? "Create"
+      ? "Workspace"
       : activeSubView === "looper"
         ? "Looper"
         : activeSubView === "instant-backing-track"
@@ -476,8 +408,10 @@ export function EntranceWorkspace() {
             : activeSubView === "top-templates"
             ? "Top Templates"
               : "Guitar Showcase";
-  const workspaceEyebrow = activeSubView === "home" ? "Agentic Producing" : "Main Workspace";
   const homePreviewScale = 0.8;
+  const sidebarWidth = 399;
+  const sidebarInlinePadding = 24;
+  const mainContentInlinePadding = 32;
 
   if (fullscreenView === "agentic-producing") {
     return <AgenticProducingPage onBack={() => setFullscreenView(null)} />;
@@ -491,27 +425,22 @@ export function EntranceWorkspace() {
         background: shellTone.appBg,
       }}
     >
-      <aside
-        className="relative flex h-full shrink-0 flex-col"
-        style={{
-          width: 326,
-          minWidth: 326,
-          padding: "22px 18px 14px",
-          background: shellTone.railBg,
-          borderRight: `1px solid ${shellTone.railBorder}`,
-          boxShadow: isDark ? "24px 0 80px rgba(0,0,0,0.28)" : "24px 0 64px rgba(15,23,42,0.08)",
-          zIndex: 2,
+        <aside
+          className="relative flex h-full shrink-0 flex-col"
+          style={{
+            width: sidebarWidth,
+            minWidth: sidebarWidth,
+            flexBasis: sidebarWidth,
+            padding: `22px ${sidebarInlinePadding}px 14px`,
+            background: shellTone.railBg,
+            borderRight: `1px solid ${shellTone.railBorder}`,
+            boxShadow: isDark ? "24px 0 80px rgba(0,0,0,0.28)" : "24px 0 64px rgba(15,23,42,0.08)",
+            zIndex: 2,
         }}
       >
         <div className="flex items-center justify-between" style={{ marginBottom: 18 }}>
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center" style={plainSidebarIconWrapStyle}>
-              <Disc3 size={18} strokeWidth={1.8} />
-            </div>
-            <div>
-              <p style={eyebrowStyle}>Start or continue</p>
-              <h1 style={railHeadingStyle}>LavaDAW</h1>
-            </div>
+          <div>
+            <h1 style={railHeadingStyle}>LavaDAW</h1>
           </div>
 
           <button
@@ -528,8 +457,8 @@ export function EntranceWorkspace() {
           className="min-h-0 flex-1 overflow-y-auto"
           style={{ paddingRight: 2, paddingBottom: 8 }}
         >
-          <div className="flex flex-col gap-14">
-            <RailCard title="Continue" icon={FolderKanban} tone={shellTone}>
+          <div className="flex flex-col gap-10">
+            <RailCard title="Continue" tone={shellTone}>
               <div className="flex flex-col gap-3">
                 <TouchActionRow
                   label="My Projects"
@@ -555,7 +484,7 @@ export function EntranceWorkspace() {
               </div>
             </RailCard>
 
-            <RailCard title="Start" icon={Sparkles} tone={shellTone}>
+            <RailCard title="Start" tone={shellTone}>
               <div className="flex flex-col gap-2.5">
                 {startActions.map((action) => (
                   <TouchActionRow
@@ -569,17 +498,8 @@ export function EntranceWorkspace() {
               </div>
             </RailCard>
 
-            <RailCard title="Explore" icon={Users} tone={shellTone}>
+            <RailCard title="Browse" tone={shellTone}>
               <div className="flex flex-col gap-2.5">
-                {toolActions.slice(0, 2).map((action) => (
-                  <TouchActionRow
-                    key={action.label}
-                    label={action.label}
-                    meta={action.meta}
-                    icon={action.icon}
-                    onClick={action.onClick}
-                  />
-                ))}
                 {exploreActions.map((action) => (
                   <TouchActionRow
                     key={action.label}
@@ -598,42 +518,32 @@ export function EntranceWorkspace() {
       <main className="flex min-w-0 flex-1 flex-col">
         <div
           className="flex items-center justify-between"
-          style={{
-            height: 72,
-            minHeight: 72,
-            padding: "0 30px 0 32px",
-            backgroundColor: shellTone.mainHeaderBg,
-            borderBottom: `1px solid ${shellTone.railBorder}`,
-            backdropFilter: "blur(22px)",
-          }}
+            style={{
+              height: 72,
+              minHeight: 72,
+              padding: `0 ${mainContentInlinePadding}px`,
+              backgroundColor: shellTone.mainHeaderBg,
+              borderBottom: `1px solid ${shellTone.railBorder}`,
+              backdropFilter: "blur(22px)",
+            }}
         >
           <div>
-            <p style={eyebrowStyle}>{workspaceEyebrow}</p>
             <h2 style={topTitleStyle}>{contentTitle}</h2>
           </div>
 
-          <div className="flex items-center gap-3">
-            {activeSubView !== "home" && (
-              <button
-                type="button"
-                onClick={() => setActiveSubView("home")}
-                className="inline-flex items-center gap-2 rounded-full"
-                style={secondaryButtonStyle}
-              >
-                <ArrowLeft size={15} strokeWidth={1.9} />
-                Back
-              </button>
-            )}
+          {activeSubView !== "home" ? (
             <button
               type="button"
-              onClick={() => setFullscreenView("agentic-producing")}
+              onClick={() => setActiveSubView("home")}
               className="inline-flex items-center gap-2 rounded-full"
-              style={primaryButtonStyle}
+              style={secondaryButtonStyle}
             >
-              <CirclePlay size={17} strokeWidth={1.9} />
-              Full DAW
+              <ArrowLeft size={15} strokeWidth={1.9} />
+              Back
             </button>
-          </div>
+          ) : (
+            <div />
+          )}
         </div>
 
         {activeSubView === "home" ? (
@@ -645,22 +555,30 @@ export function EntranceWorkspace() {
           >
             <section
               ref={studioRef}
-              style={{
-                ...sectionStyle,
-                minHeight: "clamp(640px, calc(100vh - 148px), 780px)",
-                marginLeft: -30,
-                marginRight: -30,
-              }}
-            >
-              <button
-                type="button"
+                style={{
+                  ...sectionStyle,
+                  minHeight: "clamp(520px, calc(100vh - 248px), 620px)",
+                  marginLeft: -mainContentInlinePadding,
+                  marginRight: -mainContentInlinePadding,
+                }}
+              >
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={() => setFullscreenView("agentic-producing")}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    setFullscreenView("agentic-producing");
+                  }
+                }}
                 className="relative block w-full overflow-hidden text-left"
                 style={{
-                  height: "clamp(640px, calc(100vh - 148px), 780px)",
+                  height: "clamp(520px, calc(100vh - 248px), 620px)",
                   backgroundColor: shellTone.heroFrameBg,
                   borderTop: `1px solid ${shellTone.railBorder}`,
                   borderBottom: `1px solid ${shellTone.railBorder}`,
+                  cursor: "pointer",
                 }}
               >
                 <div
@@ -679,6 +597,7 @@ export function EntranceWorkspace() {
                       height: `${100 / homePreviewScale}%`,
                       transform: `translateX(-50%) scale(${homePreviewScale})`,
                       transformOrigin: "top center",
+                      pointerEvents: "none",
                     }}
                   >
                     <AgenticProducingPage previewMode />
@@ -689,122 +608,85 @@ export function EntranceWorkspace() {
                   style={{ background: shellTone.heroScrim }}
                 />
                 <div
-                  className="absolute inline-flex items-center gap-2 rounded-full"
-                  style={{ ...heroBadgeStyle, left: 30, top: 22 }}
-                >
-                  <Sparkles size={14} strokeWidth={1.8} />
-                  Empty project
-                </div>
-                <div
                   className="absolute flex items-center gap-5"
                   style={{
                     ...heroBottomDockStyle,
                     left: "50%",
-                    top: "61.8%",
-                    width: "66.666%",
-                    maxWidth: 980,
+                    top: "72%",
+                    width: "62%",
+                    maxWidth: 860,
                     transform: "translate(-50%, -50%)",
                   }}
                 >
                   <div className="flex w-full">
-                    <div className="flex w-full items-center gap-3 rounded-full" style={heroChatFieldStyle}>
-                      <MessageSquareQuote size={18} strokeWidth={1.8} style={{ color: "var(--secondary)" }} />
-                      <span style={heroChatPlaceholderStyle}>
-                        Ask AI agent to arrange, mix, or automate...
-                      </span>
-                      <span
+                    <div className="flex w-full items-center rounded-full" style={heroChatFieldStyle}>
+                      <button
+                        type="button"
+                        onClick={(event) => event.stopPropagation()}
+                        className="flex-1 bg-transparent text-left"
+                        style={heroChatGhostButtonStyle}
+                      >
+                        <span style={heroChatPlaceholderStyle}>
+                          Start with your AI Music Producer.
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(event) => event.stopPropagation()}
                         className="inline-flex items-center gap-2 rounded-full"
                         style={heroChatSendStyle}
                       >
-                        <CirclePlay size={14} strokeWidth={1.9} />
-                        Send
-                      </span>
+                        Start
+                      </button>
                     </div>
                   </div>
                 </div>
-              </button>
+              </div>
             </section>
 
-            <div style={{ padding: "22px 30px 42px" }}>
+              <div style={{ padding: `22px ${mainContentInlinePadding}px 42px` }}>
               <section ref={launchRef} style={sectionStyle}>
                 <div className="mb-4 flex items-center justify-between">
                   <div>
-                    <p style={eyebrowStyle}>Launch</p>
-                    <h3 style={sectionTitleStyle}>Keep old entry concepts, but make them lighter.</h3>
+                    <h3 style={sectionTitleStyle}>Choose how to start.</h3>
+                    <p style={sectionDescriptionStyle}>Pick one path. You can switch later.</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-[1.4fr_0.9fr] gap-5">
-                  <div className="rounded-[30px]" style={panelStyle}>
-                    <div className="flex flex-col gap-5">
-                      {launchGroups.map((group) => (
-                        <div key={group.title}>
-                          <div className="mb-3 flex items-center justify-between">
-                            <p style={miniSectionTitleStyle}>{group.title}</p>
-                          </div>
-                          <div className="grid grid-cols-3 gap-3">
-                            {group.items.map((item) => (
-                              <button
-                                key={item.id}
-                                type="button"
-                                onClick={() => handleLaunch(item.id)}
-                                className="rounded-[22px] text-left transition-transform hover:-translate-y-0.5"
-                                style={launchCardStyle}
-                              >
-                                <span
-                                  className="mb-8 flex h-11 w-11 items-center justify-center rounded-2xl"
-                                  style={{
-                                    backgroundColor: shellTone.chipBg,
-                                    color: "var(--foreground)",
-                                  }}
-                                >
-                                  <item.icon size={18} strokeWidth={1.8} />
-                                </span>
-                                <p style={launchLabelStyle}>{item.label}</p>
-                                <p style={launchMetaStyle}>{item.meta}</p>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
+                <div className="flex flex-col gap-5">
+                  <div className="grid items-stretch gap-5 lg:grid-cols-2">
+                    <div className="flex min-h-full flex-col">
+                      <LoopLaunchPanel onLaunch={handleLaunch} />
+                    </div>
+
+                    <div className="flex min-h-full flex-col">
+                      <JamWithAI />
                     </div>
                   </div>
 
-                  <div className="flex min-h-full flex-col gap-5">
-                    <div className="rounded-[30px]" style={panelStyle}>
-                      <div className="mb-3 flex items-center justify-between">
-                        <p style={miniSectionTitleStyle}>Prompt start</p>
-                        <button
-                          type="button"
-                          onClick={() => handleLaunch("jam")}
-                          style={inlineLinkButtonStyle}
-                        >
-                          Focus
-                        </button>
+                  <div style={templateStripStyle}>
+                    <div className="mb-3 flex items-center justify-between">
+                      <div>
+                        <p style={miniSectionTitleStyle}>Template shortcuts</p>
+                        <p style={templateStripHintStyle}>Fast starting points when you do not want to prompt from scratch.</p>
                       </div>
-                      <JamWithAI />
+                      <button
+                        type="button"
+                        onClick={() => setActiveSubView("top-templates")}
+                        style={inlineLinkButtonStyle}
+                      >
+                        See all
+                      </button>
                     </div>
 
-                    <div className="rounded-[30px]" style={panelStyle}>
-                      <div className="mb-3 flex items-center justify-between">
-                        <p style={miniSectionTitleStyle}>Top templates</p>
-                        <button
-                          type="button"
-                          onClick={() => setActiveSubView("top-templates")}
-                          style={inlineLinkButtonStyle}
-                        >
-                          See all
-                        </button>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        {topTemplates.slice(0, 4).map((item) => (
-                          <CompactImageCard
-                            key={item.title}
-                            item={item}
-                            onClick={() => openTemplate(item)}
-                          />
-                        ))}
-                      </div>
+                    <div className="grid grid-cols-4 gap-3">
+                      {topTemplates.slice(0, 4).map((item) => (
+                        <TemplateShortcutCard
+                          key={item.title}
+                          item={item}
+                          onClick={() => openTemplate(item)}
+                        />
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -813,8 +695,8 @@ export function EntranceWorkspace() {
               <section ref={communityRef} style={{ ...sectionStyle, paddingBottom: 0 }}>
                 <div className="mb-4 flex items-center justify-between">
                   <div>
-                    <p style={eyebrowStyle}>Community</p>
-                    <h3 style={sectionTitleStyle}>Templates, songs, and player work stay in the same scroll flow.</h3>
+                    <p style={eyebrowStyle}>Browse</p>
+                    <h3 style={sectionTitleStyle}>Songs, templates, and player takes in one scroll.</h3>
                   </div>
                 </div>
 
@@ -941,6 +823,42 @@ export function EntranceWorkspace() {
   );
 }
 
+function LoopLaunchPanel({
+  onLaunch,
+}: {
+  onLaunch: (id: ActionId) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onLaunch("looper")}
+      className="relative flex h-full w-full flex-col overflow-hidden rounded-card border border-border p-6 text-left transition-colors hover:bg-[var(--soft-surface)]"
+      style={loopLaunchPanelStyle}
+    >
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <h3 style={loopLaunchTitleStyle}>Looper</h3>
+        </div>
+      </div>
+
+      <p style={loopLaunchDescriptionStyle}>Play fast.</p>
+
+      <div className="flex flex-1 items-center justify-center py-6">
+        <div style={loopGraphicWrapStyle}>
+            <div style={loopOuterDiscStyle} />
+            <div style={loopOuterGuideStyle} />
+            <div style={loopMidDiscStyle} />
+            <div style={loopInnerRingStyle} />
+            <div style={loopStemStyle} />
+            <div style={loopMarkerStyle} />
+            <div style={loopHubStyle} />
+        </div>
+      </div>
+
+    </button>
+  );
+}
+
 function RailCard({
   title,
   icon: Icon,
@@ -949,7 +867,7 @@ function RailCard({
   style,
 }: {
   title: string;
-  icon: LucideIcon;
+  icon?: LucideIcon;
   tone: { railSurface: string; railBorder: string };
   children: ReactNode;
   style?: CSSProperties;
@@ -964,10 +882,12 @@ function RailCard({
         ...style,
       }}
     >
-      <div className="mb-3 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center" style={plainSidebarIconWrapStyle}>
-          <Icon size={16} strokeWidth={1.8} />
-        </div>
+      <div className={`mb-3 flex items-center ${Icon ? "gap-3" : ""}`}>
+        {Icon ? (
+          <div className="flex h-10 w-10 items-center justify-center" style={plainSidebarIconWrapStyle}>
+            <Icon size={16} strokeWidth={1.8} />
+          </div>
+        ) : null}
         <p style={railCardTitleStyle}>{title}</p>
       </div>
       {children}
@@ -1044,6 +964,43 @@ function CompactImageCard({
         <p style={imageCardTitleStyle}>{item.title}</p>
         <p style={imageCardMetaStyle}>{item.author}</p>
       </div>
+    </button>
+  );
+}
+
+function TemplateShortcutCard({
+  item,
+  onClick,
+}: {
+  item: BrowseItem;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex items-center gap-3 rounded-[20px] text-left transition-transform hover:-translate-y-0.5"
+      style={templateShortcutCardStyle}
+    >
+      <div
+        className="relative overflow-hidden rounded-[14px]"
+        style={{ width: 56, height: 56, flexShrink: 0 }}
+      >
+        <ImageWithFallback
+          src={item.imageUrl}
+          alt={item.title}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate" style={listTitleStyle}>
+          {item.title}
+        </p>
+        <p className="truncate" style={listMetaStyle}>
+          {item.author}
+        </p>
+      </div>
+      <ChevronRight size={16} strokeWidth={1.8} style={{ color: "var(--secondary)", flexShrink: 0 }} />
     </button>
   );
 }
@@ -1303,13 +1260,11 @@ const sectionTitleStyle: CSSProperties = {
   letterSpacing: "-0.03em",
 };
 
-const heroBadgeStyle: CSSProperties = {
-  padding: "10px 14px",
-  border: "1px solid var(--border)",
-  backgroundColor: "var(--surface-glass-strong)",
-  color: "var(--foreground)",
-  fontSize: 12,
-  fontWeight: 700,
+const sectionDescriptionStyle: CSSProperties = {
+  margin: "8px 0 0",
+  color: "var(--secondary)",
+  fontSize: 15,
+  fontWeight: 500,
 };
 
 const heroBottomDockStyle: CSSProperties = {
@@ -1319,10 +1274,18 @@ const heroBottomDockStyle: CSSProperties = {
 
 const heroChatFieldStyle: CSSProperties = {
   minHeight: 74,
-  padding: "0 12px 0 24px",
+  padding: "0 12px 0 20px",
   border: "1px solid var(--border)",
   backgroundColor: "var(--card)",
   boxShadow: "0 10px 28px rgba(15,23,42,0.08)",
+};
+
+const heroChatGhostButtonStyle: CSSProperties = {
+  minWidth: 0,
+  border: "none",
+  padding: 0,
+  background: "transparent",
+  cursor: "pointer",
 };
 
 const heroChatPlaceholderStyle: CSSProperties = {
@@ -1344,6 +1307,7 @@ const heroChatSendStyle: CSSProperties = {
   color: "var(--background)",
   fontSize: 16,
   fontWeight: 700,
+  cursor: "pointer",
 };
 
 const panelStyle: CSSProperties = {
@@ -1351,6 +1315,17 @@ const panelStyle: CSSProperties = {
   border: "1px solid var(--border)",
   backgroundColor: "var(--surface-glass-strong)",
   boxShadow: "var(--elevation-sm)",
+};
+
+const templateStripStyle: CSSProperties = {
+  padding: "2px 0 0",
+};
+
+const templateStripHintStyle: CSSProperties = {
+  margin: "6px 0 0",
+  color: "var(--secondary)",
+  fontSize: 13,
+  fontWeight: 500,
 };
 
 const miniSectionTitleStyle: CSSProperties = {
@@ -1369,28 +1344,157 @@ const inlineLinkButtonStyle: CSSProperties = {
   cursor: "pointer",
 };
 
-const launchCardStyle: CSSProperties = {
-  minHeight: 152,
+const launchCardFeaturedStyle: CSSProperties = {
+  minHeight: 94,
   padding: 16,
   border: "1px solid var(--border)",
-  backgroundColor: "var(--card)",
+  background: "linear-gradient(180deg, var(--card) 0%, var(--soft-surface) 100%)",
   boxShadow: "0 12px 26px rgba(15,23,42,0.06)",
   cursor: "pointer",
+  borderRadius: 20,
 };
 
-const launchLabelStyle: CSSProperties = {
+const launchCardCompactStyle: CSSProperties = {
+  minHeight: 78,
+  padding: 12,
+  border: "1px solid var(--border)",
+  backgroundColor: "transparent",
+  boxShadow: "none",
+  cursor: "pointer",
+  borderRadius: 18,
+};
+
+const launchFeaturedLabelStyle: CSSProperties = {
   margin: 0,
   color: "var(--foreground)",
   fontSize: 18,
   fontWeight: 700,
-  lineHeight: 1.25,
+  lineHeight: 1.2,
 };
 
-const launchMetaStyle: CSSProperties = {
-  margin: "6px 0 0",
+const launchFeaturedMetaStyle: CSSProperties = {
+  margin: "4px 0 0",
   color: "var(--secondary)",
   fontSize: 14,
   fontWeight: 500,
+};
+
+const launchCompactLabelStyle: CSSProperties = {
+  margin: 0,
+  color: "var(--foreground)",
+  fontSize: 16,
+  fontWeight: 700,
+  lineHeight: 1.2,
+};
+
+const launchCompactMetaStyle: CSSProperties = {
+  margin: "4px 0 0",
+  color: "var(--secondary)",
+  fontSize: 13,
+  fontWeight: 500,
+};
+
+const loopLaunchPanelStyle: CSSProperties = {
+  backgroundColor: "var(--card)",
+};
+
+const loopLaunchTitleStyle: CSSProperties = {
+  margin: 0,
+  color: "var(--foreground)",
+  fontSize: "var(--text-xl)",
+  fontWeight: 700,
+  fontFamily: "var(--app-font-family)",
+};
+
+const loopLaunchDescriptionStyle: CSSProperties = {
+  margin: 0,
+  color: "var(--secondary)",
+  fontSize: "var(--text-sm)",
+  fontWeight: "var(--font-weight-normal)",
+  fontFamily: "var(--app-font-family)",
+};
+
+const loopGraphicWrapStyle: CSSProperties = {
+  position: "relative",
+  width: "min(100%, 260px)",
+  aspectRatio: "1 / 1",
+};
+
+const loopOuterDiscStyle: CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  borderRadius: "50%",
+  background:
+    "linear-gradient(90deg, color-mix(in srgb, var(--foreground) 12%, var(--card) 88%) 0%, color-mix(in srgb, var(--foreground) 8%, var(--card) 92%) 49.5%, color-mix(in srgb, var(--foreground) 3%, var(--card) 97%) 50.5%, color-mix(in srgb, var(--foreground) 5%, var(--card) 95%) 100%)",
+};
+
+const loopOuterGuideStyle: CSSProperties = {
+  position: "absolute",
+  inset: 28,
+  borderRadius: "50%",
+  border: "3px solid color-mix(in srgb, var(--foreground) 10%, transparent)",
+};
+
+const loopMidDiscStyle: CSSProperties = {
+  position: "absolute",
+  inset: 72,
+  borderRadius: "50%",
+  background:
+    "linear-gradient(90deg, color-mix(in srgb, var(--foreground) 26%, var(--card) 74%) 0%, color-mix(in srgb, var(--foreground) 20%, var(--card) 80%) 49.6%, color-mix(in srgb, var(--foreground) 6%, var(--card) 94%) 50.4%, color-mix(in srgb, var(--foreground) 10%, var(--card) 90%) 100%)",
+  boxShadow: "0 0 0 3px color-mix(in srgb, var(--foreground) 10%, transparent)",
+};
+
+const loopInnerRingStyle: CSSProperties = {
+  position: "absolute",
+  inset: 110,
+  borderRadius: "50%",
+  border: "3px solid color-mix(in srgb, var(--foreground) 12%, transparent)",
+};
+
+const loopStemStyle: CSSProperties = {
+  position: "absolute",
+  left: "50%",
+  top: 42,
+  width: 3,
+  height: 100,
+  marginLeft: -1.5,
+  borderRadius: 999,
+  backgroundColor: "color-mix(in srgb, var(--foreground) 36%, var(--card) 64%)",
+};
+
+const loopMarkerStyle: CSSProperties = {
+  position: "absolute",
+  left: "50%",
+  top: 80,
+  width: 10,
+  height: 36,
+  marginLeft: -5,
+  borderRadius: 999,
+  borderTop: "5px solid color-mix(in srgb, var(--foreground) 36%, var(--card) 64%)",
+  borderBottom: "5px solid color-mix(in srgb, var(--foreground) 36%, var(--card) 64%)",
+  backgroundColor: "transparent",
+};
+
+const loopHubStyle: CSSProperties = {
+  position: "absolute",
+  left: "50%",
+  top: "50%",
+  width: 34,
+  height: 34,
+  marginLeft: -17,
+  marginTop: -17,
+  borderRadius: "50%",
+  backgroundColor: "color-mix(in srgb, var(--foreground) 18%, var(--card) 82%)",
+  boxShadow: "0 0 0 6px color-mix(in srgb, var(--foreground) 3%, transparent)",
+};
+
+
+const templateShortcutCardStyle: CSSProperties = {
+  minHeight: 88,
+  padding: 12,
+  border: "1px solid var(--border)",
+  backgroundColor: "var(--surface-glass-strong)",
+  boxShadow: "0 8px 20px rgba(15,23,42,0.04)",
 };
 
 const listTitleStyle: CSSProperties = {

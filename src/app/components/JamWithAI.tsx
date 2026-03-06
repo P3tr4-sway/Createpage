@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { Send } from "lucide-react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 
 const promptSuggestions = [
-  "Lo-fi piano chords, rainy mood, 75 bpm",
-  "Funky slap bass groove in E, 110 bpm",
-  "Ambient pads, wide stereo, C major",
-  "Trap hi-hats with swing, 140 bpm",
+  "Lo-fi 75 bpm",
+  "Neo-soul E major",
+  "Ambient wide pads",
 ];
 
 export function JamWithAI() {
   const [inputValue, setInputValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   const handleSuggestionClick = (suggestion: string) => {
     setInputValue(suggestion);
@@ -19,10 +19,9 @@ export function JamWithAI() {
 
   return (
     <div
-      className="rounded-card border border-border p-6 overflow-hidden relative"
+      className="relative flex h-full flex-col overflow-hidden rounded-card border border-border p-6"
       style={{ backgroundColor: "var(--card)" }}
     >
-      {/* Header row with title + wave */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
           <h3
@@ -33,7 +32,7 @@ export function JamWithAI() {
               fontFamily: "var(--app-font-family)",
             }}
           >
-            Jam with AI
+            Jam
           </h3>
         </div>
       </div>
@@ -47,11 +46,98 @@ export function JamWithAI() {
           fontFamily: "var(--app-font-family)",
         }}
       >
-        Type a vibe. Generate and play.
+        Start with a vibe.
       </p>
 
-      {/* Input area */}
-      <div className="flex gap-3 mb-4">
+      <div className="flex flex-1 items-center justify-center py-5">
+        <div
+          className="relative flex w-full max-w-[360px] items-center justify-center overflow-hidden"
+          style={{
+            minHeight: 250,
+          }}
+        >
+          <div
+            className="absolute inset-[6%_8%_8%_8%]"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 50%, rgba(146, 191, 255, 0.18) 0%, rgba(146, 191, 255, 0.1) 36%, rgba(146, 191, 255, 0.04) 60%, rgba(146, 191, 255, 0) 82%)",
+              filter: "blur(18px)",
+              borderRadius: "41% 59% 48% 52% / 44% 38% 62% 56%",
+            }}
+          />
+
+          <motion.div
+            className="absolute left-[10%] top-[23%] h-[132px] w-[184px]"
+            style={{
+              background:
+                "radial-gradient(circle at 34% 38%, rgba(168, 210, 255, 0.38) 0%, rgba(168, 210, 255, 0.18) 44%, rgba(168, 210, 255, 0) 82%)",
+              filter: "blur(22px)",
+              borderRadius: "58% 42% 46% 54% / 40% 57% 43% 60%",
+              transform: "rotate(-14deg)",
+            }}
+            animate={
+              shouldReduceMotion
+                ? undefined
+                : {
+                    x: [0, 10, -4, 0],
+                    y: [0, -8, 5, 0],
+                    scale: [1, 1.07, 0.98, 1],
+                    opacity: [0.82, 1, 0.74, 0.82],
+                    rotate: [-14, -10, -16, -14],
+                  }
+            }
+            transition={{ duration: 12, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+          />
+
+          <motion.div
+            className="absolute left-[30%] top-[12%] h-[170px] w-[206px]"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 44%, rgba(132, 183, 255, 0.32) 0%, rgba(132, 183, 255, 0.15) 48%, rgba(132, 183, 255, 0) 84%)",
+              filter: "blur(24px)",
+              borderRadius: "45% 55% 53% 47% / 57% 39% 61% 43%",
+              transform: "rotate(10deg)",
+            }}
+            animate={
+              shouldReduceMotion
+                ? undefined
+                : {
+                    x: [0, -12, 6, 0],
+                    y: [0, 7, -5, 0],
+                    scale: [1, 1.08, 0.99, 1],
+                    opacity: [0.72, 0.92, 0.8, 0.72],
+                    rotate: [10, 14, 8, 10],
+                  }
+            }
+            transition={{ duration: 14, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: 0.8 }}
+          />
+
+          <motion.div
+            className="absolute left-[20%] top-[40%] h-[136px] w-[230px]"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 48%, rgba(184, 218, 255, 0.22) 0%, rgba(184, 218, 255, 0.12) 46%, rgba(184, 218, 255, 0) 86%)",
+              filter: "blur(28px)",
+              borderRadius: "62% 38% 57% 43% / 45% 60% 40% 55%",
+              transform: "rotate(4deg)",
+            }}
+            animate={
+              shouldReduceMotion
+                ? undefined
+                : {
+                    x: [0, 8, -6, 0],
+                    y: [0, 10, -4, 0],
+                    scale: [1, 1.06, 1.01, 1],
+                    opacity: [0.64, 0.82, 0.7, 0.64],
+                    rotate: [4, 8, 2, 4],
+                  }
+            }
+            transition={{ duration: 16, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: 1.4 }}
+          />
+        </div>
+      </div>
+
+      <div className="mb-3 flex gap-3">
         <div
           className="flex-1 flex items-center gap-3 px-4 py-3 rounded-lg border transition-colors"
           style={{
@@ -61,14 +147,13 @@ export function JamWithAI() {
               : "var(--border)",
           }}
         >
-          
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            placeholder="What do you want to hear?"
+            placeholder="Describe a vibe"
             className="flex-1 bg-transparent outline-none"
             style={{
               color: "var(--foreground)",
@@ -95,25 +180,12 @@ export function JamWithAI() {
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
         >
-          Generate
+          Jam
           <Send size={14} strokeWidth={1.5} />
         </motion.button>
       </div>
 
-      {/* Suggestion chips */}
-      <div className="flex flex-wrap gap-2">
-        <span
-          style={{
-            color: "var(--secondary)",
-            fontSize: "var(--text-sm)",
-            fontWeight: "var(--font-weight-normal)",
-            fontFamily: "var(--app-font-family)",
-            opacity: 0.5,
-          }}
-          className="flex items-center mr-1"
-        >
-          Try:
-        </span>
+      <div className="mt-auto flex flex-wrap gap-2">
         {promptSuggestions.map((suggestion) => (
           <motion.button
             key={suggestion}
@@ -126,7 +198,7 @@ export function JamWithAI() {
               fontWeight: "var(--font-weight-normal)",
               fontFamily: "var(--app-font-family)",
               backgroundColor: "transparent",
-              opacity: 0.7,
+              opacity: 0.85,
             }}
             whileHover={{
               backgroundColor: "var(--soft-surface-strong)",
