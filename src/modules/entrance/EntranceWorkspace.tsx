@@ -408,7 +408,9 @@ export function EntranceWorkspace() {
             : activeSubView === "top-templates"
             ? "Top Templates"
               : "Guitar Showcase";
-  const homePreviewScale = 0.8;
+  const homePreviewCanvasWidth = 1280;
+  const homePreviewZoom = 1.14;
+  const homePreviewFocusX = 0.42;
   const sidebarWidth = 399;
   const sidebarInlinePadding = 24;
   const mainContentInlinePadding = 32;
@@ -588,20 +590,13 @@ export function EntranceWorkspace() {
                     overflow: "hidden",
                   }}
                 >
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: "50%",
-                      top: 0,
-                      width: `${100 / homePreviewScale}%`,
-                      height: `${100 / homePreviewScale}%`,
-                      transform: `translateX(-50%) scale(${homePreviewScale})`,
-                      transformOrigin: "top center",
-                      pointerEvents: "none",
-                    }}
+                  <ScaledPreviewCanvas
+                    designWidth={homePreviewCanvasWidth}
+                    zoom={homePreviewZoom}
+                    focusX={homePreviewFocusX}
                   >
                     <AgenticProducingPage previewMode />
-                  </div>
+                  </ScaledPreviewCanvas>
                 </div>
                 <div
                   className="absolute inset-0"
@@ -819,6 +814,70 @@ export function EntranceWorkspace() {
         template={selectedGuitarClip}
         mode="guitar"
       />
+    </div>
+  );
+}
+
+function ScaledPreviewCanvas({
+  children,
+  designWidth,
+  zoom = 1,
+  focusX = 0.5,
+}: {
+  children: ReactNode;
+  designWidth: number;
+  zoom?: number;
+  focusX?: number;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) {
+      return;
+    }
+
+    const updateScale = () => {
+      const { width } = element.getBoundingClientRect();
+      if (!width) {
+        return;
+      }
+      setScale((width / designWidth) * zoom);
+    };
+
+    updateScale();
+
+    const observer = new ResizeObserver(updateScale);
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, [designWidth, zoom]);
+
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        position: "absolute",
+        inset: 0,
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: `${focusX * 100}%`,
+          width: designWidth,
+          height: "100%",
+          transform: `translateX(-${focusX * 100}%) scale(${scale})`,
+          transformOrigin: "top center",
+          pointerEvents: "none",
+          willChange: "transform",
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 }

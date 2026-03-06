@@ -68,6 +68,12 @@ export function AgenticProducingPage({
   const timelineRulerHeight = previewMode ? 38 : 52;
   const bottomTransportHeight = previewMode ? 72 : 94;
   const barCellWidth = previewMode ? 40 : 62;
+  const trackHeaderActionGap = previewMode ? 12 : 32;
+  const trackToggleWidth = previewMode ? 42 : 52;
+  const trackToggleHeight = previewMode ? 34 : 44;
+  const trackMoreButtonSize = previewMode ? 38 : 44;
+  const trackFaderMaxWidth = previewMode ? 156 : 270;
+  const trackKnobSize = previewMode ? 34 : 56;
 
   const sendMessage = (rawText?: string) => {
     const nextText = (rawText ?? agentDraft).trim();
@@ -219,11 +225,16 @@ export function AgenticProducingPage({
                 }}
               />
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-3">
                   <span
                     style={{
+                      minWidth: 0,
+                      flex: 1,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
                       color: "var(--agentic-track-title)",
-                      fontSize: previewMode ? 18 : 24,
+                      fontSize: previewMode ? 16 : 24,
                       fontWeight: 700,
                       lineHeight: 1.15,
                       letterSpacing: "0",
@@ -231,7 +242,7 @@ export function AgenticProducingPage({
                   >
                     Track 1
                   </span>
-                  <div className="flex items-center gap-8">
+                  <div className="flex items-center" style={{ gap: trackHeaderActionGap, flexShrink: 0 }}>
                     <div
                       className="flex items-center overflow-hidden"
                       style={{
@@ -240,19 +251,49 @@ export function AgenticProducingPage({
                         backgroundColor: "var(--agentic-control-bg)",
                       }}
                     >
-                      <button type="button" style={trackTogglePillStyle}>M</button>
-                      <button type="button" style={{ ...trackTogglePillStyle, borderLeft: "1px solid rgba(255,255,255,0.1)" }}>S</button>
+                      <button
+                        type="button"
+                        style={{
+                          ...trackTogglePillStyle,
+                          width: trackToggleWidth,
+                          height: trackToggleHeight,
+                          fontSize: previewMode ? 15 : 18,
+                        }}
+                      >
+                        M
+                      </button>
+                      <button
+                        type="button"
+                        style={{
+                          ...trackTogglePillStyle,
+                          width: trackToggleWidth,
+                          height: trackToggleHeight,
+                          fontSize: previewMode ? 15 : 18,
+                          borderLeft: "1px solid rgba(255,255,255,0.1)",
+                        }}
+                      >
+                        S
+                      </button>
                     </div>
-                    <button type="button" style={trackMoreStyle}>
-                      <MoreVertical size={18} strokeWidth={2.2} />
+                    <button
+                      type="button"
+                      style={{
+                        ...trackMoreStyle,
+                        width: trackMoreButtonSize,
+                        height: trackMoreButtonSize,
+                      }}
+                    >
+                      <MoreVertical size={previewMode ? 16 : 18} strokeWidth={2.2} />
                     </button>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-3">
                   <div
-                  style={{
-                      width: previewMode ? 172 : 270,
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      maxWidth: trackFaderMaxWidth,
                       height: 9,
                       borderRadius: 999,
                       backgroundColor: "var(--agentic-control-bg)",
@@ -275,8 +316,8 @@ export function AgenticProducingPage({
                         position: "absolute",
                         left: "74%",
                         top: -10,
-                        width: 26,
-                        height: 26,
+                        width: previewMode ? 22 : 26,
+                        height: previewMode ? 22 : 26,
                         borderRadius: 999,
                         backgroundColor: "var(--on-image-primary)",
                         boxShadow: "0 0 0 2px rgba(255,255,255,0.12)",
@@ -285,8 +326,9 @@ export function AgenticProducingPage({
                   </div>
                   <div
                     style={{
-                      width: previewMode ? 40 : 56,
-                      height: previewMode ? 40 : 56,
+                      width: trackKnobSize,
+                      height: trackKnobSize,
+                      flexShrink: 0,
                       borderRadius: 999,
                       border: "3px solid var(--agentic-control-bg)",
                       backgroundColor: "var(--agentic-contrast)",
