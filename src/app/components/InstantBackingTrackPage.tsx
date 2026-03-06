@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, SlidersHorizontal } from "lucide-react";
 
 interface InstantBackingTrackPageProps {
   onBack: () => void;
+  initialFilter?: string;
 }
 
 interface BackingTrackItem {
@@ -191,10 +192,18 @@ const tracks: BackingTrackItem[] = [
   },
 ];
 
-export function InstantBackingTrackPage({ onBack }: InstantBackingTrackPageProps) {
+export function InstantBackingTrackPage({
+  onBack,
+  initialFilter = "Hot",
+}: InstantBackingTrackPageProps) {
   const [activeFilter, setActiveFilter] = useState("Hot");
   const [showAll, setShowAll] = useState(false);
   const INITIAL_VISIBLE_COUNT = 12;
+
+  useEffect(() => {
+    setActiveFilter(filters.includes(initialFilter) ? initialFilter : "Hot");
+    setShowAll(false);
+  }, [initialFilter]);
 
   const filteredTracks = useMemo(() => {
     if (["Saved", "Hot", "New", "Samurai Jam Tracks"].includes(activeFilter)) {

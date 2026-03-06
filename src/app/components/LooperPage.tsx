@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, CirclePlus, SlidersHorizontal } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
 interface LooperPageProps {
   onBack: () => void;
+  initialFilter?: string;
 }
 
 interface LooperTrackItem {
@@ -151,10 +152,15 @@ const tracks: LooperTrackItem[] = [
   },
 ];
 
-export function LooperPage({ onBack }: LooperPageProps) {
+export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
   const [activeFilter, setActiveFilter] = useState("Hot");
   const [showAll, setShowAll] = useState(false);
   const INITIAL_VISIBLE_COUNT = 9;
+
+  useEffect(() => {
+    setActiveFilter(filters.includes(initialFilter) ? initialFilter : "Hot");
+    setShowAll(false);
+  }, [initialFilter]);
 
   const filteredTracks = useMemo(() => {
     if (["Saved", "Hot", "New"].includes(activeFilter)) {

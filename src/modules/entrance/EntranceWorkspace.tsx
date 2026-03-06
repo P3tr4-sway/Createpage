@@ -20,6 +20,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type PointerEvent as ReactPointerEvent,
   type CSSProperties,
   type ReactNode,
   type RefObject,
@@ -39,6 +40,7 @@ type HomeSubView =
   | "home"
   | "looper"
   | "instant-backing-track"
+  | "quick-actions"
   | "top-songs"
   | "top-templates"
   | "guitar-showcase";
@@ -62,6 +64,15 @@ type GuitarClip = BrowseItem & {
   id: string;
   email: string;
   comments: ShowcaseComment[];
+};
+
+type QuickAction = {
+  id: string;
+  title: string;
+  meta: string;
+  tag: string;
+  imageUrl: string;
+  onClick: () => void;
 };
 
 const topSongs: BrowseItem[] = [
@@ -106,6 +117,62 @@ const topSongs: BrowseItem[] = [
     avatarInitial: "C",
     imageUrl:
       "https://images.unsplash.com/photo-1761503556208-d8d9efd02d28?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+  },
+  {
+    title: "Velvet Sunrise",
+    author: "Ava Brooks",
+    avatarInitial: "A",
+    imageUrl:
+      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+  },
+  {
+    title: "Glass Heart Motel",
+    author: "Noah Bennett",
+    avatarInitial: "N",
+    imageUrl:
+      "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+  },
+  {
+    title: "Slow Burn Arcade",
+    author: "Maya Lewis",
+    avatarInitial: "M",
+    imageUrl:
+      "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+  },
+  {
+    title: "Ocean Room Session",
+    author: "Luca Martin",
+    avatarInitial: "L",
+    imageUrl:
+      "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+  },
+  {
+    title: "Neon Weather",
+    author: "Sofia Turner",
+    avatarInitial: "S",
+    imageUrl:
+      "https://images.unsplash.com/photo-1499364615650-ec38552f4f34?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+  },
+  {
+    title: "Lunar Exit",
+    author: "Ethan Ross",
+    avatarInitial: "E",
+    imageUrl:
+      "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+  },
+  {
+    title: "Afterglow Signals",
+    author: "Chloe Hayes",
+    avatarInitial: "C",
+    imageUrl:
+      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+  },
+  {
+    title: "Broken Halo Drive",
+    author: "Kai Morgan",
+    avatarInitial: "K",
+    imageUrl:
+      "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
 ];
 
@@ -152,7 +219,71 @@ const topTemplates: BrowseItem[] = [
     imageUrl:
       "https://images.unsplash.com/photo-1656231267321-282e40e05d24?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
+  {
+    title: "Indie Pop Writer Room",
+    author: "Harper Lane",
+    avatarInitial: "H",
+    imageUrl:
+      "https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+  },
+  {
+    title: "Dream Guitar Bed",
+    author: "Owen Cruz",
+    avatarInitial: "O",
+    imageUrl:
+      "https://images.unsplash.com/photo-1511379938547-c1f69419868d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+  },
+  {
+    title: "House Drum Starter",
+    author: "Mila Stone",
+    avatarInitial: "M",
+    imageUrl:
+      "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+  },
+  {
+    title: "Blues Club Backing Kit",
+    author: "Theo Price",
+    avatarInitial: "T",
+    imageUrl:
+      "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+  },
+  {
+    title: "Ambient Piano Sketchpad",
+    author: "Ella Chen",
+    avatarInitial: "E",
+    imageUrl:
+      "https://images.unsplash.com/photo-1516280440614-37939bbacd81?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+  },
+  {
+    title: "R&B Pocket Builder",
+    author: "Jaden Holt",
+    avatarInitial: "J",
+    imageUrl:
+      "https://images.unsplash.com/photo-1507838153414-b4b713384a76?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+  },
+  {
+    title: "Latin Jam Starter",
+    author: "Nina Flores",
+    avatarInitial: "N",
+    imageUrl:
+      "https://images.unsplash.com/photo-1548420329-2f116f28d2e9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+  },
+  {
+    title: "Dark Trap Scene",
+    author: "Zion Park",
+    avatarInitial: "Z",
+    imageUrl:
+      "https://images.unsplash.com/photo-1571266028243-d220c9f16fc9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+  },
 ];
+
+const hipHopStarterTemplate: BrowseItem = {
+  title: "Hip-Hop Starter Session",
+  author: "LavaDAW",
+  avatarInitial: "L",
+  imageUrl:
+    "https://images.unsplash.com/photo-1516280440614-37939bbacd81?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+};
 
 const guitarClips: GuitarClip[] = [
   {
@@ -235,6 +366,8 @@ export function EntranceWorkspace() {
   const [templateOpen, setTemplateOpen] = useState(false);
   const [songOpen, setSongOpen] = useState(false);
   const [guitarOpen, setGuitarOpen] = useState(false);
+  const [looperInitialFilter, setLooperInitialFilter] = useState("Hot");
+  const [backingTrackInitialFilter, setBackingTrackInitialFilter] = useState("Hot");
   const [selectedTemplate, setSelectedTemplate] = useState<BrowseItem | null>(null);
   const [selectedSong, setSelectedSong] = useState<BrowseItem | null>(null);
   const [selectedGuitarClip, setSelectedGuitarClip] = useState<GuitarClip | null>(null);
@@ -396,6 +529,66 @@ export function EntranceWorkspace() {
     },
   ];
 
+  const quickActions = useMemo<QuickAction[]>(
+    () => [
+      {
+        id: "make-song",
+        title: "Make a Song",
+        meta: "Open the full workspace and start arranging immediately.",
+        tag: "Song",
+        imageUrl: topSongs[0].imageUrl,
+        onClick: () => setFullscreenView("agentic-producing"),
+      },
+      {
+        id: "jam-now",
+        title: "Jam Right Now",
+        meta: "Jump to the AI jam prompt and start with a vibe.",
+        tag: "Jam",
+        imageUrl: topSongs[1].imageUrl,
+        onClick: () => handleScrollTo("launch"),
+      },
+      {
+        id: "rock-loop",
+        title: "Start a Rock Loop",
+        meta: "Open Looper with a rock-ready filter and browse fast riffs.",
+        tag: "Rock",
+        imageUrl: guitarClips[3].imageUrl,
+        onClick: () => {
+          setLooperInitialFilter("Rock");
+          setActiveSubView("looper");
+        },
+      },
+      {
+        id: "blues-jam",
+        title: "Start a Blues Jam",
+        meta: "Open backing tracks already pointed at blues-friendly grooves.",
+        tag: "Blues",
+        imageUrl: guitarClips[4].imageUrl,
+        onClick: () => {
+          setBackingTrackInitialFilter("Blues");
+          setActiveSubView("instant-backing-track");
+        },
+      },
+      {
+        id: "hiphop-song",
+        title: "Make a Hip-Hop Idea",
+        meta: "Launch a trap and hip-hop leaning starter session.",
+        tag: "Hip-Hop",
+        imageUrl: hipHopStarterTemplate.imageUrl,
+        onClick: () => openTemplate(hipHopStarterTemplate),
+      },
+      {
+        id: "guitar-solo",
+        title: "Solo a Guitar Take",
+        meta: "Open a featured guitar clip and jump into a lead-focused flow.",
+        tag: "Guitar",
+        imageUrl: guitarClips[0].imageUrl,
+        onClick: () => openGuitar(guitarClips[0]),
+      },
+    ],
+    [handleScrollTo, openGuitar, openTemplate],
+  );
+
   const contentTitle =
     activeSubView === "home"
       ? "Workspace"
@@ -403,6 +596,8 @@ export function EntranceWorkspace() {
         ? "Looper"
         : activeSubView === "instant-backing-track"
           ? "Backing Track"
+          : activeSubView === "quick-actions"
+            ? "Quick Access"
           : activeSubView === "top-songs"
             ? "Top Songs"
             : activeSubView === "top-templates"
@@ -663,30 +858,10 @@ export function EntranceWorkspace() {
                   </div>
 
                   <div style={templateStripStyle}>
-                    <div className="mb-3 flex items-center justify-between">
-                      <div>
-                        <p style={miniSectionTitleStyle}>Template shortcuts</p>
-                        <p style={templateStripHintStyle}>Fast starting points when you do not want to prompt from scratch.</p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setActiveSubView("top-templates")}
-                        className="tablet-touch-target tablet-pressable"
-                        style={inlineLinkButtonStyle}
-                      >
-                        See all
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-4 gap-3">
-                      {topTemplates.slice(0, 4).map((item) => (
-                        <TemplateShortcutCard
-                          key={item.title}
-                          item={item}
-                          onClick={() => openTemplate(item)}
-                        />
-                      ))}
-                    </div>
+                    <QuickAccessCarousel
+                      actions={quickActions}
+                      onSeeAll={() => setActiveSubView("quick-actions")}
+                    />
                   </div>
                 </div>
               </section>
@@ -764,9 +939,20 @@ export function EntranceWorkspace() {
         ) : (
           <div className="min-h-0 flex-1 overflow-y-auto" style={{ padding: "24px 30px 40px" }}>
             {activeSubView === "looper" ? (
-              <LooperPage onBack={() => setActiveSubView("home")} />
+              <LooperPage
+                onBack={() => setActiveSubView("home")}
+                initialFilter={looperInitialFilter}
+              />
             ) : activeSubView === "instant-backing-track" ? (
-              <InstantBackingTrackPage onBack={() => setActiveSubView("home")} />
+              <InstantBackingTrackPage
+                onBack={() => setActiveSubView("home")}
+                initialFilter={backingTrackInitialFilter}
+              />
+            ) : activeSubView === "quick-actions" ? (
+              <QuickActionsPage
+                actions={quickActions}
+                onBack={() => setActiveSubView("home")}
+              />
             ) : activeSubView === "top-songs" ? (
               <TopBrowsePage
                 title="Top Songs"
@@ -821,6 +1007,117 @@ export function EntranceWorkspace() {
       />
     </div>
   );
+}
+
+function useDragScroll(axis: "x" | "y") {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dragStateRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    startScrollLeft: number;
+    startScrollTop: number;
+    moved: boolean;
+  } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handlePointerDown = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
+    const container = containerRef.current;
+    if (!container) {
+      return;
+    }
+
+    dragStateRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      startScrollLeft: container.scrollLeft,
+      startScrollTop: container.scrollTop,
+      moved: false,
+    };
+    setIsDragging(false);
+  }, []);
+
+  const handlePointerMove = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
+    const container = containerRef.current;
+    const dragState = dragStateRef.current;
+    if (!container || !dragState || dragState.pointerId !== event.pointerId) {
+      return;
+    }
+
+    const deltaX = event.clientX - dragState.startX;
+    const deltaY = event.clientY - dragState.startY;
+    const movedEnough = Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4;
+
+    if (movedEnough && !dragState.moved) {
+      dragState.moved = true;
+      setIsDragging(true);
+    }
+
+    if (!dragState.moved) {
+      return;
+    }
+
+    if (axis === "x") {
+      container.scrollLeft = dragState.startScrollLeft - deltaX;
+    } else {
+      container.scrollTop = dragState.startScrollTop - deltaY;
+    }
+  }, [axis]);
+
+  const endDrag = useCallback((pointerId: number) => {
+    const dragState = dragStateRef.current;
+    if (!dragState || dragState.pointerId !== pointerId) {
+      return;
+    }
+
+    dragStateRef.current = null;
+    window.setTimeout(() => setIsDragging(false), 0);
+  }, []);
+
+  const handlePointerUp = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
+    endDrag(event.pointerId);
+  }, [endDrag]);
+
+  const handlePointerCancel = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
+    endDrag(event.pointerId);
+  }, [endDrag]);
+
+  const handleClickCapture = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    if (dragStateRef.current?.moved || isDragging) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }, [isDragging]);
+
+  const handleWheel = useCallback((event: React.WheelEvent<HTMLDivElement>) => {
+    if (axis !== "x") {
+      return;
+    }
+
+    const container = containerRef.current;
+    if (!container) {
+      return;
+    }
+
+    if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+      container.scrollLeft += event.deltaY;
+      event.preventDefault();
+    }
+  }, [axis]);
+
+  return {
+    containerRef,
+    isDragging,
+    dragBind: {
+      onPointerDown: handlePointerDown,
+      onPointerMove: handlePointerMove,
+      onPointerUp: handlePointerUp,
+      onPointerCancel: handlePointerCancel,
+      onClickCapture: handleClickCapture,
+      onWheel: handleWheel,
+    },
+  };
 }
 
 function ScaledPreviewCanvas({
@@ -1032,40 +1329,138 @@ function CompactImageCard({
   );
 }
 
-function TemplateShortcutCard({
-  item,
+function QuickActionCard({
+  action,
   onClick,
 }: {
-  item: BrowseItem;
+  action: QuickAction;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="tablet-touch-target tablet-pressable tablet-hover-lift flex items-center gap-3 rounded-[20px] text-left"
-      style={templateShortcutCardStyle}
+      className="tablet-touch-target tablet-pressable tablet-hover-lift flex h-full items-center gap-3 rounded-[22px] text-left"
+      style={quickActionCardStyle}
     >
       <div
         className="relative overflow-hidden rounded-[14px]"
-        style={{ width: 56, height: 56, flexShrink: 0 }}
+        style={{ width: 68, height: 68, flexShrink: 0 }}
       >
         <ImageWithFallback
-          src={item.imageUrl}
-          alt={item.title}
+          src={action.imageUrl}
+          alt={action.title}
           className="absolute inset-0 h-full w-full object-cover"
         />
       </div>
       <div className="min-w-0 flex-1">
+        <p style={quickActionTagStyle}>{action.tag}</p>
         <p className="truncate" style={listTitleStyle}>
-          {item.title}
+          {action.title}
         </p>
-        <p className="truncate" style={listMetaStyle}>
-          {item.author}
+        <p style={quickActionMetaStyle}>
+          {action.meta}
         </p>
       </div>
       <ChevronRight size={16} strokeWidth={1.8} style={{ color: "var(--secondary)", flexShrink: 0 }} />
     </button>
+  );
+}
+
+function QuickAccessCarousel({
+  actions,
+  onSeeAll,
+}: {
+  actions: QuickAction[];
+  onSeeAll: () => void;
+}) {
+  const { containerRef, isDragging, dragBind } = useDragScroll("x");
+
+  return (
+    <div style={templateStripStyle}>
+      <div className="mb-3 flex items-center justify-between">
+        <div>
+          <p style={miniSectionTitleStyle}>Quick Access</p>
+          <p style={templateStripHintStyle}>
+            Swipe horizontally to jump into a concrete session, loop, jam, or guitar flow.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onSeeAll}
+          className="tablet-touch-target tablet-pressable"
+          style={inlineLinkButtonStyle}
+        >
+          See all
+        </button>
+      </div>
+
+      <div
+        ref={containerRef}
+        {...dragBind}
+        className="overflow-x-auto pb-2"
+        style={{
+          WebkitOverflowScrolling: "touch",
+          overscrollBehaviorX: "contain",
+          scrollbarWidth: "none",
+          touchAction: "none",
+          cursor: isDragging ? "grabbing" : "grab",
+        }}
+      >
+        <div className="flex gap-3 pr-6" style={{ width: "max-content" }}>
+          {actions.map((action) => (
+            <div
+              key={action.id}
+              style={{
+                width: 372,
+                minWidth: 372,
+                maxWidth: 372,
+              }}
+            >
+              <QuickActionCard action={action} onClick={action.onClick} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function QuickActionsPage({
+  actions,
+  onBack,
+}: {
+  actions: QuickAction[];
+  onBack: () => void;
+}) {
+  return (
+    <section>
+      <div className="mb-6 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={onBack}
+          className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-full"
+          style={secondaryButtonStyle}
+        >
+          <ArrowLeft size={15} strokeWidth={1.9} />
+          Back
+        </button>
+        <h3 style={sectionTitleStyle}>Quick Access</h3>
+        <div style={{ width: 72 }} />
+      </div>
+
+      <div className="mb-6">
+        <p style={sectionDescriptionStyle}>
+          Pick a concrete starting point and jump directly into the right flow.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        {actions.map((action) => (
+          <QuickActionCard key={action.id} action={action} onClick={action.onClick} />
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -1080,8 +1475,10 @@ function TopListColumn({
   onItemClick: (item: BrowseItem) => void;
   onOpenDetail: () => void;
 }) {
+  const { containerRef, isDragging, dragBind } = useDragScroll("y");
+
   return (
-    <div className="rounded-[30px]" style={panelStyle}>
+    <div className="rounded-[30px]" style={{ ...panelStyle, display: "flex", flexDirection: "column" }}>
       <div className="mb-3 flex items-center justify-between">
         <p style={miniSectionTitleStyle}>{title}</p>
         <button type="button" onClick={onOpenDetail} className="tablet-touch-target tablet-pressable" style={inlineLinkButtonStyle}>
@@ -1089,8 +1486,20 @@ function TopListColumn({
         </button>
       </div>
 
-      <div className="flex flex-col gap-2">
-        {items.slice(0, 5).map((item) => (
+      <div
+        ref={containerRef}
+        {...dragBind}
+        className="flex flex-col gap-2 overflow-y-auto pr-1"
+        style={{
+          maxHeight: 432,
+          minHeight: 432,
+          WebkitOverflowScrolling: "touch",
+          overscrollBehaviorY: "contain",
+          touchAction: "none",
+          cursor: isDragging ? "grabbing" : "grab",
+        }}
+      >
+        {items.map((item) => (
           <button
             key={item.title}
             type="button"
@@ -1555,12 +1964,21 @@ const loopHubStyle: CSSProperties = {
 };
 
 
-const templateShortcutCardStyle: CSSProperties = {
-  minHeight: 88,
-  padding: 12,
+const quickActionCardStyle: CSSProperties = {
+  minHeight: 104,
+  padding: 14,
   border: "1px solid var(--border)",
   backgroundColor: "var(--surface-glass-strong)",
   boxShadow: "0 8px 20px rgba(15,23,42,0.04)",
+};
+
+const quickActionTagStyle: CSSProperties = {
+  margin: "0 0 6px",
+  color: "var(--secondary)",
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
 };
 
 const listTitleStyle: CSSProperties = {
@@ -1575,6 +1993,18 @@ const listMetaStyle: CSSProperties = {
   color: "var(--secondary)",
   fontSize: 13,
   fontWeight: 500,
+};
+
+const quickActionMetaStyle: CSSProperties = {
+  margin: "6px 0 0",
+  color: "var(--secondary)",
+  fontSize: 13,
+  fontWeight: 500,
+  lineHeight: 1.35,
+  display: "-webkit-box",
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: "vertical",
+  overflow: "hidden",
 };
 
 const imageCardTitleStyle: CSSProperties = {
