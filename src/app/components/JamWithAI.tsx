@@ -1,35 +1,17 @@
-import { useState, useEffect } from "react";
-import { Send, Sparkles } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
+import { useState } from "react";
+import { Send } from "lucide-react";
+import { motion } from "motion/react";
 
 const promptSuggestions = [
   "Lo-fi piano chords, rainy mood, 75 bpm",
   "Funky slap bass groove in E, 110 bpm",
   "Ambient pads, wide stereo, C major",
   "Trap hi-hats with swing, 140 bpm",
-  "Acoustic fingerpicking, folk, G major",
-  "Ethereal vocal chops, reverb-drenched",
 ];
-
-const barHeights = [0.3, 0.6, 0.9, 0.5, 1, 0.7, 0.4, 0.8, 0.55, 0.95, 0.35, 0.75];
-
-function SoundWave() {
-  return (
-    null
-  );
-}
 
 export function JamWithAI() {
   const [inputValue, setInputValue] = useState("");
-  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveSuggestionIndex((prev) => (prev + 1) % promptSuggestions.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
 
   const handleSuggestionClick = (suggestion: string) => {
     setInputValue(suggestion);
@@ -53,7 +35,6 @@ export function JamWithAI() {
           >
             Jam with AI
           </h3>
-          <SoundWave />
         </div>
       </div>
 
@@ -66,7 +47,7 @@ export function JamWithAI() {
           fontFamily: "var(--app-font-family)",
         }}
       >
-        Describe a sound. We generate it. You play.
+        Type a vibe. Generate and play.
       </p>
 
       {/* Input area */}
