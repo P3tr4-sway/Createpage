@@ -104,7 +104,6 @@ export function TemplateSheet({
     );
   }, []);
   const inWorkbenchPortal = portalRoot?.id === "design-workbench-portal-root";
-  const panelWidth = 620;
 
   const content = (
     <AnimatePresence>
@@ -116,35 +115,52 @@ export function TemplateSheet({
             width: "100%",
             height: "100%",
             transform: `scale(${inverseScale})`,
-            transformOrigin: "top right",
+            transformOrigin: "center center",
             overflow: "hidden",
             pointerEvents: "auto",
+            zIndex: 340,
           }}
         >
           {/* Backdrop */}
           <motion.div
-            className={`${inWorkbenchPortal ? "absolute" : "fixed"} inset-0 z-50`}
-            style={{ backgroundColor: "rgba(0,0,0,0.6)" }}
+            className={inWorkbenchPortal ? "absolute inset-0" : "fixed inset-0"}
+            style={{ backgroundColor: "rgba(6, 8, 14, 0.58)" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
 
-          {/* Sheet */}
-          <motion.div
-            className={`${inWorkbenchPortal ? "absolute" : "fixed"} top-0 right-0 bottom-0 z-50 flex flex-col overflow-hidden`}
+          {/* Centered dialog */}
+          <div
+            className={inWorkbenchPortal ? "absolute" : "fixed"}
             style={{
-              width: panelWidth,
-              backgroundColor: "var(--background)",
-              borderLeft: "1px solid var(--border)",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "min(920px, calc(100% - 72px))",
+              height: "min(760px, calc(100% - 72px))",
+              maxWidth: 920,
+              maxHeight: 760,
+              display: "flex",
+              flexDirection: "column",
+              padding: 0,
+              borderRadius: 30,
+              border: "1px solid color-mix(in srgb, var(--border) 84%, transparent)",
+              backgroundColor: "color-mix(in srgb, var(--background) 94%, rgba(10,12,18,0.92) 6%)",
+              boxShadow: "0 36px 100px rgba(0,0,0,0.34)",
               fontFamily: FONT,
+              outline: "none",
+              overflow: "hidden",
             }}
-            initial={{ x: panelWidth }}
-            animate={{ x: 0 }}
-            exit={{ x: panelWidth }}
-            transition={{ type: "spring", stiffness: 340, damping: 32 }}
           >
+            <motion.div
+              style={{ display: "flex", height: "100%", flexDirection: "column" }}
+              initial={{ opacity: 0, y: 18, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 12, scale: 0.98 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+            >
             {/* Header area — hero image */}
             <div className="relative" style={{ height: 240, flexShrink: 0 }}>
               <ImageWithFallback
@@ -153,14 +169,7 @@ export function TemplateSheet({
                 className="absolute inset-0 w-full h-full object-cover"
                 style={{ filter: "brightness(0.5)" }}
               />
-              {/* Gradient overlay */}
-              <div
-                className="absolute inset-0 flex items-center justify-center"
-                style={{
-                  background:
-                    "linear-gradient(to top, var(--background) 0%, transparent 60%)",
-                }}
-              >
+              <div className="absolute inset-0 flex items-center justify-center">
                 <button
                   type="button"
                   aria-label={isSong ? "Play song preview" : isGuitar ? "Play guitar clip preview" : "Play template preview"}
@@ -186,13 +195,12 @@ export function TemplateSheet({
                 aria-label="Close detail sheet"
                 className="tablet-icon-target tablet-pressable tablet-hover-fade absolute top-4 right-4 flex items-center justify-center"
                 style={{
-                  width: 36,
-                  height: 36,
+                  width: 40,
+                  height: 40,
                   borderRadius: "50%",
-                  backgroundColor: "var(--on-image-control-bg)",
-                  border: "none",
-                  color: "var(--on-image-primary)",
-                  backdropFilter: "blur(8px)",
+                  border: "1px solid rgba(255,255,255,0.14)",
+                  backgroundColor: "rgba(0,0,0,0.26)",
+                  color: "white",
                 }}
               >
                 <X size={18} strokeWidth={1.5} />
@@ -491,7 +499,8 @@ export function TemplateSheet({
                 </div>
               )}
             </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </div>
       )}
     </AnimatePresence>

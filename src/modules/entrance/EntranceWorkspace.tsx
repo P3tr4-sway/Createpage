@@ -1,6 +1,7 @@
 import {
   ArrowLeft,
   Bot,
+  ChevronRight,
   Moon,
   Repeat,
   Sparkles,
@@ -801,7 +802,7 @@ export function EntranceWorkspace() {
         : activeSubView === "instant-backing-track"
           ? "Backing Track"
           : activeSubView === "quick-actions"
-            ? "Quick Access"
+            ? "Quick Actions"
           : activeSubView === "top-songs"
             ? "Top Songs"
             : activeSubView === "top-templates"
@@ -1676,7 +1677,7 @@ function QuickAccessCarousel({
     <div style={templateStripStyle}>
       <div className="mb-3 flex items-center justify-between">
         <div>
-          <p style={miniSectionTitleStyle}>Quick Access</p>
+          <p style={miniSectionTitleStyle}>Quick Actions</p>
           <p style={templateStripHintStyle}>
             Swipe horizontally to jump into a concrete session, loop, jam, or guitar flow.
           </p>
@@ -1741,7 +1742,7 @@ function QuickActionsPage({
           <ArrowLeft size={15} strokeWidth={1.9} />
           Back
         </button>
-        <h3 style={sectionTitleStyle}>Quick Access</h3>
+        <h3 style={sectionTitleStyle}>Quick Actions</h3>
         <div style={{ width: 72 }} />
       </div>
 
