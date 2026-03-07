@@ -1410,60 +1410,62 @@ export function AgenticProducingPage({
                             />
                           ) : null}
 
-                          {track.clips.map((clip) => (
-                            <button
-                              key={clip.id}
-                              type="button"
-                              onClick={() => {
-                                setSelectedTrackId(track.id);
-                                seekToBeat(clip.startBeat);
-                              }}
-                              className="absolute overflow-hidden text-left"
-                              style={{
-                                left:
-                                  timelineLeadingInset +
-                                  clip.startBeat * pixelsPerBeat +
-                                  4,
-                                top: previewMode ? 10 : 12,
-                                width: clip.durationBeats * pixelsPerBeat - 8,
-                                height: trackRowHeight - (previewMode ? 20 : 24),
-                                borderRadius: previewMode ? 12 : 14,
-                                border: isSelected
-                                  ? "1px solid rgba(255,255,255,0.38)"
-                                  : "1px solid rgba(255,255,255,0.16)",
-                                background: clip.fill,
-                                boxShadow: isSelected
-                                  ? "0 16px 28px rgba(15,23,42,0.28)"
-                                  : "0 10px 18px rgba(15,23,42,0.2)",
-                                padding: previewMode ? "10px 10px" : "12px 12px",
-                                color: clip.accent,
-                              }}
-                            >
-                              <span
-                                style={{
-                                  display: "block",
-                                  fontSize: previewMode ? 12 : 13,
-                                  fontWeight: 700,
-                                  letterSpacing: "0.01em",
-                                }}
-                              >
-                                {clip.label}
-                              </span>
-                              <span
-                                style={{
-                                  display: "block",
-                                  marginTop: 5,
-                                  fontSize: previewMode ? 10 : 11,
-                                  opacity: 0.86,
-                                }}
-                              >
-                                {copy.barLabel(
-                                  Math.floor(clip.startBeat / beatsPerBar) + 1,
-                                  Math.ceil(clip.durationBeats / beatsPerBar),
-                                )}
-                              </span>
-                            </button>
-                          ))}
+                          {!previewMode
+                            ? track.clips.map((clip) => (
+                                <button
+                                  key={clip.id}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedTrackId(track.id);
+                                    seekToBeat(clip.startBeat);
+                                  }}
+                                  className="absolute overflow-hidden text-left"
+                                  style={{
+                                    left:
+                                      timelineLeadingInset +
+                                      clip.startBeat * pixelsPerBeat +
+                                      4,
+                                    top: previewMode ? 10 : 12,
+                                    width: clip.durationBeats * pixelsPerBeat - 8,
+                                    height: trackRowHeight - (previewMode ? 20 : 24),
+                                    borderRadius: previewMode ? 12 : 14,
+                                    border: isSelected
+                                      ? "1px solid rgba(255,255,255,0.38)"
+                                      : "1px solid rgba(255,255,255,0.16)",
+                                    background: clip.fill,
+                                    boxShadow: isSelected
+                                      ? "0 16px 28px rgba(15,23,42,0.28)"
+                                      : "0 10px 18px rgba(15,23,42,0.2)",
+                                    padding: previewMode ? "10px 10px" : "12px 12px",
+                                    color: clip.accent,
+                                  }}
+                                >
+                                  <span
+                                    style={{
+                                      display: "block",
+                                      fontSize: previewMode ? 12 : 13,
+                                      fontWeight: 700,
+                                      letterSpacing: "0.01em",
+                                    }}
+                                  >
+                                    {clip.label}
+                                  </span>
+                                  <span
+                                    style={{
+                                      display: "block",
+                                      marginTop: 5,
+                                      fontSize: previewMode ? 10 : 11,
+                                      opacity: 0.86,
+                                    }}
+                                  >
+                                    {copy.barLabel(
+                                      Math.floor(clip.startBeat / beatsPerBar) + 1,
+                                      Math.ceil(clip.durationBeats / beatsPerBar),
+                                    )}
+                                  </span>
+                                </button>
+                              ))
+                            : null}
                         </div>
                       );
                     })}
