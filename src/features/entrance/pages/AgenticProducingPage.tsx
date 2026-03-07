@@ -1,10 +1,4 @@
-import {
-  type CSSProperties,
-  type PointerEvent as ReactPointerEvent,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { type CSSProperties } from "react";
 import {
   X,
   Undo2,
@@ -24,33 +18,13 @@ import { AgenticOverlayDock } from "@/features/entrance/components/AgenticOverla
 import { useEntranceLocale } from "@/features/entrance/EntranceLocaleContext";
 import { agenticCopyByLocale } from "@/features/entrance/i18n/agentic.copy";
 import { getMusicianTargetsForLocale } from "@/features/entrance/model/agentic.mock";
+import { useAgenticOverlayController } from "@/features/entrance/pages/agentic/useAgenticOverlayController";
+import { useAgenticTimelineController } from "@/features/entrance/pages/agentic/useAgenticTimelineController";
 import { useAgenticSessionState } from "@/features/entrance/state/useAgenticSessionState";
 
 interface AgenticProducingPageProps {
   onBack?: () => void;
   previewMode?: boolean;
-}
-
-function clampBeat(beat: number, totalBeats: number) {
-  const maxBeat = Math.max(totalBeats - 0.001, 0);
-  return Math.min(Math.max(beat, 0), maxBeat);
-}
-
-function formatTransportPosition(
-  currentBeat: number,
-  beatsPerBar: number,
-  totalBeats: number,
-) {
-  const safeBeat = clampBeat(currentBeat, totalBeats);
-  const wholeBeat = Math.floor(safeBeat);
-  const bar = Math.floor(wholeBeat / beatsPerBar) + 1;
-  const beatInBar = (wholeBeat % beatsPerBar) + 1;
-  const sixteenth = Math.floor((safeBeat - wholeBeat) * 4) + 1;
-  return `${String(bar).padStart(2, "0")}.${beatInBar}.${Math.min(sixteenth, 4)}`;
-}
-
-function createUiId(prefix: string) {
-  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 }
 export function AgenticProducingPage({
   onBack,
@@ -59,8 +33,6 @@ export function AgenticProducingPage({
   const locale = useEntranceLocale();
   const copy = agenticCopyByLocale[locale];
   const localizedTargets = getMusicianTargetsForLocale(locale);
-  const previewInitialBeat = 6;
-  const previewPlayheadTargetRatio = 2 / 3;
   const {
     tracks,
     selectedTrackId,
@@ -108,289 +80,58 @@ export function AgenticProducingPage({
     trackName: copy.trackName,
     ideaLane: copy.ideaLane,
   });
-  const [previewViewportWidth, setPreviewViewportWidth] = useState(() =>
-    previewMode ? 1280 : 0,
-  );
-
-  const previewRootRef = useRef<HTMLElement | null>(null);
-  const timelinePaneRef = useRef<HTMLDivElement | null>(null);
-  const timelineBodyRef = useRef<HTMLDivElement | null>(null);
-  const overlayDockRef = useRef<HTMLDivElement | null>(null);
 
   const showAgentOverlay = !previewMode;
   const showProjectTitle = !previewMode;
   const showBackButton = !previewMode && typeof onBack === "function";
-  const trackPanelWidth = previewMode ? 282 : 356;
-  const arrangementHeaderHeight = previewMode ? 44 : 58;
-  const trackRowHeight = previewMode ? 76 : 92;
-  const bottomTransportHeight = previewMode ? 72 : 94;
-  const pixelsPerBeat = previewMode ? 26 : 36;
-  const previewPlayheadViewportX = previewMode
-    ? Math.max(previewViewportWidth * previewPlayheadTargetRatio - trackPanelWidth, 0)
-    : 0;
-  const previewTimelinePaneWidth = previewMode
-    ? Math.max(previewViewportWidth - trackPanelWidth, 0)
-    : 0;
-  const timelineLeadingInset = previewMode
-    ? Math.max(20, previewPlayheadViewportX - previewInitialBeat * pixelsPerBeat)
-    : 36;
-  const timelineTrailingInset = previewMode
-    ? Math.max(52, previewTimelinePaneWidth - previewPlayheadViewportX + 24)
-    : 72;
-  const beatsPerBar = 4;
-  const totalBars = 24;
-  const tempo = 65;
-  const totalBeats = totalBars * beatsPerBar;
-  const maxTimelineBeat = Math.max(totalBeats - 0.001, 0);
-  const barWidth = beatsPerBar * pixelsPerBeat;
-  const timelineGridWidth = totalBeats * pixelsPerBeat;
-  const timelineContentWidth =
-    timelineLeadingInset + timelineGridWidth + timelineTrailingInset;
-  const playheadViewportX =
-    timelineLeadingInset + currentBeat * pixelsPerBeat - scrollLeft;
   const selectedTrack = tracks.find((track) => track.id === selectedTrackId) ?? tracks[0];
   const selectedMusicianTarget =
     localizedTargets.find((target) => target.id === musicianTargetId) ?? localizedTargets[0];
   const selectedStyle = styleDraft.trim() || copy.selectedStyleFallback;
   const producerWorkspaceVisible = showAgentOverlay && agentMode === "producer" && producerWorkspaceOpen;
-
-  useEffect(() => {
-    if (!previewMode) return;
-
-    const previewRoot = previewRootRef.current;
-    if (!previewRoot) return;
-
-    const updatePreviewViewportWidth = () => {
-      const { width } = previewRoot.getBoundingClientRect();
-      if (width > 0) {
-        setPreviewViewportWidth(width);
-      }
-    };
-
-    updatePreviewViewportWidth();
-
-    const observer = new ResizeObserver(updatePreviewViewportWidth);
-    observer.observe(previewRoot);
-
-    return () => observer.disconnect();
-  }, [previewMode]);
-
-  useEffect(() => {
-    const handlePointerDown = (event: PointerEvent) => {
-      if (!overlayDockRef.current) return;
-      if (!overlayDockRef.current.contains(event.target as Node)) {
-        setOpenOverlayMenu(null);
-      }
-    };
-
-    window.addEventListener("pointerdown", handlePointerDown);
-    return () => window.removeEventListener("pointerdown", handlePointerDown);
-  }, []);
-
-  const handleMusicianGenerate = () => {
-    setOpenOverlayMenu(null);
-
-    const targetTrack = tracks.find((track) =>
-      track.name.toLowerCase().includes(selectedMusicianTarget.trackMatch),
-    );
-
-    if (targetTrack) {
-      setSelectedTrackId(targetTrack.id);
-    }
-
-    pushQueueItem({
-      id: createUiId("queue"),
-      title: copy.musicianPassTitle(selectedMusicianTarget.label),
-      owner: selectedMusicianTarget.label,
-      status: copy.statusGenerating,
-      detail: `${selectedStyle} • ${targetTrack?.name ?? selectedTrack.name}`,
-      progress: selectedMusicianTarget.showsLyrics
-        ? copy.lyricProgress
-        : copy.instrumentalProgress,
-    });
-
-    pushHistoryItem({
-      id: createUiId("history"),
-      title: copy.musicianPassTitle(selectedMusicianTarget.label),
-      owner: selectedMusicianTarget.label,
-      meta: selectedMusicianTarget.showsLyrics
-        ? copy.lyricDraftMeta(selectedStyle)
-        : copy.instrumentalPassMeta(selectedStyle),
-      timestamp: copy.justNow,
-    });
-  };
-
-  const handleProducerSubmit = () => {
-    const nextDraft = producerDraft.trim();
-    if (!nextDraft) return;
-
-    setOpenOverlayMenu(null);
-    setProducerWorkspaceOpen(true);
-
-    setProducerMessages((prev) => [
-      ...prev,
-      {
-        id: createUiId("message"),
-        role: "user",
-        text: nextDraft,
-        timestamp: copy.justNow,
-      },
-      {
-        id: createUiId("message"),
-        role: "agent",
-        text: copy.producerSubmitReply(selectedStyle, selectedMusicianTarget.label),
-        timestamp: copy.justNow,
-      },
-    ]);
-
-    pushQueueItem({
-      id: createUiId("queue"),
-      title: copy.producerBrief,
-      owner: copy.aiProducer,
-      status: copy.statusGenerating,
-      detail: copy.producerSessionDirection(selectedStyle),
-      progress: copy.producerDispatch,
-    });
-
-    pushHistoryItem({
-      id: createUiId("history"),
-      title: copy.producerBrief,
-      owner: copy.aiProducer,
-      meta: copy.producerChatDirected(selectedStyle),
-      timestamp: copy.justNow,
-    });
-
-    setProducerDraft("");
-  };
-
-  const seekToBeat = (nextBeat: number) => {
-    setCurrentBeat(clampBeat(nextBeat, totalBeats));
-  };
-
-  const seekFromClientX = (clientX: number) => {
-    const pane = timelinePaneRef.current;
-    if (!pane) return;
-    const bounds = pane.getBoundingClientRect();
-    const localX = clientX - bounds.left + scrollLeft - timelineLeadingInset;
-    seekToBeat(localX / pixelsPerBeat);
-  };
-
-  const handleSeekPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    seekFromClientX(event.clientX);
-  };
-
-  const handlePlayheadPointerDown = (
-    event: ReactPointerEvent<HTMLButtonElement>,
-  ) => {
-    event.preventDefault();
-    seekFromClientX(event.clientX);
-    setIsDraggingPlayhead(true);
-  };
-
-  useEffect(() => {
-    if (!isDraggingPlayhead) return;
-
-    const handlePointerMove = (event: PointerEvent) => {
-      seekFromClientX(event.clientX);
-    };
-
-    const handlePointerUp = () => {
-      setIsDraggingPlayhead(false);
-    };
-
-    window.addEventListener("pointermove", handlePointerMove);
-    window.addEventListener("pointerup", handlePointerUp, { once: true });
-
-    return () => {
-      window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("pointerup", handlePointerUp);
-    };
-  }, [isDraggingPlayhead, pixelsPerBeat, scrollLeft, totalBeats]);
-
-  useEffect(() => {
-    if (!isPlaying) return;
-
-    let frameId = 0;
-    let previousTime = performance.now();
-
-    const tick = (now: number) => {
-      const deltaSeconds = (now - previousTime) / 1000;
-      previousTime = now;
-
-      setCurrentBeat((prev) => {
-        const nextBeat = prev + deltaSeconds * (tempo / 60);
-        if (nextBeat >= totalBeats) {
-          return loopEnabled ? nextBeat % totalBeats : maxTimelineBeat;
-        }
-        return nextBeat;
-      });
-
-      frameId = window.requestAnimationFrame(tick);
-    };
-
-    frameId = window.requestAnimationFrame(tick);
-    return () => window.cancelAnimationFrame(frameId);
-  }, [isPlaying, loopEnabled, maxTimelineBeat, tempo, totalBeats]);
-
-  useEffect(() => {
-    if (isPlaying && !loopEnabled && currentBeat >= maxTimelineBeat) {
-      setIsPlaying(false);
-    }
-  }, [currentBeat, isPlaying, loopEnabled, maxTimelineBeat]);
-
-  useEffect(() => {
-    const timelineBody = timelineBodyRef.current;
-    if (!timelineBody) return;
-
-    const markerX = timelineLeadingInset + currentBeat * pixelsPerBeat;
-    const maxScrollLeft = Math.max(
-      timelineBody.scrollWidth - timelineBody.clientWidth,
-      0,
-    );
-
-    if (previewMode) {
-      const nextScrollLeft = Math.min(
-        Math.max(markerX - previewPlayheadViewportX, 0),
-        maxScrollLeft,
-      );
-
-      if (Math.abs(timelineBody.scrollLeft - nextScrollLeft) > 1) {
-        timelineBody.scrollTo({ left: nextScrollLeft });
-      }
-      return;
-    }
-
-    const viewportStart = timelineBody.scrollLeft;
-    const viewportEnd = viewportStart + timelineBody.clientWidth;
-    const leftPadding = 48;
-    const rightPadding = 92;
-
-    if (markerX < viewportStart + leftPadding) {
-      timelineBody.scrollTo({ left: Math.max(markerX - leftPadding, 0) });
-      return;
-    }
-
-    if (markerX > viewportEnd - rightPadding) {
-      timelineBody.scrollTo({
-        left: Math.min(
-          markerX - timelineBody.clientWidth + rightPadding,
-          maxScrollLeft,
-        ),
-      });
-    }
-  }, [
+  const {
+    handlePlayheadPointerDown,
+    handleSeekPointerDown,
+    handleTimelineScroll,
+    metrics,
+    previewRootRef,
+    seekToBeat,
+    timelineBodyRef,
+    timelinePaneRef,
+    transportPosition,
+  } = useAgenticTimelineController({
     currentBeat,
-    pixelsPerBeat,
+    isDraggingPlayhead,
+    isPlaying,
+    loopEnabled,
     previewMode,
-    previewPlayheadViewportX,
-    timelineLeadingInset,
-  ]);
-
-  const transportPosition = formatTransportPosition(
-    currentBeat,
-    beatsPerBar,
-    totalBeats,
-  );
+    scrollLeft,
+    setCurrentBeat,
+    setIsDraggingPlayhead,
+    setIsPlaying,
+    setScrollLeft,
+    setScrollTop,
+  });
+  const {
+    handleMusicianGenerate,
+    handleProducerSubmit,
+    openProducerWorkspace,
+    overlayDockRef,
+  } = useAgenticOverlayController({
+    copy,
+    producerDraft,
+    pushHistoryItem,
+    pushQueueItem,
+    selectedMusicianTarget,
+    selectedStyle,
+    selectedTrack,
+    setOpenOverlayMenu,
+    setProducerDraft,
+    setProducerMessages,
+    setProducerWorkspaceOpen,
+    setSelectedTrackId,
+    tracks,
+  });
 
   return (
     <section
@@ -501,7 +242,7 @@ export function AgenticProducingPage({
               <div
                 className="flex shrink-0 flex-col"
                 style={{
-                  width: trackPanelWidth,
+                  width: metrics.trackPanelWidth,
                   borderRight: "1px solid var(--agentic-border-strong)",
                   background:
                     "linear-gradient(180deg, rgba(10,12,17,0.92), rgba(19,24,33,0.92))",
@@ -510,7 +251,7 @@ export function AgenticProducingPage({
                 <div
                   className="flex items-center justify-between"
                   style={{
-                    height: arrangementHeaderHeight,
+                    height: metrics.arrangementHeaderHeight,
                     padding: previewMode ? "0 12px" : "0 16px",
                     borderBottom: "1px solid rgba(255,255,255,0.08)",
                   }}
@@ -522,7 +263,7 @@ export function AgenticProducingPage({
                         fontSize: previewMode ? 11 : 12,
                       }}
                     >
-                      {totalBars} {copy.barsUnit} • {tempo} BPM • {tracks.length} {copy.tracksUnit}
+                      {metrics.totalBars} {copy.barsUnit} • {metrics.tempo} BPM • {tracks.length} {copy.tracksUnit}
                     </div>
                   </div>
 
@@ -556,7 +297,7 @@ export function AgenticProducingPage({
                           key={track.id}
                           className="flex items-center"
                           style={{
-                            height: trackRowHeight,
+                            height: metrics.trackRowHeight,
                             padding: previewMode ? "0 12px" : "0 16px",
                             borderBottom: "1px solid rgba(255,255,255,0.08)",
                             backgroundColor: isSelected
@@ -686,7 +427,7 @@ export function AgenticProducingPage({
                 <div
                   className="relative shrink-0 overflow-hidden"
                   style={{
-                    height: arrangementHeaderHeight,
+                    height: metrics.arrangementHeaderHeight,
                     backgroundColor: "var(--agentic-surface)",
                     borderBottom: "1px solid var(--agentic-border-strong)",
                   }}
@@ -695,9 +436,9 @@ export function AgenticProducingPage({
                   <div
                     className="relative flex h-full items-stretch"
                     style={{
-                      width: timelineContentWidth,
-                      paddingLeft: timelineLeadingInset,
-                      paddingRight: timelineTrailingInset,
+                      width: metrics.timelineContentWidth,
+                      paddingLeft: metrics.timelineLeadingInset,
+                      paddingRight: metrics.timelineTrailingInset,
                       transform: `translateX(-${scrollLeft}px)`,
                       background:
                         "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015))",
@@ -707,7 +448,7 @@ export function AgenticProducingPage({
                       aria-hidden="true"
                       style={{
                         position: "absolute",
-                        left: timelineLeadingInset,
+                        left: metrics.timelineLeadingInset,
                         top: 0,
                         bottom: 0,
                         width: 1,
@@ -715,15 +456,15 @@ export function AgenticProducingPage({
                         zIndex: 1,
                       }}
                     />
-                    {Array.from({ length: totalBars }, (_, barIndex) => {
+                    {Array.from({ length: metrics.totalBars }, (_, barIndex) => {
                       const label = barIndex + 1;
                       return (
                         <div
                           key={label}
                           className="relative h-full shrink-0"
                           style={{
-                            width: barWidth,
-                            minWidth: barWidth,
+                            width: metrics.barWidth,
+                            minWidth: metrics.barWidth,
                             borderRight: "1px solid var(--agentic-border-strong)",
                             backgroundColor:
                               label % 2 === 0
@@ -746,12 +487,12 @@ export function AgenticProducingPage({
                             {label}
                           </span>
 
-                          {Array.from({ length: beatsPerBar - 1 }, (_, beatIndex) => (
+                          {Array.from({ length: metrics.beatsPerBar - 1 }, (_, beatIndex) => (
                             <span
                               key={`${label}-${beatIndex}`}
                               style={{
                                 position: "absolute",
-                                left: (beatIndex + 1) * pixelsPerBeat,
+                                left: (beatIndex + 1) * metrics.pixelsPerBeat,
                                 top: previewMode ? 20 : 24,
                                 bottom: previewMode ? 7 : 9,
                                 width: 1,
@@ -778,13 +519,10 @@ export function AgenticProducingPage({
                 <div
                   ref={timelineBodyRef}
                   className="min-h-0 flex-1 overflow-x-auto overflow-y-auto"
-                  onScroll={(event) => {
-                    setScrollLeft(event.currentTarget.scrollLeft);
-                    setScrollTop(event.currentTarget.scrollTop);
-                  }}
+                  onScroll={handleTimelineScroll}
                   style={{ backgroundColor: "var(--agentic-topbar)" }}
                 >
-                  <div style={{ width: timelineContentWidth }}>
+                  <div style={{ width: metrics.timelineContentWidth }}>
                     {tracks.map((track, rowIndex) => {
                       const isSelected = track.id === selectedTrackId;
 
@@ -793,15 +531,15 @@ export function AgenticProducingPage({
                           key={track.id}
                           className="relative"
                           style={{
-                            height: trackRowHeight,
+                            height: metrics.trackRowHeight,
                             borderBottom: "1px solid var(--agentic-border)",
                             backgroundColor: isSelected
                               ? "rgba(255,255,255,0.03)"
                               : "transparent",
                             backgroundImage:
                               "linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(to right, rgba(255,255,255,0.16) 1px, transparent 1px)",
-                            backgroundSize: `${pixelsPerBeat}px 100%, ${barWidth}px 100%`,
-                            backgroundPosition: `${timelineLeadingInset}px 0, ${timelineLeadingInset}px 0`,
+                            backgroundSize: `${metrics.pixelsPerBeat}px 100%, ${metrics.barWidth}px 100%`,
+                            backgroundPosition: `${metrics.timelineLeadingInset}px 0, ${metrics.timelineLeadingInset}px 0`,
                           }}
                           onPointerDown={handleSeekPointerDown}
                         >
@@ -809,7 +547,7 @@ export function AgenticProducingPage({
                             aria-hidden="true"
                             style={{
                               position: "absolute",
-                              left: timelineLeadingInset,
+                              left: metrics.timelineLeadingInset,
                               top: 0,
                               bottom: 0,
                               width: 1,
@@ -840,12 +578,12 @@ export function AgenticProducingPage({
                                   className="absolute overflow-hidden text-left"
                                   style={{
                                     left:
-                                      timelineLeadingInset +
-                                      clip.startBeat * pixelsPerBeat +
+                                      metrics.timelineLeadingInset +
+                                      clip.startBeat * metrics.pixelsPerBeat +
                                       4,
                                     top: previewMode ? 10 : 12,
-                                    width: clip.durationBeats * pixelsPerBeat - 8,
-                                    height: trackRowHeight - (previewMode ? 20 : 24),
+                                    width: clip.durationBeats * metrics.pixelsPerBeat - 8,
+                                    height: metrics.trackRowHeight - (previewMode ? 20 : 24),
                                     borderRadius: previewMode ? 12 : 14,
                                     border: isSelected
                                       ? "1px solid rgba(255,255,255,0.38)"
@@ -877,8 +615,8 @@ export function AgenticProducingPage({
                                     }}
                                   >
                                     {copy.barLabel(
-                                      Math.floor(clip.startBeat / beatsPerBar) + 1,
-                                      Math.ceil(clip.durationBeats / beatsPerBar),
+                                      Math.floor(clip.startBeat / metrics.beatsPerBar) + 1,
+                                      Math.ceil(clip.durationBeats / metrics.beatsPerBar),
                                     )}
                                   </span>
                                 </button>
@@ -904,7 +642,7 @@ export function AgenticProducingPage({
                     onPointerDown={handlePlayheadPointerDown}
                     style={{
                       position: "absolute",
-                      left: playheadViewportX,
+                      left: metrics.playheadViewportX,
                       top: 0,
                       bottom: 0,
                       width: 44,
@@ -949,7 +687,7 @@ export function AgenticProducingPage({
             <div
               className="flex items-center justify-between"
               style={{
-                height: bottomTransportHeight,
+                height: metrics.bottomTransportHeight,
                 padding: previewMode ? "0 14px" : "0 16px",
                 borderTop: "1px solid var(--agentic-border)",
                 backgroundColor: "var(--agentic-surface)",
@@ -997,7 +735,7 @@ export function AgenticProducingPage({
                 <button
                   type="button"
                   onClick={() => {
-                    if (!isPlaying && currentBeat >= maxTimelineBeat) {
+                    if (!isPlaying && currentBeat >= metrics.maxTimelineBeat) {
                       seekToBeat(0);
                     }
                     setIsPlaying((prev) => !prev);
@@ -1049,7 +787,7 @@ export function AgenticProducingPage({
                   4/4
                 </button>
                 <button type="button" style={bottomPillStyle}>
-                  {tempo} BPM
+                  {metrics.tempo} BPM
                 </button>
               </div>
             </div>
@@ -1057,7 +795,7 @@ export function AgenticProducingPage({
 
           {showAgentOverlay ? (
             <AgenticOverlayDock
-              bottomTransportHeight={bottomTransportHeight}
+              bottomTransportHeight={metrics.bottomTransportHeight}
               producerWorkspaceVisible={producerWorkspaceVisible}
               producerMessages={producerMessages}
               audioQueue={audioQueue}
@@ -1088,10 +826,7 @@ export function AgenticProducingPage({
               onSelectMode={selectAgentMode}
               onDraftChange={setProducerDraft}
               onDraftSubmit={handleProducerSubmit}
-              onOpenWorkspace={() => {
-                setOpenOverlayMenu(null);
-                setProducerWorkspaceOpen(true);
-              }}
+              onOpenWorkspace={openProducerWorkspace}
             />
           ) : null}
         </div>
