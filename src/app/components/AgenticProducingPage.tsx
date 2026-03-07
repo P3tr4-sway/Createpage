@@ -11,7 +11,7 @@ import {
   Upload,
   Save,
   Plus,
-  MoreVertical,
+  ChevronDown,
   SkipBack,
   Play,
   Pause,
@@ -19,23 +19,14 @@ import {
   Repeat,
   MicOff,
   SlidersHorizontal,
+  Trash2,
   AudioWaveform,
-  Bot,
-  SendHorizontal,
-  Sparkles,
-  WandSparkles,
 } from "lucide-react";
 
 interface AgenticProducingPageProps {
   onBack?: () => void;
   previewMode?: boolean;
 }
-
-type AgentMessage = {
-  id: number;
-  role: "agent" | "user";
-  text: string;
-};
 
 type ArrangementClip = {
   id: string;
@@ -177,45 +168,209 @@ const initialTracks: ArrangementTrack[] = [
   },
 ];
 
-const initialAgentMessages: AgentMessage[] = [
-  {
-    id: 1,
-    role: "agent",
-    text: "I am watching your arrangement. Tell me what to change and I can plan the next edit.",
-  },
-  {
-    id: 2,
-    role: "agent",
-    text: "Current suggestion: add a drum fill before bar 9 and automate the filter in bars 13-16.",
-  },
-];
-
-const quickPrompts = [
-  "Build intro -> drop transition",
-  "Thicken low-end without mud",
-  "Give me a 16-bar arrangement plan",
-];
-
 function clampBeat(beat: number, totalBeats: number) {
-  return Math.min(Math.max(beat, 0), totalBeats);
+  const maxBeat = Math.max(totalBeats - 0.001, 0);
+  return Math.min(Math.max(beat, 0), maxBeat);
 }
 
-function formatTransportPosition(currentBeat: number, beatsPerBar: number) {
-  const wholeBeat = Math.floor(currentBeat);
+function formatTransportPosition(
+  currentBeat: number,
+  beatsPerBar: number,
+  totalBeats: number,
+) {
+  const safeBeat = clampBeat(currentBeat, totalBeats);
+  const wholeBeat = Math.floor(safeBeat);
   const bar = Math.floor(wholeBeat / beatsPerBar) + 1;
   const beatInBar = (wholeBeat % beatsPerBar) + 1;
-  const sixteenth = Math.floor((currentBeat - wholeBeat) * 4) + 1;
+  const sixteenth = Math.floor((safeBeat - wholeBeat) * 4) + 1;
   return `${String(bar).padStart(2, "0")}.${beatInBar}.${Math.min(sixteenth, 4)}`;
 }
+
+function createUiId(prefix: string) {
+  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+type AgentMode = "musician" | "producer";
+
+type MusicianTargetId =
+  | "ai-drummer"
+  | "ai-bassist"
+  | "ai-guitarist"
+  | "ai-keyboardist"
+  | "ai-percussionist"
+  | "ai-vocalist";
+
+type MusicianTarget = {
+  id: MusicianTargetId;
+  label: string;
+  helper: string;
+  showsLyrics: boolean;
+  trackMatch: string;
+};
+
+type OverlayMenu = "target" | "style" | "mode" | null;
+
+type ProducerMessage = {
+  id: string;
+  role: "user" | "agent";
+  text: string;
+  timestamp: string;
+};
+
+type QueueStatus = "Generating" | "Queued" | "Ready";
+
+type AudioQueueItem = {
+  id: string;
+  title: string;
+  owner: string;
+  status: QueueStatus;
+  detail: string;
+  progress: string;
+};
+
+type GenerationHistoryItem = {
+  id: string;
+  title: string;
+  owner: string;
+  meta: string;
+  timestamp: string;
+};
+
+const musicianTargets: MusicianTarget[] = [
+  {
+    id: "ai-drummer",
+    label: "AI Drummer",
+    helper: "Pocket, fills, and momentum",
+    showsLyrics: false,
+    trackMatch: "drums",
+  },
+  {
+    id: "ai-bassist",
+    label: "AI Bassist",
+    helper: "Low-end pulse and movement",
+    showsLyrics: false,
+    trackMatch: "bass",
+  },
+  {
+    id: "ai-guitarist",
+    label: "AI Guitarist",
+    helper: "Comping, voicings, and texture",
+    showsLyrics: false,
+    trackMatch: "guitar",
+  },
+  {
+    id: "ai-keyboardist",
+    label: "AI Keyboardist",
+    helper: "Keys, harmony pads, and glue",
+    showsLyrics: false,
+    trackMatch: "keys",
+  },
+  {
+    id: "ai-percussionist",
+    label: "AI Percussionist",
+    helper: "Perc layers and groove detail",
+    showsLyrics: false,
+    trackMatch: "perc",
+  },
+  {
+    id: "ai-vocalist",
+    label: "AI Vocalist",
+    helper: "Topline, phrasing, and hooks",
+    showsLyrics: true,
+    trackMatch: "vocal",
+  },
+];
+
+const agentModeOptions: Array<{
+  id: AgentMode;
+  label: string;
+  description: string;
+}> = [
+  {
+    id: "musician",
+    label: "AI Musician",
+    description: "Generate focused parts on a chosen role.",
+  },
+  {
+    id: "producer",
+    label: "AI Producer",
+    description: "Chat through structure, direction, and next steps.",
+  },
+];
+
+const initialProducerMessages: ProducerMessage[] = [
+  {
+    id: "producer-intro",
+    role: "agent",
+    text: "I can guide arrangement, assign AI musicians, and keep the session queue moving while you stay inside the timeline.",
+    timestamp: "Ready",
+  },
+];
+
+const initialAudioQueue: AudioQueueItem[] = [
+  {
+    id: "queue-vocal-hook",
+    title: "Hook doubles",
+    owner: "AI Vocalist",
+    status: "Generating",
+    detail: "Neo Soul • Bars 9-16",
+    progress: "Rendering topline timing",
+  },
+  {
+    id: "queue-bass-pocket",
+    title: "Verse pocket",
+    owner: "AI Bassist",
+    status: "Queued",
+    detail: "Neo Soul • Bars 1-8",
+    progress: "Waiting for lane handoff",
+  },
+  {
+    id: "queue-drum-variation",
+    title: "Lift fill",
+    owner: "AI Drummer",
+    status: "Ready",
+    detail: "House • Bars 17-20",
+    progress: "Ready to audition",
+  },
+];
+
+const initialGenerationHistory: GenerationHistoryItem[] = [
+  {
+    id: "history-drum-pocket",
+    title: "Main pocket",
+    owner: "AI Drummer",
+    meta: "Neo Soul • Drums",
+    timestamp: "2 min ago",
+  },
+  {
+    id: "history-guitar-comp",
+    title: "Muted comp",
+    owner: "AI Guitarist",
+    meta: "Indie Pop • Guitar",
+    timestamp: "12 min ago",
+  },
+  {
+    id: "history-producer-brief",
+    title: "Session brief",
+    owner: "AI Producer",
+    meta: "Structure + cue sheet",
+    timestamp: "18 min ago",
+  },
+];
+
+const styleOptions = [
+  "Neo Soul",
+  "Indie Pop",
+  "Afrobeat",
+  "Synthwave",
+  "House",
+  "Cinematic",
+];
 
 export function AgenticProducingPage({
   onBack,
   previewMode = false,
 }: AgenticProducingPageProps) {
-  const [agentMessages, setAgentMessages] = useState<AgentMessage[]>(
-    initialAgentMessages,
-  );
-  const [agentDraft, setAgentDraft] = useState("");
   const [tracks, setTracks] = useState(initialTracks);
   const [selectedTrackId, setSelectedTrackId] = useState(initialTracks[0].id);
   const [mutedTrackIds, setMutedTrackIds] = useState<string[]>([]);
@@ -226,11 +381,27 @@ export function AgenticProducingPage({
   const [scrollLeft, setScrollLeft] = useState(0);
   const [scrollTop, setScrollTop] = useState(0);
   const [isDraggingPlayhead, setIsDraggingPlayhead] = useState(false);
+  const [agentMode, setAgentMode] = useState<AgentMode>("musician");
+  const [openOverlayMenu, setOpenOverlayMenu] = useState<OverlayMenu>(null);
+  const [musicianTargetId, setMusicianTargetId] =
+    useState<MusicianTargetId>("ai-drummer");
+  const [styleIndex, setStyleIndex] = useState(0);
+  const [lyricsDraft, setLyricsDraft] = useState(
+    "Falling through the city lights, give me a slow-burn chorus with space.",
+  );
+  const [producerDraft, setProducerDraft] = useState("");
+  const [producerWorkspaceOpen, setProducerWorkspaceOpen] = useState(false);
+  const [producerMessages, setProducerMessages] =
+    useState<ProducerMessage[]>(initialProducerMessages);
+  const [audioQueue, setAudioQueue] = useState<AudioQueueItem[]>(initialAudioQueue);
+  const [generationHistory, setGenerationHistory] =
+    useState<GenerationHistoryItem[]>(initialGenerationHistory);
 
   const timelinePaneRef = useRef<HTMLDivElement | null>(null);
   const timelineBodyRef = useRef<HTMLDivElement | null>(null);
+  const overlayDockRef = useRef<HTMLDivElement | null>(null);
 
-  const showAgentPanel = !previewMode;
+  const showAgentOverlay = !previewMode;
   const showProjectTitle = !previewMode;
   const showBackButton = !previewMode && typeof onBack === "function";
   const trackPanelWidth = previewMode ? 282 : 356;
@@ -238,30 +409,48 @@ export function AgenticProducingPage({
   const trackRowHeight = previewMode ? 76 : 92;
   const bottomTransportHeight = previewMode ? 72 : 94;
   const pixelsPerBeat = previewMode ? 26 : 36;
+  const timelineLeadingInset = previewMode ? 20 : 36;
+  const timelineTrailingInset = previewMode ? 52 : 72;
   const beatsPerBar = 4;
   const totalBars = 24;
   const tempo = 65;
   const totalBeats = totalBars * beatsPerBar;
+  const maxTimelineBeat = Math.max(totalBeats - 0.001, 0);
   const barWidth = beatsPerBar * pixelsPerBeat;
-  const timelineContentWidth = totalBeats * pixelsPerBeat;
-  const playheadViewportX = currentBeat * pixelsPerBeat - scrollLeft;
+  const timelineGridWidth = totalBeats * pixelsPerBeat;
+  const timelineContentWidth =
+    timelineLeadingInset + timelineGridWidth + timelineTrailingInset;
+  const playheadViewportX =
+    timelineLeadingInset + currentBeat * pixelsPerBeat - scrollLeft;
   const selectedTrack = tracks.find((track) => track.id === selectedTrackId) ?? tracks[0];
+  const selectedMusicianTarget =
+    musicianTargets.find((target) => target.id === musicianTargetId) ?? musicianTargets[0];
+  const selectedStyle = styleOptions[styleIndex];
+  const producerWorkspaceVisible = showAgentOverlay && agentMode === "producer" && producerWorkspaceOpen;
 
-  const sendMessage = (rawText?: string) => {
-    const nextText = (rawText ?? agentDraft).trim();
-    if (!nextText) return;
+  useEffect(() => {
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!overlayDockRef.current) return;
+      if (!overlayDockRef.current.contains(event.target as Node)) {
+        setOpenOverlayMenu(null);
+      }
+    };
 
-    setAgentMessages((prev) => {
-      const nextId = prev.length + 1;
-      const userMessage: AgentMessage = { id: nextId, role: "user", text: nextText };
-      const agentMessage: AgentMessage = {
-        id: nextId + 1,
-        role: "agent",
-        text: "Noted. I can apply this as: 1) section edit 2) automation move 3) mix tweak. Pick one and I will detail exact bars.",
-      };
-      return [...prev, userMessage, agentMessage];
-    });
-    setAgentDraft("");
+    window.addEventListener("pointerdown", handlePointerDown);
+    return () => window.removeEventListener("pointerdown", handlePointerDown);
+  }, []);
+
+  const pushQueueItem = (item: AudioQueueItem) => {
+    setAudioQueue((prev) => [item, ...prev].slice(0, 6));
+  };
+
+  const pushHistoryItem = (item: GenerationHistoryItem) => {
+    setGenerationHistory((prev) => [item, ...prev].slice(0, 8));
+  };
+
+  const selectAgentMode = (nextMode: AgentMode) => {
+    setAgentMode(nextMode);
+    setOpenOverlayMenu(null);
   };
 
   const addTrack = () => {
@@ -277,6 +466,20 @@ export function AgenticProducingPage({
     setSelectedTrackId(nextTrack.id);
   };
 
+  const deleteTrack = (trackId: string) => {
+    setTracks((prev) => {
+      if (prev.length <= 1) return prev;
+      const deletedIndex = prev.findIndex((track) => track.id === trackId);
+      const nextTracks = prev.filter((track) => track.id !== trackId);
+      const fallbackTrack =
+        nextTracks[Math.min(deletedIndex, nextTracks.length - 1)] ?? nextTracks[0];
+      setSelectedTrackId((current) => (current === trackId ? fallbackTrack.id : current));
+      return nextTracks;
+    });
+    setMutedTrackIds((prev) => prev.filter((id) => id !== trackId));
+    setSoloTrackIds((prev) => prev.filter((id) => id !== trackId));
+  };
+
   const toggleMuted = (trackId: string) => {
     setMutedTrackIds((prev) =>
       prev.includes(trackId) ? prev.filter((id) => id !== trackId) : [...prev, trackId],
@@ -289,6 +492,82 @@ export function AgenticProducingPage({
     );
   };
 
+  const handleMusicianGenerate = () => {
+    setOpenOverlayMenu(null);
+
+    const targetTrack = tracks.find((track) =>
+      track.name.toLowerCase().includes(selectedMusicianTarget.trackMatch),
+    );
+
+    if (targetTrack) {
+      setSelectedTrackId(targetTrack.id);
+    }
+
+    pushQueueItem({
+      id: createUiId("queue"),
+      title: `${selectedMusicianTarget.label} pass`,
+      owner: selectedMusicianTarget.label,
+      status: "Generating",
+      detail: `${selectedStyle} • ${targetTrack?.name ?? selectedTrack.name}`,
+      progress: selectedMusicianTarget.showsLyrics
+        ? "Shaping topline + lyric cadence"
+        : "Rendering arrangement take",
+    });
+
+    pushHistoryItem({
+      id: createUiId("history"),
+      title: `${selectedMusicianTarget.label} pass`,
+      owner: selectedMusicianTarget.label,
+      meta: selectedMusicianTarget.showsLyrics
+        ? `${selectedStyle} • lyric-guided draft`
+        : `${selectedStyle} • instrumental pass`,
+      timestamp: "Just now",
+    });
+  };
+
+  const handleProducerSubmit = () => {
+    const nextDraft = producerDraft.trim();
+    if (!nextDraft) return;
+
+    setOpenOverlayMenu(null);
+    setProducerWorkspaceOpen(true);
+
+    setProducerMessages((prev) => [
+      ...prev,
+      {
+        id: createUiId("message"),
+        role: "user",
+        text: nextDraft,
+        timestamp: "Just now",
+      },
+      {
+        id: createUiId("message"),
+        role: "agent",
+        text: `I’m steering this into a ${selectedStyle} session. First move: ${selectedMusicianTarget.label} owns the next pass while I keep the queue and generation history synchronized on the right.`,
+        timestamp: "Just now",
+      },
+    ]);
+
+    pushQueueItem({
+      id: createUiId("queue"),
+      title: "Producer brief",
+      owner: "AI Producer",
+      status: "Generating",
+      detail: `${selectedStyle} • Session direction`,
+      progress: "Dispatching tasks to AI musicians",
+    });
+
+    pushHistoryItem({
+      id: createUiId("history"),
+      title: "Producer brief",
+      owner: "AI Producer",
+      meta: `${selectedStyle} • chat-directed`,
+      timestamp: "Just now",
+    });
+
+    setProducerDraft("");
+  };
+
   const seekToBeat = (nextBeat: number) => {
     setCurrentBeat(clampBeat(nextBeat, totalBeats));
   };
@@ -297,7 +576,7 @@ export function AgenticProducingPage({
     const pane = timelinePaneRef.current;
     if (!pane) return;
     const bounds = pane.getBoundingClientRect();
-    const localX = clientX - bounds.left + scrollLeft;
+    const localX = clientX - bounds.left + scrollLeft - timelineLeadingInset;
     seekToBeat(localX / pixelsPerBeat);
   };
 
@@ -346,7 +625,7 @@ export function AgenticProducingPage({
       setCurrentBeat((prev) => {
         const nextBeat = prev + deltaSeconds * (tempo / 60);
         if (nextBeat >= totalBeats) {
-          return loopEnabled ? nextBeat % totalBeats : totalBeats;
+          return loopEnabled ? nextBeat % totalBeats : maxTimelineBeat;
         }
         return nextBeat;
       });
@@ -356,19 +635,19 @@ export function AgenticProducingPage({
 
     frameId = window.requestAnimationFrame(tick);
     return () => window.cancelAnimationFrame(frameId);
-  }, [isPlaying, loopEnabled, tempo, totalBeats]);
+  }, [isPlaying, loopEnabled, maxTimelineBeat, tempo, totalBeats]);
 
   useEffect(() => {
-    if (isPlaying && !loopEnabled && currentBeat >= totalBeats) {
+    if (isPlaying && !loopEnabled && currentBeat >= maxTimelineBeat) {
       setIsPlaying(false);
     }
-  }, [currentBeat, isPlaying, loopEnabled, totalBeats]);
+  }, [currentBeat, isPlaying, loopEnabled, maxTimelineBeat]);
 
   useEffect(() => {
     const timelineBody = timelineBodyRef.current;
     if (!timelineBody) return;
 
-    const markerX = currentBeat * pixelsPerBeat;
+    const markerX = timelineLeadingInset + currentBeat * pixelsPerBeat;
     const viewportStart = timelineBody.scrollLeft;
     const viewportEnd = viewportStart + timelineBody.clientWidth;
     const leftPadding = 48;
@@ -384,9 +663,13 @@ export function AgenticProducingPage({
         left: Math.min(markerX - timelineBody.clientWidth + rightPadding, timelineContentWidth),
       });
     }
-  }, [currentBeat, pixelsPerBeat, timelineContentWidth]);
+  }, [currentBeat, pixelsPerBeat, timelineContentWidth, timelineLeadingInset]);
 
-  const transportPosition = formatTransportPosition(currentBeat, beatsPerBar);
+  const transportPosition = formatTransportPosition(
+    currentBeat,
+    beatsPerBar,
+    totalBeats,
+  );
 
   return (
     <section
@@ -482,7 +765,7 @@ export function AgenticProducingPage({
           className="flex min-h-0 flex-1"
           style={{ backgroundColor: "var(--agentic-bg)" }}
         >
-          <div className="flex min-w-0 flex-1 flex-col">
+          <div className="relative flex min-w-0 flex-1 flex-col">
             <div
               className="flex min-h-0 flex-1"
               style={{
@@ -524,7 +807,7 @@ export function AgenticProducingPage({
                         marginTop: 2,
                       }}
                     >
-                      {totalBars} bars • {tempo} BPM • 4 tracks
+                      {totalBars} bars • {tempo} BPM • {tracks.length} tracks
                     </div>
                   </div>
 
@@ -533,15 +816,15 @@ export function AgenticProducingPage({
                     onClick={addTrack}
                     className="tablet-touch-target tablet-pressable inline-flex items-center justify-center"
                     style={{
-                      width: previewMode ? 34 : 40,
-                      height: previewMode ? 34 : 40,
-                      borderRadius: 12,
+                      width: previewMode ? 28 : 32,
+                      height: previewMode ? 28 : 32,
+                      borderRadius: 10,
                       border: "1px solid rgba(255,255,255,0.1)",
-                      backgroundColor: "rgba(255,255,255,0.06)",
+                      backgroundColor: "rgba(255,255,255,0.04)",
                       color: "var(--agentic-contrast)",
                     }}
                   >
-                    <Plus size={previewMode ? 18 : 20} strokeWidth={2.2} />
+                    <Plus size={previewMode ? 14 : 16} strokeWidth={2.2} />
                   </button>
                 </div>
 
@@ -578,7 +861,7 @@ export function AgenticProducingPage({
                           >
                             <span
                               style={{
-                                width: 8,
+                                width: 10,
                                 alignSelf: "stretch",
                                 borderRadius: 999,
                                 backgroundColor: track.clips[0]?.accent ?? "#94A3B8",
@@ -600,14 +883,37 @@ export function AgenticProducingPage({
                                 {track.name}
                               </span>
                               <span
+                                className="flex items-center"
                                 style={{
-                                  display: "block",
-                                  color: "var(--agentic-muted)",
-                                  fontSize: previewMode ? 11 : 13,
+                                  gap: 8,
                                   marginTop: 6,
+                                  fontSize: previewMode ? 11 : 12,
                                 }}
                               >
-                                {track.role} • {track.level}
+                                <span
+                                  style={{
+                                    color: "rgba(226,232,240,0.9)",
+                                    fontWeight: 600,
+                                  }}
+                                >
+                                  {track.role}
+                                </span>
+                                <span
+                                  style={{
+                                    width: 4,
+                                    height: 4,
+                                    borderRadius: 999,
+                                    backgroundColor: "rgba(148,163,184,0.7)",
+                                  }}
+                                />
+                                <span
+                                  style={{
+                                    color: "rgba(148,163,184,0.95)",
+                                    fontWeight: 500,
+                                  }}
+                                >
+                                  {track.level}
+                                </span>
                               </span>
                             </span>
                           </button>
@@ -624,10 +930,10 @@ export function AgenticProducingPage({
                                 width: previewMode ? 32 : 36,
                                 height: previewMode ? 32 : 36,
                                 backgroundColor: isMuted
-                                  ? "rgba(245, 158, 11, 0.22)"
+                                  ? "rgba(239, 68, 68, 0.22)"
                                   : "rgba(255,255,255,0.06)",
                                 color: isMuted
-                                  ? "#FDE68A"
+                                  ? "#FCA5A5"
                                   : "var(--agentic-contrast)",
                               }}
                             >
@@ -641,10 +947,10 @@ export function AgenticProducingPage({
                                 width: previewMode ? 32 : 36,
                                 height: previewMode ? 32 : 36,
                                 backgroundColor: isSolo
-                                  ? "rgba(59, 130, 246, 0.24)"
+                                  ? "rgba(250, 204, 21, 0.24)"
                                   : "rgba(255,255,255,0.06)",
                                 color: isSolo
-                                  ? "#DBEAFE"
+                                  ? "#FDE68A"
                                   : "var(--agentic-contrast)",
                               }}
                             >
@@ -652,13 +958,16 @@ export function AgenticProducingPage({
                             </button>
                             <button
                               type="button"
+                              onClick={() => deleteTrack(track.id)}
+                              disabled={tracks.length <= 1}
                               style={{
                                 ...trackMoreStyle,
                                 width: previewMode ? 34 : 38,
                                 height: previewMode ? 34 : 38,
+                                opacity: tracks.length <= 1 ? 0.45 : 1,
                               }}
                             >
-                              <MoreVertical size={previewMode ? 16 : 18} strokeWidth={2.2} />
+                              <Trash2 size={previewMode ? 15 : 16} strokeWidth={2.1} />
                             </button>
                           </div>
                         </div>
@@ -679,12 +988,27 @@ export function AgenticProducingPage({
                   onPointerDown={handleSeekPointerDown}
                 >
                   <div
-                    className="flex h-full"
+                    className="relative flex h-full items-stretch"
                     style={{
                       width: timelineContentWidth,
+                      paddingLeft: timelineLeadingInset,
+                      paddingRight: timelineTrailingInset,
                       transform: `translateX(-${scrollLeft}px)`,
+                      background:
+                        "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015))",
                     }}
                   >
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        position: "absolute",
+                        left: timelineLeadingInset,
+                        top: 0,
+                        bottom: 0,
+                        width: 1,
+                        backgroundColor: "rgba(255,255,255,0.22)",
+                      }}
+                    />
                     {Array.from({ length: totalBars }, (_, barIndex) => {
                       const label = barIndex + 1;
                       return (
@@ -704,14 +1028,16 @@ export function AgenticProducingPage({
                           <span
                             style={{
                               position: "absolute",
-                              left: previewMode ? 8 : 12,
-                              top: previewMode ? 10 : 14,
+                              left: previewMode ? 10 : 14,
+                              top: previewMode ? 9 : 13,
+                              zIndex: 2,
                               color:
                                 label === 1
-                                  ? "var(--agentic-contrast)"
-                                  : "var(--agentic-muted)",
-                              fontSize: previewMode ? 12 : 14,
+                                  ? "#F8FAFC"
+                                  : "rgba(226,232,240,0.78)",
+                              fontSize: previewMode ? 12 : 15,
                               fontWeight: label === 1 ? 700 : 600,
+                              textShadow: "0 1px 0 rgba(0,0,0,0.3)",
                             }}
                           >
                             {label}
@@ -723,13 +1049,23 @@ export function AgenticProducingPage({
                               style={{
                                 position: "absolute",
                                 left: (beatIndex + 1) * pixelsPerBeat,
-                                top: previewMode ? 18 : 20,
-                                bottom: previewMode ? 8 : 10,
+                                top: previewMode ? 20 : 24,
+                                bottom: previewMode ? 7 : 9,
                                 width: 1,
                                 backgroundColor: "rgba(255,255,255,0.09)",
                               }}
                             />
                           ))}
+                          <span
+                            style={{
+                              position: "absolute",
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              height: 1,
+                              backgroundColor: "rgba(255,255,255,0.08)",
+                            }}
+                          />
                         </div>
                       );
                     })}
@@ -762,9 +1098,21 @@ export function AgenticProducingPage({
                             backgroundImage:
                               "linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(to right, rgba(255,255,255,0.16) 1px, transparent 1px)",
                             backgroundSize: `${pixelsPerBeat}px 100%, ${barWidth}px 100%`,
+                            backgroundPosition: `${timelineLeadingInset}px 0, ${timelineLeadingInset}px 0`,
                           }}
                           onPointerDown={handleSeekPointerDown}
                         >
+                          <span
+                            aria-hidden="true"
+                            style={{
+                              position: "absolute",
+                              left: timelineLeadingInset,
+                              top: 0,
+                              bottom: 0,
+                              width: 1,
+                              backgroundColor: "rgba(255,255,255,0.18)",
+                            }}
+                          />
                           {rowIndex % 2 === 1 ? (
                             <span
                               aria-hidden="true"
@@ -786,7 +1134,10 @@ export function AgenticProducingPage({
                               }}
                               className="absolute overflow-hidden text-left"
                               style={{
-                                left: clip.startBeat * pixelsPerBeat + 4,
+                                left:
+                                  timelineLeadingInset +
+                                  clip.startBeat * pixelsPerBeat +
+                                  4,
                                 top: previewMode ? 10 : 12,
                                 width: clip.durationBeats * pixelsPerBeat - 8,
                                 height: trackRowHeight - (previewMode ? 20 : 24),
@@ -862,7 +1213,7 @@ export function AgenticProducingPage({
                       style={{
                         position: "absolute",
                         left: 9,
-                        top: arrangementHeaderHeight,
+                        top: previewMode ? 8 : 10,
                         bottom: 0,
                         width: 2,
                         borderRadius: 999,
@@ -873,10 +1224,10 @@ export function AgenticProducingPage({
                     <span
                       style={{
                         position: "absolute",
-                        left: 2,
-                        top: previewMode ? 6 : 10,
-                        width: 16,
-                        height: previewMode ? 20 : 24,
+                        left: 4,
+                        top: previewMode ? 1 : 2,
+                        width: 12,
+                        height: previewMode ? 12 : 14,
                         borderRadius: 999,
                         backgroundColor: "var(--agentic-marker)",
                         boxShadow: "0 10px 18px rgba(244,67,67,0.28)",
@@ -937,7 +1288,7 @@ export function AgenticProducingPage({
                 <button
                   type="button"
                   onClick={() => {
-                    if (!isPlaying && currentBeat >= totalBeats) {
+                    if (!isPlaying && currentBeat >= maxTimelineBeat) {
                       seekToBeat(0);
                     }
                     setIsPlaying((prev) => !prev);
@@ -993,165 +1344,460 @@ export function AgenticProducingPage({
             </div>
           </div>
 
-          {showAgentPanel && (
-            <aside
-              className="flex shrink-0 flex-col"
-              style={{
-                width: 420,
-                minWidth: 420,
-                borderLeft: "1px solid var(--agentic-border-strong)",
-                backgroundColor: "var(--agentic-surface)",
-              }}
-            >
-              <div
-                className="flex items-center justify-between"
-                style={{
-                  height: 58,
-                  padding: "0 14px",
-                  borderBottom: "1px solid var(--agentic-border)",
-                }}
-              >
+          {showAgentOverlay ? (
+            <>
+              {producerWorkspaceVisible ? (
+                <div style={producerWorkspaceShellStyle(bottomTransportHeight)}>
+                  <div style={{ pointerEvents: "auto" }}>
+                    <ProducerWorkspacePanel
+                      messages={producerMessages}
+                      audioQueue={audioQueue}
+                      generationHistory={generationHistory}
+                      onClose={() => setProducerWorkspaceOpen(false)}
+                    />
+                  </div>
+                </div>
+              ) : null}
+
+              <div style={overlayDockShellStyle(bottomTransportHeight)}>
                 <div
-                  className="flex items-center gap-2"
-                  style={{ color: "var(--agentic-foreground)" }}
+                  ref={overlayDockRef}
+                  className="flex items-end"
+                  style={{ gap: 14, pointerEvents: "auto", position: "relative" }}
                 >
-                  <Bot size={18} strokeWidth={2} />
-                  <span style={{ fontSize: 16, fontWeight: 700 }}>AI Agent</span>
-                </div>
-                <div
-                  className="flex items-center gap-1.5"
-                  style={{ color: "var(--secondary)", fontSize: 13, fontWeight: 600 }}
-                >
-                  <span
-                    style={{
-                      width: 7,
-                      height: 7,
-                      borderRadius: 999,
-                      backgroundColor: "var(--sidebar-accent-teal)",
-                    }}
-                  />
-                  Online
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2" style={{ padding: "12px 12px 10px" }}>
-                {quickPrompts.map((prompt) => (
-                  <button
-                    key={prompt}
-                    type="button"
-                    onClick={() => sendMessage(prompt)}
-                    className="tablet-touch-target tablet-pressable inline-flex items-center gap-1.5"
-                    style={{
-                      minHeight: 40,
-                      padding: "0 11px",
-                      borderRadius: 12,
-                      border: "1px solid var(--agentic-border)",
-                      backgroundColor: "var(--agentic-control-bg)",
-                      color: "var(--agentic-foreground)",
-                      fontSize: 12,
-                      fontWeight: 500,
-                      cursor: "pointer",
-                    }}
-                  >
-                    <WandSparkles size={12} strokeWidth={1.8} />
-                    {prompt}
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex-1 overflow-y-auto" style={{ padding: "0 12px 12px" }}>
-                <div className="flex flex-col gap-2">
-                  {agentMessages.map((message) => {
-                    const isUser = message.role === "user";
-                    return (
-                      <div
-                        key={message.id}
-                        className="flex"
-                        style={{ justifyContent: isUser ? "flex-end" : "flex-start" }}
-                      >
-                        <div
-                          style={{
-                            maxWidth: "86%",
-                            borderRadius: isUser ? 14 : 12,
-                            padding: "10px 12px",
-                            backgroundColor: isUser
-                              ? "var(--agentic-chat-user-bg)"
-                              : "var(--agentic-chat-agent-bg)",
-                            color: isUser
-                              ? "var(--agentic-chat-user-fg)"
-                              : "var(--agentic-chat-agent-fg)",
-                            border: isUser
-                              ? "1px solid var(--agentic-chat-user-border)"
-                              : "1px solid var(--agentic-chat-agent-border)",
-                            fontSize: 14,
-                            lineHeight: 1.45,
-                            fontWeight: 450,
-                          }}
-                        >
-                          {message.text}
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {agentMode === "musician" ? (
+                    <MusicianComposerBar
+                      openMenu={openOverlayMenu}
+                      targets={musicianTargets}
+                      selectedTarget={selectedMusicianTarget}
+                      selectedStyle={selectedStyle}
+                      styleOptions={styleOptions}
+                      lyricsDraft={lyricsDraft}
+                      onTargetToggle={() =>
+                        setOpenOverlayMenu((prev) => (prev === "target" ? null : "target"))
+                      }
+                      onStyleToggle={() =>
+                        setOpenOverlayMenu((prev) => (prev === "style" ? null : "style"))
+                      }
+                      onModeToggle={() =>
+                        setOpenOverlayMenu((prev) => (prev === "mode" ? null : "mode"))
+                      }
+                      onSelectTarget={(targetId) => {
+                        setMusicianTargetId(targetId);
+                        setOpenOverlayMenu(null);
+                      }}
+                      onSelectStyle={(nextIndex) => {
+                        setStyleIndex(nextIndex);
+                        setOpenOverlayMenu(null);
+                      }}
+                      onLyricsChange={setLyricsDraft}
+                      onGenerate={handleMusicianGenerate}
+                      onSelectMode={selectAgentMode}
+                      currentMode={agentMode}
+                    />
+                  ) : (
+                    <ProducerComposerBar
+                      draft={producerDraft}
+                      workspaceOpen={producerWorkspaceOpen}
+                      openMenu={openOverlayMenu}
+                      onDraftChange={setProducerDraft}
+                      onDraftSubmit={handleProducerSubmit}
+                      onModeToggle={() =>
+                        setOpenOverlayMenu((prev) => (prev === "mode" ? null : "mode"))
+                      }
+                      onSelectMode={selectAgentMode}
+                      currentMode={agentMode}
+                    />
+                  )}
                 </div>
               </div>
-
-              <div
-                style={{
-                  borderTop: "1px solid var(--agentic-border)",
-                  padding: "10px 12px 12px",
-                  backgroundColor: "var(--agentic-topbar)",
-                }}
-              >
-                <div className="flex items-center gap-2" style={{ marginBottom: 8 }}>
-                  <Sparkles size={13} strokeWidth={1.9} style={{ color: "var(--secondary)" }} />
-                  <span style={{ fontSize: 11, color: "var(--secondary)", fontWeight: 600 }}>
-                    Context: Arrangement + Timeline
-                  </span>
-                </div>
-
-                <div className="flex items-end gap-2">
-                  <textarea
-                    value={agentDraft}
-                    onChange={(event) => setAgentDraft(event.target.value)}
-                    placeholder="Ask agent to arrange, mix, or automate..."
-                    rows={2}
-                    style={{
-                      flex: 1,
-                      resize: "none",
-                      borderRadius: 14,
-                      border: "1px solid var(--agentic-border)",
-                      backgroundColor: "var(--agentic-elevated-strong)",
-                      color: "var(--agentic-foreground)",
-                      fontSize: 14,
-                      fontFamily: "var(--app-font-family)",
-                      padding: "9px 10px",
-                      outline: "none",
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => sendMessage()}
-                    className="tablet-icon-target tablet-pressable inline-flex items-center justify-center"
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 9999,
-                      border: "1px solid var(--solid-button-border)",
-                      backgroundColor: "var(--solid-button-bg)",
-                      color: "var(--solid-button-fg)",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <SendHorizontal size={18} strokeWidth={2.1} />
-                  </button>
-                </div>
-              </div>
-            </aside>
-          )}
+            </>
+          ) : null}
         </div>
       </div>
     </section>
+  );
+}
+
+interface MusicianComposerBarProps {
+  openMenu: OverlayMenu;
+  targets: MusicianTarget[];
+  selectedTarget: MusicianTarget;
+  selectedStyle: string;
+  styleOptions: string[];
+  lyricsDraft: string;
+  currentMode: AgentMode;
+  onTargetToggle: () => void;
+  onStyleToggle: () => void;
+  onModeToggle: () => void;
+  onSelectTarget: (targetId: MusicianTargetId) => void;
+  onSelectStyle: (styleIndex: number) => void;
+  onLyricsChange: (value: string) => void;
+  onGenerate: () => void;
+  onSelectMode: (mode: AgentMode) => void;
+}
+
+function MusicianComposerBar({
+  openMenu,
+  targets,
+  selectedTarget,
+  selectedStyle,
+  styleOptions,
+  lyricsDraft,
+  currentMode,
+  onTargetToggle,
+  onStyleToggle,
+  onModeToggle,
+  onSelectTarget,
+  onSelectStyle,
+  onLyricsChange,
+  onGenerate,
+  onSelectMode,
+}: MusicianComposerBarProps) {
+  return (
+    <div className="flex-1" style={overlayBarStyle}>
+      <div className="flex flex-wrap items-center" style={{ gap: 14 }}>
+        <div style={{ ...overlayFieldWrapStyle, flex: "0 0 220px", position: "relative" }}>
+          <button
+            type="button"
+            onClick={onTargetToggle}
+            className="flex items-center justify-between"
+            style={overlayFieldButtonStyle}
+          >
+            <span>
+              <span style={overlayFieldLabelStyle}>AI Musician</span>
+              <span style={overlayFieldValueStyle}>{selectedTarget.label}</span>
+            </span>
+            <ChevronDown size={18} strokeWidth={2} />
+          </button>
+
+          {openMenu === "target" ? (
+            <div style={overlayMenuStyle}>
+              <div style={overlayMenuTitleStyle}>Choose AI Musician</div>
+              {targets.map((target) => {
+                const isActive = target.id === selectedTarget.id;
+                return (
+                  <button
+                    key={target.id}
+                    type="button"
+                    onClick={() => onSelectTarget(target.id)}
+                    className="flex w-full items-center justify-between text-left"
+                    style={{
+                      ...overlayMenuItemStyle,
+                      backgroundColor: isActive ? "var(--soft-surface-strong)" : "transparent",
+                      color: "var(--foreground)",
+                    }}
+                  >
+                    <span>
+                      <span style={{ display: "block" }}>{target.label}</span>
+                      <span style={overlayMenuMetaStyle}>{target.helper}</span>
+                    </span>
+                    {isActive ? <span style={overlayMenuDotStyle} /> : null}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+        </div>
+
+        <div style={{ ...overlayFieldWrapStyle, flex: "0 0 220px", position: "relative" }}>
+          <button
+            type="button"
+            onClick={onStyleToggle}
+            className="flex items-center justify-between"
+            style={overlayFieldButtonStyle}
+          >
+            <span>
+              <span style={overlayFieldLabelStyle}>Style</span>
+              <span style={overlayFieldValueStyle}>{selectedStyle}</span>
+            </span>
+            <ChevronDown size={18} strokeWidth={2} />
+          </button>
+
+          {openMenu === "style" ? (
+            <div style={overlayMenuStyle}>
+              <div style={overlayMenuTitleStyle}>Style</div>
+              {styleOptions.map((styleOption, index) => {
+                const isActive = styleOption === selectedStyle;
+                return (
+                  <button
+                    key={styleOption}
+                    type="button"
+                    onClick={() => onSelectStyle(index)}
+                    className="flex w-full items-center justify-between text-left"
+                    style={{
+                      ...overlayMenuItemStyle,
+                      backgroundColor: isActive ? "var(--soft-surface-strong)" : "transparent",
+                      color: "var(--foreground)",
+                    }}
+                  >
+                    <span>{styleOption}</span>
+                    {isActive ? <span style={overlayMenuDotStyle} /> : null}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+        </div>
+
+        {selectedTarget.showsLyrics ? (
+          <label style={{ ...overlayFieldWrapStyle, ...overlayLyricsFieldStyle, flex: "1 1 320px" }}>
+            <span style={overlayFieldLabelStyle}>Lyrics</span>
+            <textarea
+              value={lyricsDraft}
+              onChange={(event) => onLyricsChange(event.target.value)}
+              rows={1}
+              placeholder="Shape the topline or paste a hook..."
+              style={overlayLyricsInputStyle}
+            />
+          </label>
+        ) : null}
+
+        <div
+          className="flex items-center"
+          style={{
+            marginLeft: "auto",
+            gap: 10,
+            flex: selectedTarget.showsLyrics ? "0 0 auto" : "1 1 280px",
+            justifyContent: "flex-end",
+          }}
+        >
+          <button type="button" onClick={onGenerate} style={generateButtonStyle}>
+            Generate
+          </button>
+          <ModeSelector
+            open={openMenu === "mode"}
+            currentMode={currentMode}
+            onToggle={onModeToggle}
+            onSelectMode={onSelectMode}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface ProducerComposerBarProps {
+  draft: string;
+  workspaceOpen: boolean;
+  openMenu: OverlayMenu;
+  currentMode: AgentMode;
+  onDraftChange: (value: string) => void;
+  onDraftSubmit: () => void;
+  onModeToggle: () => void;
+  onSelectMode: (mode: AgentMode) => void;
+}
+
+function ProducerComposerBar({
+  draft,
+  workspaceOpen,
+  openMenu,
+  currentMode,
+  onDraftChange,
+  onDraftSubmit,
+  onModeToggle,
+  onSelectMode,
+}: ProducerComposerBarProps) {
+  return (
+    <div className="flex-1" style={overlayBarStyle}>
+      <div className="flex items-center" style={{ gap: 12 }}>
+        <div className="flex-1" style={producerInputShellStyle}>
+          <input
+            type="text"
+            value={draft}
+            onChange={(event) => onDraftChange(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                onDraftSubmit();
+              }
+            }}
+            placeholder="Start with your AI Music Producer."
+            className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-[var(--secondary)]"
+            style={producerInputStyle}
+          />
+        </div>
+
+        <button type="button" onClick={onDraftSubmit} style={generateButtonStyle}>
+          {workspaceOpen ? "Send" : "Start"}
+        </button>
+
+        <ModeSelector
+          open={openMenu === "mode"}
+          currentMode={currentMode}
+          onToggle={onModeToggle}
+          onSelectMode={onSelectMode}
+        />
+      </div>
+    </div>
+  );
+}
+
+interface ModeSelectorProps {
+  open: boolean;
+  currentMode: AgentMode;
+  onToggle: () => void;
+  onSelectMode: (mode: AgentMode) => void;
+}
+
+function ModeSelector({
+  open,
+  currentMode,
+  onToggle,
+  onSelectMode,
+}: ModeSelectorProps) {
+  return (
+    <div style={{ position: "relative", flex: "0 0 auto" }}>
+      <button type="button" onClick={onToggle} style={generateChevronStyle} aria-label="Select AI mode">
+        <ChevronDown size={18} strokeWidth={2.2} />
+      </button>
+
+      {open ? (
+        <div style={{ ...overlayMenuStyle, left: "auto", right: 0, width: 264 }}>
+          <div style={overlayMenuTitleStyle}>Mode</div>
+          {agentModeOptions.map((mode) => {
+            const isActive = mode.id === currentMode;
+            return (
+              <button
+                key={mode.id}
+                type="button"
+                onClick={() => onSelectMode(mode.id)}
+                className="flex w-full items-center justify-between text-left"
+                style={{
+                  ...overlayMenuItemStyle,
+                  backgroundColor: isActive ? "var(--soft-surface-strong)" : "transparent",
+                  color: "var(--foreground)",
+                }}
+              >
+                <span>
+                  <span style={{ display: "block" }}>{mode.label}</span>
+                  <span style={overlayMenuMetaStyle}>{mode.description}</span>
+                </span>
+                {isActive ? <span style={overlayMenuDotStyle} /> : null}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+interface ProducerWorkspacePanelProps {
+  messages: ProducerMessage[];
+  audioQueue: AudioQueueItem[];
+  generationHistory: GenerationHistoryItem[];
+  onClose: () => void;
+}
+
+function ProducerWorkspacePanel({
+  messages,
+  audioQueue,
+  generationHistory,
+  onClose,
+}: ProducerWorkspacePanelProps) {
+  return (
+    <div style={producerPanelStyle}>
+      <div className="flex items-center justify-between" style={producerPanelHeaderStyle}>
+        <div>
+          <div style={producerPanelEyebrowStyle}>AI Producer Workspace</div>
+          <div style={producerPanelTitleStyle}>Chat on the left, queue on the right.</div>
+        </div>
+
+        <button type="button" onClick={onClose} style={producerPanelCloseStyle} aria-label="Close AI Producer workspace">
+          <X size={18} strokeWidth={2} />
+        </button>
+      </div>
+
+      <div
+        className="flex min-h-0 flex-1"
+        style={{ gap: 16, padding: 16, flexWrap: "wrap" }}
+      >
+        <div style={producerChatCardStyle}>
+          <div style={producerSectionHeaderStyle}>
+            <div style={producerSectionEyebrowStyle}>Chat</div>
+            <div style={producerSectionMetaStyle}>Direction, notes, and next actions</div>
+          </div>
+
+          <div className="min-h-0 flex-1 overflow-y-auto" style={producerMessagesWrapStyle}>
+            <div className="flex flex-col" style={{ gap: 10 }}>
+              {messages.map((message) => {
+                const isUser = message.role === "user";
+                return (
+                  <div
+                    key={message.id}
+                    className="flex"
+                    style={{ justifyContent: isUser ? "flex-end" : "flex-start" }}
+                  >
+                    <div
+                      style={{
+                        ...(isUser ? producerUserBubbleStyle : producerAgentBubbleStyle),
+                        maxWidth: "82%",
+                      }}
+                    >
+                      <div>{message.text}</div>
+                      <div style={producerMessageTimestampStyle}>{message.timestamp}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div
+          className="flex min-h-0 flex-col"
+          style={{ flex: "0 0 320px", width: "min(320px, 100%)", gap: 16 }}
+        >
+          <div style={producerRailCardStyle}>
+            <div style={producerSectionHeaderStyle}>
+              <div style={producerSectionEyebrowStyle}>Audio Queue</div>
+              <div style={producerSectionMetaStyle}>What is actively rendering now</div>
+            </div>
+
+            <div className="flex flex-col" style={{ gap: 10 }}>
+              {audioQueue.map((item) => (
+                <div key={item.id} style={producerListItemStyle}>
+                  <div className="flex items-start justify-between" style={{ gap: 12 }}>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={producerListItemTitleStyle}>{item.title}</div>
+                      <div style={producerListItemMetaStyle}>
+                        {item.owner} • {item.detail}
+                      </div>
+                    </div>
+                    <span style={queueStatusBadgeStyle(item.status)}>{item.status}</span>
+                  </div>
+                  <div style={producerListItemSubtleStyle}>{item.progress}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={producerRailCardStyle}>
+            <div style={producerSectionHeaderStyle}>
+              <div style={producerSectionEyebrowStyle}>Generation History</div>
+              <div style={producerSectionMetaStyle}>Recent outputs and role handoffs</div>
+            </div>
+
+            <div className="flex flex-col" style={{ gap: 10 }}>
+              {generationHistory.map((item) => (
+                <div key={item.id} style={producerListItemStyle}>
+                  <div className="flex items-start justify-between" style={{ gap: 12 }}>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={producerListItemTitleStyle}>{item.title}</div>
+                      <div style={producerListItemMetaStyle}>
+                        {item.owner} • {item.meta}
+                      </div>
+                    </div>
+                    <span style={producerHistoryTimestampStyle}>{item.timestamp}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -1222,3 +1868,368 @@ const bottomPillStyle: CSSProperties = {
   justifyContent: "center",
   gap: 6,
 };
+
+const overlayDockShellStyle = (bottomTransportHeight: number): CSSProperties => ({
+  position: "absolute",
+  left: "50%",
+  bottom: bottomTransportHeight + 18,
+  transform: "translateX(-50%)",
+  width: "min(1120px, calc(100% - 56px))",
+  zIndex: 30,
+  pointerEvents: "none",
+});
+
+const producerWorkspaceShellStyle = (bottomTransportHeight: number): CSSProperties => ({
+  position: "absolute",
+  left: "50%",
+  bottom: bottomTransportHeight + 118,
+  transform: "translateX(-50%)",
+  width: "min(1120px, calc(100% - 56px))",
+  height: "min(500px, calc(100% - 164px))",
+  zIndex: 24,
+  pointerEvents: "none",
+});
+
+const overlayBarStyle: CSSProperties = {
+  minHeight: 80,
+  borderRadius: 9999,
+  border: "1px solid var(--border)",
+  backgroundColor: "var(--card)",
+  boxShadow: "0 10px 28px rgba(15,23,42,0.08)",
+  padding: "12px",
+};
+
+const overlayFieldWrapStyle: CSSProperties = {
+  minWidth: 0,
+};
+
+const overlayFieldButtonStyle: CSSProperties = {
+  width: "100%",
+  minHeight: 56,
+  padding: "0 18px",
+  borderRadius: 9999,
+  border: "none",
+  backgroundColor: "var(--soft-surface)",
+  color: "var(--foreground)",
+  textAlign: "left",
+  cursor: "pointer",
+};
+
+const overlayFieldLabelStyle: CSSProperties = {
+  display: "block",
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  color: "var(--muted-foreground)",
+  marginBottom: 4,
+};
+
+const overlayFieldValueStyle: CSSProperties = {
+  display: "block",
+  fontSize: 16,
+  fontWeight: 600,
+  color: "var(--foreground)",
+  lineHeight: 1.2,
+};
+
+const overlayLyricsFieldStyle: CSSProperties = {
+  minHeight: 56,
+  padding: "10px 18px",
+  borderRadius: 9999,
+  border: "none",
+  backgroundColor: "var(--soft-surface)",
+  display: "block",
+};
+
+const overlayLyricsInputStyle: CSSProperties = {
+  width: "100%",
+  border: "none",
+  background: "transparent",
+  color: "var(--foreground)",
+  fontSize: 16,
+  fontWeight: 500,
+  lineHeight: 1.25,
+  resize: "none",
+  outline: "none",
+  fontFamily: "var(--app-font-family)",
+  padding: 0,
+  minHeight: 20,
+};
+
+const producerInputShellStyle: CSSProperties = {
+  minHeight: 56,
+  display: "flex",
+  alignItems: "center",
+  padding: "0 12px 0 10px",
+};
+
+const producerInputStyle: CSSProperties = {
+  flex: 1,
+  minWidth: 0,
+  border: "none",
+  padding: 0,
+  background: "transparent",
+  color: "var(--foreground)",
+  fontSize: 18,
+  fontWeight: 500,
+};
+
+const generateButtonStyle: CSSProperties = {
+  height: 56,
+  minWidth: 164,
+  padding: "0 30px",
+  border: "none",
+  backgroundColor: "var(--foreground)",
+  color: "var(--background)",
+  fontSize: 16,
+  fontWeight: 700,
+  letterSpacing: "0",
+  borderRadius: 9999,
+  cursor: "pointer",
+};
+
+const generateChevronStyle: CSSProperties = {
+  width: 56,
+  height: 56,
+  border: "none",
+  backgroundColor: "var(--foreground)",
+  color: "var(--background)",
+  borderRadius: 9999,
+  cursor: "pointer",
+};
+
+const overlayMenuStyle: CSSProperties = {
+  position: "absolute",
+  left: 0,
+  bottom: "calc(100% + 12px)",
+  width: "100%",
+  minWidth: 220,
+  borderRadius: 24,
+  border: "1px solid var(--border)",
+  backgroundColor: "var(--float-surface)",
+  boxShadow: "var(--float-shadow)",
+  padding: 8,
+  overflow: "hidden",
+};
+
+const overlayMenuTitleStyle: CSSProperties = {
+  padding: "10px 12px 8px",
+  color: "var(--muted-foreground)",
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+};
+
+const overlayMenuItemStyle: CSSProperties = {
+  minHeight: 48,
+  padding: "0 14px",
+  border: "none",
+  borderRadius: 16,
+  fontSize: 15,
+  fontWeight: 600,
+  cursor: "pointer",
+};
+
+const overlayMenuMetaStyle: CSSProperties = {
+  display: "block",
+  marginTop: 3,
+  color: "var(--muted-foreground)",
+  fontSize: 12,
+  fontWeight: 500,
+  lineHeight: 1.35,
+};
+
+const overlayMenuDotStyle: CSSProperties = {
+  width: 7,
+  height: 7,
+  borderRadius: 999,
+  backgroundColor: "var(--sidebar-accent-teal)",
+};
+
+const producerPanelStyle: CSSProperties = {
+  height: "100%",
+  borderRadius: 24,
+  border: "1px solid var(--border)",
+  backgroundColor: "var(--float-surface)",
+  boxShadow: "var(--float-shadow)",
+  display: "flex",
+  flexDirection: "column",
+  overflow: "hidden",
+};
+
+const producerPanelHeaderStyle: CSSProperties = {
+  padding: "16px 18px",
+  borderBottom: "1px solid var(--border)",
+  backgroundColor: "var(--float-surface-muted)",
+};
+
+const producerPanelEyebrowStyle: CSSProperties = {
+  color: "var(--muted-foreground)",
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+};
+
+const producerPanelTitleStyle: CSSProperties = {
+  marginTop: 4,
+  color: "var(--foreground)",
+  fontSize: 18,
+  fontWeight: 700,
+  letterSpacing: "-0.01em",
+};
+
+const producerPanelCloseStyle: CSSProperties = {
+  width: 40,
+  height: 40,
+  borderRadius: 9999,
+  border: "1px solid var(--border)",
+  backgroundColor: "var(--float-surface)",
+  color: "var(--secondary)",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  cursor: "pointer",
+};
+
+const producerChatCardStyle: CSSProperties = {
+  flex: "1 1 560px",
+  minWidth: 0,
+  minHeight: 0,
+  borderRadius: 22,
+  border: "1px solid var(--border)",
+  backgroundColor: "var(--float-surface-soft)",
+  padding: 16,
+  display: "flex",
+  flexDirection: "column",
+};
+
+const producerRailCardStyle: CSSProperties = {
+  borderRadius: 22,
+  border: "1px solid var(--border)",
+  backgroundColor: "var(--float-surface-soft)",
+  padding: 14,
+};
+
+const producerSectionHeaderStyle: CSSProperties = {
+  marginBottom: 12,
+};
+
+const producerSectionEyebrowStyle: CSSProperties = {
+  color: "var(--muted-foreground)",
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+};
+
+const producerSectionMetaStyle: CSSProperties = {
+  marginTop: 4,
+  color: "var(--foreground)",
+  fontSize: 14,
+  fontWeight: 600,
+};
+
+const producerMessagesWrapStyle: CSSProperties = {
+  paddingRight: 4,
+};
+
+const producerAgentBubbleStyle: CSSProperties = {
+  borderRadius: 14,
+  padding: "12px 14px",
+  backgroundColor: "var(--chat-agent-bg)",
+  color: "var(--chat-agent-fg)",
+  border: "1px solid var(--chat-agent-border)",
+  fontSize: 14,
+  lineHeight: 1.5,
+};
+
+const producerUserBubbleStyle: CSSProperties = {
+  borderRadius: 16,
+  padding: "12px 14px",
+  backgroundColor: "var(--chat-user-bg)",
+  color: "var(--chat-user-fg)",
+  border: "1px solid var(--chat-user-border)",
+  fontSize: 14,
+  lineHeight: 1.5,
+};
+
+const producerMessageTimestampStyle: CSSProperties = {
+  marginTop: 8,
+  color: "var(--muted-foreground)",
+  fontSize: 11,
+  fontWeight: 600,
+};
+
+const producerListItemStyle: CSSProperties = {
+  borderRadius: 16,
+  border: "1px solid var(--border)",
+  backgroundColor: "var(--float-surface)",
+  padding: "12px 12px 13px",
+};
+
+const producerListItemTitleStyle: CSSProperties = {
+  color: "var(--foreground)",
+  fontSize: 14,
+  fontWeight: 700,
+  lineHeight: 1.3,
+};
+
+const producerListItemMetaStyle: CSSProperties = {
+  marginTop: 4,
+  color: "var(--muted-foreground)",
+  fontSize: 12,
+  fontWeight: 500,
+  lineHeight: 1.4,
+};
+
+const producerListItemSubtleStyle: CSSProperties = {
+  marginTop: 10,
+  color: "var(--foreground)",
+  fontSize: 12,
+  fontWeight: 500,
+  lineHeight: 1.35,
+  opacity: 0.78,
+};
+
+const producerHistoryTimestampStyle: CSSProperties = {
+  color: "var(--muted-foreground)",
+  fontSize: 11,
+  fontWeight: 700,
+  whiteSpace: "nowrap",
+};
+
+function queueStatusBadgeStyle(status: QueueStatus): CSSProperties {
+  const tones: Record<QueueStatus, { background: string; color: string }> = {
+    Generating: {
+      background: "rgba(59, 130, 246, 0.14)",
+      color: "#2563EB",
+    },
+    Queued: {
+      background: "rgba(148, 163, 184, 0.18)",
+      color: "var(--foreground)",
+    },
+    Ready: {
+      background: "rgba(34, 197, 94, 0.16)",
+      color: "#15803D",
+    },
+  };
+
+  return {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 76,
+    height: 28,
+    padding: "0 10px",
+    borderRadius: 9999,
+    backgroundColor: tones[status].background,
+    color: tones[status].color,
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: "0.04em",
+    textTransform: "uppercase",
+  };
+}
