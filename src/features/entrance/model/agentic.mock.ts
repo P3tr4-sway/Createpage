@@ -1,11 +1,7 @@
-import type { Locale } from "../../../modules/entrance/EntranceLocaleContext";
+import type { Locale } from "@/features/entrance/EntranceLocaleContext";
 import { agenticCopyByLocale } from "../i18n/agentic.copy";
 import type {
-  AudioQueueItem,
-  AgentMode,
-  GenerationHistoryItem,
   MusicianTarget,
-  ProducerMessage,
   ArrangementTrack,
 } from "./agentic.types";
 

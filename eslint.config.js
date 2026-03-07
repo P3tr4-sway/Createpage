@@ -20,8 +20,25 @@ export default tseslint.config(
       import: importPlugin,
     },
     rules: {
-      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/no-unused-vars": "error",
       "@typescript-eslint/prefer-as-const": "off",
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "../modules/*",
+                "../../modules/*",
+                "../../../modules/*",
+                "../../../../modules/*",
+                "@/modules/*",
+              ],
+              message: "modules 目录已废弃。请改为从 features 或 shared 导入。",
+            },
+          ],
+        },
+      ],
     },
   },
   {

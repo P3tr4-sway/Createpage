@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import type { Locale } from "../../../modules/entrance/EntranceLocaleContext";
+import type { Locale } from "@/features/entrance/EntranceLocaleContext";
 import {
   getInitialAudioQueueForLocale,
   getInitialGenerationHistoryForLocale,
   getInitialProducerMessagesForLocale,
   getInitialTracksForLocale,
-} from "../model/agentic.mock";
+} from "@/features/entrance/model/agentic.mock";
 import type {
   AgentMode,
   ArrangementTrack,
@@ -14,7 +14,7 @@ import type {
   MusicianTargetId,
   OverlayMenu,
   ProducerMessage,
-} from "../model/agentic.types";
+} from "@/features/entrance/model/agentic.types";
 
 interface UseAgenticSessionStateParams {
   locale: Locale;

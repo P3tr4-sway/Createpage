@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import type { LucideIcon } from "lucide-react";
 import { ChevronDown } from "lucide-react";
 import { FeatureCard } from "./FeatureCard";
-import { useHasCoarsePointer } from "./ui/use-mobile";
+import { useHasCoarsePointer } from "@/shared/hooks/use-mobile";
 
 interface FeatureCardData {
   title: string;

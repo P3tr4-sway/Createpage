@@ -21,12 +21,12 @@ import {
   SlidersHorizontal,
   AudioWaveform,
 } from "lucide-react";
-import { useEntranceLocale } from "../../modules/entrance/EntranceLocaleContext";
-import { agenticCopyByLocale } from "../../features/entrance/i18n/agentic.copy";
+import { useEntranceLocale } from "@/features/entrance/EntranceLocaleContext";
+import { agenticCopyByLocale } from "@/features/entrance/i18n/agentic.copy";
 import {
   getAgentModeOptionsForLocale,
   getMusicianTargetsForLocale,
-} from "../../features/entrance/model/agentic.mock";
+} from "@/features/entrance/model/agentic.mock";
 import type {
   AudioQueueItem,
   AgentMode,
@@ -36,8 +36,8 @@ import type {
   OverlayMenu,
   ProducerMessage,
   QueueStatus,
-} from "../../features/entrance/model/agentic.types";
-import { useAgenticSessionState } from "../../features/entrance/state/useAgenticSessionState";
+} from "@/features/entrance/model/agentic.types";
+import { useAgenticSessionState } from "@/features/entrance/state/useAgenticSessionState";
 
 interface AgenticProducingPageProps {
   onBack?: () => void;
@@ -1536,17 +1536,6 @@ const trackTogglePillStyle: CSSProperties = {
   cursor: "pointer",
 };
 
-const trackMoreStyle: CSSProperties = {
-  borderRadius: 12,
-  border: "1px solid rgba(255,255,255,0.18)",
-  backgroundColor: "rgba(255,255,255,0.06)",
-  color: "var(--agentic-contrast)",
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  cursor: "pointer",
-};
-
 const bottomIconStyle: CSSProperties = {
   width: 44,
   height: 44,
@@ -1784,15 +1773,6 @@ const overlayMenuItemStyle: CSSProperties = {
   fontSize: 15,
   fontWeight: 600,
   cursor: "pointer",
-};
-
-const overlayMenuMetaStyle: CSSProperties = {
-  display: "block",
-  marginTop: 3,
-  color: "var(--muted-foreground)",
-  fontSize: 12,
-  fontWeight: 500,
-  lineHeight: 1.35,
 };
 
 const overlayMenuDotStyle: CSSProperties = {

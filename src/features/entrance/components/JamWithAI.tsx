@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Send } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
-import { useHasCoarsePointer } from "./ui/use-mobile";
-import { useEntranceLocale } from "../../modules/entrance/EntranceLocaleContext";
+import { useEntranceLocale } from "@/features/entrance/EntranceLocaleContext";
+import { useHasCoarsePointer } from "@/shared/hooks/use-mobile";
 
 const promptSuggestionsByLocale = {
   en: ["Lo-fi 75 bpm", "Neo-soul E major", "Ambient wide pads"],

@@ -2,7 +2,7 @@
 
 ## A. HTML design phase (this repo)
 
-1. 在 `src/modules/<module>/` 完成视觉和交互状态稿。
+1. 在 `src/features/<feature>/` 完成视觉和交互状态稿。
 2. 保持画布为 `1920x1080` 基线。
 3. 在模块 `specs/` 中写清楚状态：默认/选中/禁用/加载/进度/弹窗。
 

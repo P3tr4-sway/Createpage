@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, SlidersHorizontal } from "lucide-react";
-import { useEntranceLocale } from "../../modules/entrance/EntranceLocaleContext";
+import { useEntranceLocale } from "@/features/entrance/EntranceLocaleContext";
 
 interface InstantBackingTrackPageProps {
   onBack: () => void;

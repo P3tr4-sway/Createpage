@@ -1,4 +1,4 @@
-import type { Locale } from "../../../modules/entrance/EntranceLocaleContext";
+import type { Locale } from "@/features/entrance/EntranceLocaleContext";
 import type { HeroPromptSuggestion } from "../model/entrance.types";
 
 export const LOCALE_STORAGE_KEY = "lavadaw-locale";

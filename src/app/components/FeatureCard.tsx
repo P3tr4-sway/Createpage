@@ -12,7 +12,6 @@ export function FeatureCard({
   title,
   description,
   subDescription,
-  icon: Icon,
   onClick,
 }: FeatureCardProps) {
   const isInteractive = typeof onClick === "function";

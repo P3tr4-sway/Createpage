@@ -30,8 +30,9 @@ npm run dev
 ├── src/
 │   ├── app/                     # 应用入口
 │   ├── core/design/             # 设计工作台（固定画布壳层）
-│   ├── modules/                 # 按业务模块组织设计页面
+│   ├── features/                # 按业务模块组织设计页面
 │   │   └── entrance/            # 当前入口模块设计
+│   ├── shared/                  # 共享组件、hooks、工具与样式
 │   └── styles/                  # 全局样式与 token
 └── guidelines/                  # 既有设计资料
 ```

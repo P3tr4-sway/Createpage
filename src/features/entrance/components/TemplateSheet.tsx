@@ -11,8 +11,8 @@ import {
   Users,
   MessageCircle,
 } from "lucide-react";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { useEntranceLocale } from "../../modules/entrance/EntranceLocaleContext";
+import { useEntranceLocale } from "@/features/entrance/EntranceLocaleContext";
+import { ImageWithFallback } from "@/shared/ui/ImageWithFallback";
 
 const FONT = "var(--app-font-family)";
 

@@ -1,2 +1,6 @@
 export { EntranceWorkspace } from "./workspace/EntranceWorkspace";
-export { EntranceLocaleProvider, useEntranceLocale, type Locale } from "../../modules/entrance/EntranceLocaleContext";
+export {
+  EntranceLocaleProvider,
+  useEntranceLocale,
+  type Locale,
+} from "./EntranceLocaleContext";

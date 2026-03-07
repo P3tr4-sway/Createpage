@@ -1,4 +1,4 @@
-import type { Locale } from "../../../modules/entrance/EntranceLocaleContext";
+import type { Locale } from "@/features/entrance/EntranceLocaleContext";
 
 export type ArrangementClip = {
   id: string;
