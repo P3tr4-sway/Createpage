@@ -28,6 +28,7 @@ import { JamWithAI } from "../../app/components/JamWithAI";
 import { LooperPage } from "../../app/components/LooperPage";
 import { ProjectsSheet } from "../../app/components/ProjectsSheet";
 import { TemplateSheet } from "../../app/components/TemplateSheet";
+import { TutorialDialog, tutorialCourses, type TutorialCourse } from "../../app/components/TutorialDialog";
 
 type SectionId = "studio" | "launch" | "community";
 type FullscreenView = "agentic-producing" | null;
@@ -38,7 +39,7 @@ type HomeSubView =
   | "quick-actions"
   | "top-songs"
   | "top-templates"
-  | "guitar-showcase";
+  | "tutorials";
 
 type ActionId = "looper";
 
@@ -85,6 +86,40 @@ type SidebarProject = {
   status: string;
   onClick: () => void;
 };
+
+type HeroPromptSuggestion = {
+  tag: string;
+  title: string;
+  prompt: string;
+};
+
+const heroPromptSuggestions: HeroPromptSuggestion[] = [
+  {
+    tag: "Jazz Fusion",
+    title: "Late-night jazz fusion",
+    prompt: "Build a jazz fusion track with warm Rhodes chords, elastic bass, and a late-night city feeling.",
+  },
+  {
+    tag: "Neo Soul",
+    title: "Loose neo-soul pocket",
+    prompt: "Start a neo-soul idea with laid-back drums, rich bass movement, and an intimate smoky mood.",
+  },
+  {
+    tag: "Indie Pop",
+    title: "Hopeful indie pop chorus",
+    prompt: "Write an indie pop song that feels hopeful and cinematic, with bright guitars and a singalong hook.",
+  },
+  {
+    tag: "Trap",
+    title: "Dark minimal trap beat",
+    prompt: "Create a dark trap beat with sparse drums, deep 808s, and a tense futuristic atmosphere.",
+  },
+  {
+    tag: "Ambient",
+    title: "Weightless ambient scene",
+    prompt: "Make an ambient instrumental that feels weightless and reflective, with evolving pads and distant textures.",
+  },
+];
 
 const topSongs: BrowseItem[] = [
   {
@@ -369,6 +404,8 @@ export function EntranceWorkspace() {
   const launchRef = useRef<HTMLDivElement>(null);
   const communityRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const heroPromptFieldRef = useRef<HTMLDivElement>(null);
+  const heroPromptInputRef = useRef<HTMLInputElement>(null);
   const [activeSection, setActiveSection] = useState<SectionId>("studio");
   const [pendingScrollTarget, setPendingScrollTarget] = useState<SectionId | null>(null);
   const [fullscreenView, setFullscreenView] = useState<FullscreenView>(null);
@@ -377,11 +414,15 @@ export function EntranceWorkspace() {
   const [templateOpen, setTemplateOpen] = useState(false);
   const [songOpen, setSongOpen] = useState(false);
   const [guitarOpen, setGuitarOpen] = useState(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
   const [looperInitialFilter, setLooperInitialFilter] = useState("Hot");
   const [backingTrackInitialFilter, setBackingTrackInitialFilter] = useState("Hot");
   const [selectedTemplate, setSelectedTemplate] = useState<BrowseItem | null>(null);
   const [selectedSong, setSelectedSong] = useState<BrowseItem | null>(null);
   const [selectedGuitarClip, setSelectedGuitarClip] = useState<GuitarClip | null>(null);
+  const [selectedTutorial, setSelectedTutorial] = useState<TutorialCourse | null>(null);
+  const [heroPromptValue, setHeroPromptValue] = useState("");
+  const [heroPromptOpen, setHeroPromptOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
   const isDark = mounted ? resolvedTheme === "dark" : true;
@@ -411,6 +452,46 @@ export function EntranceWorkspace() {
 
     return () => window.clearTimeout(timer);
   }, [activeSubView, pendingScrollTarget]);
+
+  useEffect(() => {
+    if (!heroPromptOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (target instanceof Node && heroPromptFieldRef.current?.contains(target)) {
+        return;
+      }
+
+      setHeroPromptOpen(false);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      setHeroPromptOpen(false);
+      heroPromptInputRef.current?.blur();
+    };
+
+    window.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [heroPromptOpen]);
+
+  useEffect(() => {
+    if (!heroPromptOpen) {
+      return;
+    }
+
+    heroPromptInputRef.current?.focus();
+  }, [heroPromptOpen]);
 
   const shellTone = useMemo(
     () => ({
@@ -494,6 +575,11 @@ export function EntranceWorkspace() {
   const openGuitar = useCallback((item: GuitarClip) => {
     setSelectedGuitarClip(item);
     setGuitarOpen(true);
+  }, []);
+
+  const openTutorial = useCallback((item: TutorialCourse) => {
+    setSelectedTutorial(item);
+    setTutorialOpen(true);
   }, []);
 
   const handleLaunch = useCallback((id: ActionId) => {
@@ -632,9 +718,43 @@ export function EntranceWorkspace() {
     [handleScrollTo, openGuitar, openTemplate],
   );
 
+  const filteredHeroPromptSuggestions = useMemo(() => {
+    const query = heroPromptValue.trim().toLowerCase();
+
+    if (!query) {
+      return heroPromptSuggestions;
+    }
+
+    return heroPromptSuggestions.filter((suggestion) =>
+      [suggestion.tag, suggestion.title, suggestion.prompt].some((value) =>
+        value.toLowerCase().includes(query),
+      ),
+    );
+  }, [heroPromptValue]);
+
+  const handleHeroPromptSuggestionSelect = useCallback((prompt: string) => {
+    setHeroPromptValue(prompt);
+    setHeroPromptOpen(false);
+
+    window.requestAnimationFrame(() => {
+      heroPromptInputRef.current?.focus();
+    });
+  }, []);
+
+  const tutorialBrowseItems = useMemo<BrowseItem[]>(
+    () =>
+      tutorialCourses.map((course) => ({
+        title: course.title,
+        author: `${course.lessons.length} parts · ${course.duration}`,
+        avatarInitial: course.mentor.slice(0, 1),
+        imageUrl: course.imageUrl,
+      })),
+    [],
+  );
+
   const contentTitle =
     activeSubView === "home"
-      ? "Workspace"
+      ? "Create"
       : activeSubView === "looper"
         ? "Looper"
         : activeSubView === "instant-backing-track"
@@ -645,7 +765,7 @@ export function EntranceWorkspace() {
             ? "Top Songs"
             : activeSubView === "top-templates"
             ? "Top Templates"
-              : "Guitar Showcase";
+              : "Tutorials";
   const homePreviewCanvasWidth = 1280;
   const homePreviewZoom = 1.14;
   const homePreviewFocusX = 0.42;
@@ -702,7 +822,6 @@ export function EntranceWorkspace() {
         >
           <div className="flex flex-col" style={{ minHeight: "100%" }}>
             <section style={sidebarHeroSectionStyle}>
-              <p style={eyebrowStyle}>Create</p>
               <h2 style={sidebarHeroTitleStyle}>Start from what you want to make.</h2>
               <p style={sidebarHeroCopyStyle}>
                 No DAW thinking first. Pick the idea in your head and jump straight into that flow.
@@ -885,18 +1004,31 @@ export function EntranceWorkspace() {
                     zIndex: 4,
                   }}
                 >
-                  <div className="flex w-full">
+                  <div
+                    ref={heroPromptFieldRef}
+                    className="relative flex w-full"
+                    onClick={(event) => event.stopPropagation()}
+                  >
                     <div className="flex w-full items-center rounded-full" style={heroChatFieldStyle}>
-                      <button
-                        type="button"
-                        onClick={(event) => event.stopPropagation()}
-                        className="tablet-touch-target flex-1 bg-transparent text-left"
-                        style={heroChatGhostButtonStyle}
-                      >
-                        <span style={heroChatPlaceholderStyle}>
-                          Start with your AI Music Producer.
-                        </span>
-                      </button>
+                      <input
+                        ref={heroPromptInputRef}
+                        type="text"
+                        value={heroPromptValue}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setHeroPromptOpen(true);
+                        }}
+                        onFocus={() => setHeroPromptOpen(true)}
+                        onChange={(event) => {
+                          setHeroPromptValue(event.target.value);
+                          if (!heroPromptOpen) {
+                            setHeroPromptOpen(true);
+                          }
+                        }}
+                        placeholder="Start with your AI Music Producer."
+                        className="tablet-touch-target min-w-0 flex-1 bg-transparent text-left outline-none placeholder:text-[var(--secondary)]"
+                        style={heroChatInputStyle}
+                      />
                       <button
                         type="button"
                         onClick={(event) => event.stopPropagation()}
@@ -906,6 +1038,44 @@ export function EntranceWorkspace() {
                         Start
                       </button>
                     </div>
+                    {heroPromptOpen ? (
+                      <div
+                        className="absolute"
+                        style={heroPromptPanelStyle}
+                        onClick={(event) => event.stopPropagation()}
+                      >
+                        <div style={heroPromptPanelHeaderStyle}>
+                          <p style={heroPromptPanelEyebrowStyle}>Try asking AI</p>
+                          <p style={heroPromptPanelTitleStyle}>
+                            Pick a starting prompt and edit it from there.
+                          </p>
+                        </div>
+                        <div className="flex max-h-[320px] flex-col gap-2 overflow-y-auto pr-1">
+                          {filteredHeroPromptSuggestions.length ? (
+                            filteredHeroPromptSuggestions.map((suggestion) => (
+                              <button
+                                key={suggestion.prompt}
+                                type="button"
+                                className="w-full text-left transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+                                style={heroPromptSuggestionStyle}
+                                onClick={() => handleHeroPromptSuggestionSelect(suggestion.prompt)}
+                              >
+                                <div className="flex items-center justify-between gap-3">
+                                  <span style={heroPromptSuggestionTagStyle}>{suggestion.tag}</span>
+                                  <span style={heroPromptSuggestionActionStyle}>Use prompt</span>
+                                </div>
+                                <p style={heroPromptSuggestionTitleStyle}>{suggestion.title}</p>
+                                <p style={heroPromptSuggestionBodyStyle}>{suggestion.prompt}</p>
+                              </button>
+                            ))
+                          ) : (
+                            <div style={heroPromptEmptyStyle}>
+                              No matching starter prompt yet. Try words like jazz, trap, ambient, or neo-soul.
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               </div>
@@ -954,7 +1124,7 @@ export function EntranceWorkspace() {
                 <div className="mb-4 flex items-center justify-between">
                   <div>
                     <p style={eyebrowStyle}>Browse</p>
-                    <h3 style={sectionTitleStyle}>Songs, templates, and player takes in one scroll.</h3>
+                    <h3 style={sectionTitleStyle}>Songs, templates, and tutorials in one scroll.</h3>
                   </div>
                 </div>
 
@@ -973,10 +1143,10 @@ export function EntranceWorkspace() {
                   />
                   <div className="rounded-[30px]" style={panelStyle}>
                     <div className="mb-3 flex items-center justify-between">
-                      <p style={miniSectionTitleStyle}>Guitar Showcase</p>
+                      <p style={miniSectionTitleStyle}>Tutorial</p>
                       <button
                         type="button"
-                        onClick={() => setActiveSubView("guitar-showcase")}
+                        onClick={() => setActiveSubView("tutorials")}
                         className="tablet-touch-target tablet-pressable"
                         style={inlineLinkButtonStyle}
                       >
@@ -985,11 +1155,11 @@ export function EntranceWorkspace() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-                      {guitarClips.slice(0, 4).map((clip) => (
+                      {tutorialCourses.slice(0, 4).map((course) => (
                         <button
-                          key={clip.id}
+                          key={course.id}
                           type="button"
-                          onClick={() => openGuitar(clip)}
+                          onClick={() => openTutorial(course)}
                           className="tablet-pressable relative overflow-hidden rounded-[22px] text-left"
                           style={{
                             minHeight: 168,
@@ -998,8 +1168,8 @@ export function EntranceWorkspace() {
                           }}
                         >
                           <ImageWithFallback
-                            src={clip.imageUrl}
-                            alt={clip.title}
+                            src={course.imageUrl}
+                            alt={course.title}
                             className="absolute inset-0 h-full w-full object-cover"
                           />
                           <div
@@ -1009,8 +1179,8 @@ export function EntranceWorkspace() {
                             }}
                           />
                           <div className="absolute bottom-0 left-0 right-0" style={{ padding: 14 }}>
-                            <p style={imageCardTitleStyle}>{clip.title}</p>
-                            <p style={imageCardMetaStyle}>{clip.author}</p>
+                            <p style={imageCardTitleStyle}>{course.title}</p>
+                            <p style={imageCardMetaStyle}>{course.lessons.length} parts · {course.duration}</p>
                           </div>
                         </button>
                       ))}
@@ -1053,15 +1223,15 @@ export function EntranceWorkspace() {
               />
             ) : (
               <TopBrowsePage
-                title="Guitar Showcase"
-                items={guitarClips}
+                title="Tutorials"
+                items={tutorialBrowseItems}
                 onBack={() => setActiveSubView("home")}
                 onItemClick={(item) => {
-                  const clip = guitarClips.find(
-                    (source) => source.title === item.title && source.author === item.author,
+                  const tutorial = tutorialCourses.find(
+                    (source) => source.title === item.title,
                   );
-                  if (clip) {
-                    openGuitar(clip);
+                  if (tutorial) {
+                    openTutorial(tutorial);
                   }
                 }}
               />
@@ -1088,6 +1258,11 @@ export function EntranceWorkspace() {
         onClose={() => setGuitarOpen(false)}
         template={selectedGuitarClip}
         mode="guitar"
+      />
+      <TutorialDialog
+        open={tutorialOpen}
+        onOpenChange={setTutorialOpen}
+        tutorial={selectedTutorial}
       />
     </div>
   );
@@ -1921,23 +2096,15 @@ const heroChatFieldStyle: CSSProperties = {
   boxShadow: "0 10px 28px rgba(15,23,42,0.08)",
 };
 
-const heroChatGhostButtonStyle: CSSProperties = {
+const heroChatInputStyle: CSSProperties = {
+  flex: 1,
   minWidth: 0,
   border: "none",
   padding: 0,
   background: "transparent",
-  cursor: "pointer",
-};
-
-const heroChatPlaceholderStyle: CSSProperties = {
-  flex: 1,
-  minWidth: 0,
-  color: "var(--secondary)",
+  color: "var(--foreground)",
   fontSize: 18,
   fontWeight: 500,
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
 };
 
 const heroChatSendStyle: CSSProperties = {
@@ -1949,6 +2116,88 @@ const heroChatSendStyle: CSSProperties = {
   fontSize: 16,
   fontWeight: 700,
   cursor: "pointer",
+};
+
+const heroPromptPanelStyle: CSSProperties = {
+  left: 0,
+  right: 0,
+  top: "calc(100% + 14px)",
+  zIndex: 8,
+  padding: 14,
+  border: "1px solid var(--border)",
+  borderRadius: 24,
+  backgroundColor: "var(--card)",
+  boxShadow: "0 22px 48px rgba(15,23,42,0.16)",
+  backdropFilter: "blur(18px)",
+};
+
+const heroPromptPanelHeaderStyle: CSSProperties = {
+  marginBottom: 12,
+  padding: "2px 4px 0",
+};
+
+const heroPromptPanelEyebrowStyle: CSSProperties = {
+  margin: 0,
+  color: "var(--secondary)",
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+};
+
+const heroPromptPanelTitleStyle: CSSProperties = {
+  margin: "6px 0 0",
+  color: "var(--foreground)",
+  fontSize: 14,
+  fontWeight: 600,
+  lineHeight: 1.4,
+};
+
+const heroPromptSuggestionStyle: CSSProperties = {
+  padding: "14px 16px",
+  border: "1px solid var(--border)",
+  borderRadius: 20,
+  background: "linear-gradient(180deg, var(--card) 0%, var(--soft-surface) 100%)",
+};
+
+const heroPromptSuggestionTagStyle: CSSProperties = {
+  color: "var(--foreground)",
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+};
+
+const heroPromptSuggestionActionStyle: CSSProperties = {
+  color: "var(--secondary)",
+  fontSize: 12,
+  fontWeight: 600,
+};
+
+const heroPromptSuggestionTitleStyle: CSSProperties = {
+  margin: "8px 0 0",
+  color: "var(--foreground)",
+  fontSize: 16,
+  fontWeight: 700,
+  lineHeight: 1.3,
+};
+
+const heroPromptSuggestionBodyStyle: CSSProperties = {
+  margin: "6px 0 0",
+  color: "var(--secondary)",
+  fontSize: 13,
+  fontWeight: 500,
+  lineHeight: 1.5,
+};
+
+const heroPromptEmptyStyle: CSSProperties = {
+  padding: "18px 16px",
+  border: "1px dashed var(--border)",
+  borderRadius: 18,
+  color: "var(--secondary)",
+  fontSize: 13,
+  fontWeight: 500,
+  lineHeight: 1.5,
 };
 
 const panelStyle: CSSProperties = {
