@@ -194,13 +194,13 @@ const topSongNames = [
 ];
 
 const topTemplateNames = [
-  "Neo-Soul Starter (92 BPM, Am)",
-  "Lo-Fi Piano Pack (78 BPM, C)",
-  "Trap Bounce Kit (140 BPM, F#)",
-  "Ambient Texture Bed (70 BPM, Dm)",
-  "Pop Hook Builder (122 BPM, G)",
-  "R&B Vocal Space (88 BPM, Bb)",
-  "Cinematic Rise Template (100 BPM, Em)",
+  "Midnight Pocket Jam (92 BPM, Am)",
+  "Lo-Fi Room Groove (78 BPM, C)",
+  "Trap Bounce Jam (140 BPM, F#)",
+  "Ambient Drift Bed (70 BPM, Dm)",
+  "Indie Night Drive (122 BPM, G)",
+  "R&B Pocket Jam (88 BPM, Bb)",
+  "Cinematic Lift Track (100 BPM, Em)",
 ];
 
 interface ShowcaseComment {
@@ -668,8 +668,8 @@ export function MainContent({
         />
       ) : activeSubView === "top-template" ? (
         <TopBrowsePage
-          title="Top Template"
-          subtitle="Browse all reusable templates from the player community."
+          title="Top Jam Tracks"
+          subtitle="Browse the jam tracks people are starting from right now."
           items={topTemplateCatalog}
           onBack={() => setActiveSubView("home")}
           onItemClick={handleTemplateClick}
@@ -826,7 +826,7 @@ export function MainContent({
             onOpenDetail={() => setActiveSubView("top-songs")}
           />
           <TopListColumn
-            title="Top Template"
+            title="Top Jam Tracks"
             items={topTemplates}
             onItemClick={handleTemplateClick}
             onOpenDetail={() => setActiveSubView("top-template")}

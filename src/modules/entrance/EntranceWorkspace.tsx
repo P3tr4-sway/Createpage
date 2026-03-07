@@ -132,7 +132,7 @@ const copyByLocale = {
       backingTrack: "Backing Track",
       quickActions: "Quick Actions",
       topSongs: "Top Songs",
-      topTemplates: "Top Templates",
+      topTemplates: "Top Jam Tracks",
       tutorials: "Tutorials",
     },
     back: "Back",
@@ -181,8 +181,8 @@ const copyByLocale = {
     ] as HeroPromptSuggestion[],
     launchTitle: "Choose how to start.",
     launchDescription: "Pick one path. You can switch later.",
-    browseEyebrow: "Browse",
-    browseTitle: "Songs, templates, and tutorials in one scroll.",
+    browseEyebrow: "Charts",
+    browseTitle: "What's moving right now.",
     tutorialTitle: "Tutorial",
     tutorialPartUnit: "parts",
     createActions: [
@@ -285,7 +285,7 @@ const copyByLocale = {
       backingTrack: "伴奏",
       quickActions: "快捷开始",
       topSongs: "热门歌曲",
-      topTemplates: "热门模板",
+      topTemplates: "热门 Jam Tracks",
       tutorials: "教程",
     },
     back: "返回",
@@ -334,8 +334,8 @@ const copyByLocale = {
     ] as HeroPromptSuggestion[],
     launchTitle: "选择你的开始方式。",
     launchDescription: "先选一条路径，之后仍然可以切换。",
-    browseEyebrow: "浏览",
-    browseTitle: "歌曲、模板和教程，一次滑动看完。",
+    browseEyebrow: "榜单",
+    browseTitle: "看看大家现在在听什么、用什么、学什么。",
     tutorialTitle: "教程",
     tutorialPartUnit: "节",
     createActions: [
@@ -571,100 +571,100 @@ const topSongs: BrowseItem[] = [
   },
 ];
 
-const topTemplates: BrowseItem[] = [
+const topJamTracks: BrowseItem[] = [
   {
-    title: "Neo-Soul Starter",
+    title: "Midnight Pocket Jam",
     author: "Marcus Bell",
     avatarInitial: "M",
     imageUrl:
       "https://images.unsplash.com/photo-1760507388320-2500b019f3ba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
-    title: "Lo-Fi Piano Pack",
+    title: "Lo-Fi Room Groove",
     author: "Nadia Osei",
     avatarInitial: "N",
     imageUrl:
       "https://images.unsplash.com/photo-1741190745018-50ed4935c493?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
-    title: "Trap Bounce Kit",
+    title: "Trap Bounce Jam",
     author: "Ray Santos",
     avatarInitial: "R",
     imageUrl:
       "https://images.unsplash.com/photo-1659117675918-69ec794c64f2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
-    title: "Ambient Texture Bed",
+    title: "Ambient Drift Bed",
     author: "Sam Ekow",
     avatarInitial: "S",
     imageUrl:
       "https://images.unsplash.com/photo-1696245843884-3fbc53aad9a3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
-    title: "R&B Vocal Space",
+    title: "R&B Pocket Jam",
     author: "Tara Kim",
     avatarInitial: "T",
     imageUrl:
       "https://images.unsplash.com/photo-1761596897055-5c2ae7f56290?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
-    title: "Cinematic Rise",
+    title: "Cinematic Lift Track",
     author: "Zara Mensah",
     avatarInitial: "Z",
     imageUrl:
       "https://images.unsplash.com/photo-1656231267321-282e40e05d24?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
-    title: "Indie Pop Writer Room",
+    title: "Indie Night Drive",
     author: "Harper Lane",
     avatarInitial: "H",
     imageUrl:
       "https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
-    title: "Dream Guitar Bed",
+    title: "Open Chords at Dusk",
     author: "Owen Cruz",
     avatarInitial: "O",
     imageUrl:
       "https://images.unsplash.com/photo-1511379938547-c1f69419868d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
-    title: "House Drum Starter",
+    title: "Basement Funk Run",
     author: "Mila Stone",
     avatarInitial: "M",
     imageUrl:
       "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
-    title: "Blues Club Backing Kit",
+    title: "Blue Room Jam Track",
     author: "Theo Price",
     avatarInitial: "T",
     imageUrl:
       "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
-    title: "Ambient Piano Sketchpad",
+    title: "Tape Echo Cruise",
     author: "Ella Chen",
     avatarInitial: "E",
     imageUrl:
       "https://images.unsplash.com/photo-1516280440614-37939bbacd81?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
-    title: "R&B Pocket Builder",
+    title: "Velvet Delay Jam",
     author: "Jaden Holt",
     avatarInitial: "J",
     imageUrl:
       "https://images.unsplash.com/photo-1507838153414-b4b713384a76?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
-    title: "Latin Jam Starter",
+    title: "Late Bus Bounce",
     author: "Nina Flores",
     avatarInitial: "N",
     imageUrl:
       "https://images.unsplash.com/photo-1548420329-2f116f28d2e9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
-    title: "Dark Trap Scene",
+    title: "Golden String Drift",
     author: "Zion Park",
     avatarInitial: "Z",
     imageUrl:
@@ -1020,7 +1020,7 @@ export function EntranceWorkspace() {
         title: copy.sidebarProjects[3].title,
         meta: copy.sidebarProjects[3].meta,
         status: copy.sidebarProjects[3].status,
-        onClick: () => openTemplate(topTemplates[8]),
+        onClick: () => openTemplate(topJamTracks[8]),
       },
       {
         id: "backing-1",
@@ -1037,7 +1037,7 @@ export function EntranceWorkspace() {
         title: copy.sidebarProjects[5].title,
         meta: copy.sidebarProjects[5].meta,
         status: copy.sidebarProjects[5].status,
-        onClick: () => openTemplate(topTemplates[6]),
+        onClick: () => openTemplate(topJamTracks[6]),
       },
       {
         id: "guitar-2",
@@ -1167,7 +1167,8 @@ export function EntranceWorkspace() {
   const homePreviewZoom = 1.14;
   const homePreviewFocusX = 0.42;
   const mainHeaderHeight = 72;
-  const showMainHeader = activeSubView !== "home";
+  const isLooperFullscreen = activeSubView === "looper";
+  const showMainHeader = activeSubView !== "home" && !isLooperFullscreen;
   const homeHeroHeight = `clamp(${520 + mainHeaderHeight}px, calc(100vh - ${248 - mainHeaderHeight}px), ${620 + mainHeaderHeight}px)`;
   const sidebarWidth = 399;
   const sidebarInlinePadding = 24;
@@ -1190,111 +1191,108 @@ export function EntranceWorkspace() {
           background: shellTone.appBg,
         }}
       >
-        <aside
-          className="relative flex h-full shrink-0 flex-col"
-          style={{
-            width: sidebarWidth,
-            minWidth: sidebarWidth,
-            flexBasis: sidebarWidth,
-            padding: `22px ${sidebarInlinePadding}px 14px`,
-            background: isDark
-              ? "radial-gradient(circle at top left, rgba(255,255,255,0.04), transparent 28%), linear-gradient(180deg, #1a1a1a 0%, #131313 100%)"
-              : "radial-gradient(circle at top left, rgba(255,255,255,0.7), transparent 30%), linear-gradient(180deg, #fbfbfa 0%, #f1f1ee 100%)",
-            borderRight: `1px solid ${shellTone.railBorder}`,
-            boxShadow: isDark ? "24px 0 80px rgba(0,0,0,0.24)" : "24px 0 64px rgba(0,0,0,0.05)",
-            zIndex: 2,
-        }}
-      >
-        <div className="flex items-center justify-between" style={{ marginBottom: 18 }}>
-          <div>
-            <h1 style={railHeadingStyle}>Create</h1>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="relative" style={languageSelectWrapStyle}>
-              <select
-                value={locale}
-                onChange={(event) => setLocale(event.target.value as Locale)}
-                className="tablet-touch-target"
-                style={languageSelectStyle}
-                aria-label={copy.languageSelectorAriaLabel}
-              >
-                {localeOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                aria-hidden="true"
-                size={14}
-                strokeWidth={1.8}
-                style={languageSelectIconStyle}
-              />
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setTheme(isDark ? "light" : "dark")}
-              className="tablet-icon-target tablet-pressable"
-              style={iconButtonStyle}
-              aria-label={isDark ? copy.switchToLightMode : copy.switchToDarkMode}
-            >
-              {isDark ? <Sun size={16} strokeWidth={1.9} /> : <Moon size={16} strokeWidth={1.9} />}
-            </button>
-          </div>
-        </div>
-
-        <div
-          className="min-h-0 flex-1 overflow-y-auto"
-          style={{ paddingRight: 2, paddingBottom: 8 }}
-        >
-          <div className="flex flex-col" style={{ minHeight: "100%" }}>
-            <section style={sidebarHeroSectionStyle}>
-              <h2 style={sidebarHeroTitleStyle}>{copy.sidebarHeroTitle}</h2>
-              <p style={sidebarHeroCopyStyle}>{copy.sidebarHeroCopy}</p>
-            </section>
-
-            <section style={sidebarSectionStyle}>
-              <div className="mb-3">
-                <p style={sidebarSectionLabelStyle}>{copy.start}</p>
+        {isLooperFullscreen ? null : (
+          <aside
+            className="relative flex h-full shrink-0 flex-col"
+            style={{
+              width: sidebarWidth,
+              minWidth: sidebarWidth,
+              flexBasis: sidebarWidth,
+              padding: `22px ${sidebarInlinePadding}px 14px`,
+              background: isDark
+                ? "radial-gradient(circle at top left, rgba(255,255,255,0.04), transparent 28%), linear-gradient(180deg, #1a1a1a 0%, #131313 100%)"
+                : "radial-gradient(circle at top left, rgba(255,255,255,0.7), transparent 30%), linear-gradient(180deg, #fbfbfa 0%, #f1f1ee 100%)",
+              borderRight: `1px solid ${shellTone.railBorder}`,
+              boxShadow: isDark ? "24px 0 80px rgba(0,0,0,0.24)" : "24px 0 64px rgba(0,0,0,0.05)",
+              zIndex: 2,
+            }}
+          >
+            <div className="flex items-center justify-between" style={{ marginBottom: 18 }}>
+              <div>
+                <h1 style={railHeadingStyle}>Create</h1>
               </div>
-              <div className="flex flex-col gap-2.5">
-                {createActions.map((action) => (
-                  <SidebarStartAction
-                    key={action.label}
-                    label={action.label}
-                    meta={action.meta}
-                    icon={action.icon}
-                    accent={action.accent}
-                    onClick={action.onClick}
+
+              <div className="flex items-center gap-2">
+                <div className="relative" style={languageSelectWrapStyle}>
+                  <select
+                    value={locale}
+                    onChange={(event) => setLocale(event.target.value as Locale)}
+                    className="tablet-touch-target"
+                    style={languageSelectStyle}
+                    aria-label={copy.languageSelectorAriaLabel}
+                  >
+                    {localeOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    aria-hidden="true"
+                    size={14}
+                    strokeWidth={1.8}
+                    style={languageSelectIconStyle}
                   />
-                ))}
-              </div>
-            </section>
+                </div>
 
-            <section style={{ ...sidebarSectionStyle, display: "flex", minHeight: 0, flex: 1, flexDirection: "column" }}>
-              <div className="mb-3 flex items-center justify-between">
-                <p style={sidebarSectionLabelStyle}>{copy.myProjects}</p>
                 <button
                   type="button"
-                  onClick={() => setProjectsOpen(true)}
-                  className="tablet-touch-target tablet-pressable"
-                  style={inlineLinkButtonStyle}
+                  onClick={() => setTheme(isDark ? "light" : "dark")}
+                  className="tablet-icon-target tablet-pressable"
+                  style={iconButtonStyle}
+                  aria-label={isDark ? copy.switchToLightMode : copy.switchToDarkMode}
                 >
-                  {copy.viewAll}
+                  {isDark ? <Sun size={16} strokeWidth={1.9} /> : <Moon size={16} strokeWidth={1.9} />}
                 </button>
               </div>
+            </div>
 
-              <div className="min-h-0 flex-1 overflow-y-auto" style={sidebarProjectListStyle}>
-                {sidebarProjects.map((project) => (
-                  <SidebarProjectListItem key={project.id} project={project} />
-                ))}
+            <div
+              className="min-h-0 flex-1 overflow-y-auto"
+              style={{ paddingRight: 2, paddingBottom: 8 }}
+            >
+              <div className="flex flex-col" style={{ minHeight: "100%" }}>
+                <section style={{ ...sidebarSectionStyle, paddingBottom: 18 }}>
+                  <div className="mb-3">
+                    <p style={sidebarSectionLabelStyle}>{copy.start}</p>
+                  </div>
+                  <div className="flex flex-col gap-2.5">
+                    {createActions.map((action) => (
+                      <SidebarStartAction
+                        key={action.label}
+                        label={action.label}
+                        meta={action.meta}
+                        icon={action.icon}
+                        accent={action.accent}
+                        onClick={action.onClick}
+                      />
+                    ))}
+                  </div>
+                </section>
+
+                <section style={{ ...sidebarSectionStyle, display: "flex", minHeight: 0, flex: 1, flexDirection: "column" }}>
+                  <div className="mb-3 flex items-center justify-between">
+                    <p style={sidebarSectionLabelStyle}>{copy.myProjects}</p>
+                    <button
+                      type="button"
+                      onClick={() => setProjectsOpen(true)}
+                      className="tablet-touch-target tablet-pressable"
+                      style={inlineLinkButtonStyle}
+                    >
+                      {copy.viewAll}
+                    </button>
+                  </div>
+
+                  <div className="min-h-0 flex-1 overflow-y-auto" style={sidebarProjectListStyle}>
+                    {sidebarProjects.map((project) => (
+                      <SidebarProjectListItem key={project.id} project={project} />
+                    ))}
+                  </div>
+                </section>
               </div>
-            </section>
-          </div>
-        </div>
-      </aside>
+            </div>
+          </aside>
+        )}
 
       <main className="flex min-w-0 flex-1 flex-col">
         {showMainHeader ? (
@@ -1397,6 +1395,13 @@ export function EntranceWorkspace() {
                 >
                   <span style={heroPreviewHintEyebrowStyle}>{copy.heroPreviewEyebrow}</span>
                   <span style={heroPreviewHintLabelStyle}>{copy.heroPreviewLabel}</span>
+                </div>
+                <div
+                  aria-hidden="true"
+                  className="absolute"
+                  style={heroSloganOverlayStyle}
+                >
+                  <h2 style={heroSloganTitleStyle}>{copy.sidebarHeroTitle}</h2>
                 </div>
                 <div
                   aria-hidden="true"
@@ -1580,7 +1585,7 @@ export function EntranceWorkspace() {
                   />
                   <TopListColumn
                     title={copy.contentTitles.topTemplates}
-                    items={topTemplates}
+                    items={topJamTracks}
                     onItemClick={openTemplate}
                     onOpenDetail={() => setActiveSubView("top-templates")}
                     seeAllLabel={copy.seeAll}
@@ -1637,7 +1642,10 @@ export function EntranceWorkspace() {
             </div>
           </div>
         ) : (
-          <div className="min-h-0 flex-1 overflow-y-auto" style={{ padding: "24px 30px 40px" }}>
+          <div
+            className="min-h-0 flex-1 overflow-y-auto"
+            style={isLooperFullscreen ? { padding: 0 } : { padding: "24px 30px 40px" }}
+          >
             {activeSubView === "looper" ? (
               <LooperPage
                 onBack={() => setActiveSubView("home")}
@@ -1667,7 +1675,7 @@ export function EntranceWorkspace() {
             ) : activeSubView === "top-templates" ? (
               <TopBrowsePage
                 title={copy.contentTitles.topTemplates}
-                items={topTemplates}
+                items={topJamTracks}
                 onBack={() => setActiveSubView("home")}
                 onItemClick={openTemplate}
                 backLabel={copy.back}
@@ -2366,29 +2374,6 @@ const languageSelectIconStyle: CSSProperties = {
   pointerEvents: "none",
 };
 
-const sidebarHeroSectionStyle: CSSProperties = {
-  padding: "8px 0 34px",
-};
-
-const sidebarHeroTitleStyle: CSSProperties = {
-  margin: "14px 0 0",
-  color: "var(--foreground)",
-  fontSize: 34,
-  fontWeight: 700,
-  lineHeight: 1,
-  letterSpacing: "-0.05em",
-  maxWidth: 280,
-};
-
-const sidebarHeroCopyStyle: CSSProperties = {
-  margin: "14px 0 0",
-  maxWidth: 300,
-  color: "var(--secondary)",
-  fontSize: 14,
-  fontWeight: 500,
-  lineHeight: 1.5,
-};
-
 const sidebarSectionStyle: CSSProperties = {
   paddingTop: 22,
   borderTop: "1px solid color-mix(in srgb, var(--border) 76%, transparent)",
@@ -2555,6 +2540,27 @@ const heroPreviewHintLabelStyle: CSSProperties = {
   fontSize: 14,
   fontWeight: 700,
   lineHeight: 1.2,
+};
+
+const heroSloganOverlayStyle: CSSProperties = {
+  top: "33.333vh",
+  left: "50%",
+  width: "auto",
+  maxWidth: "none",
+  transform: "translateX(-50%)",
+  zIndex: 4,
+  pointerEvents: "none",
+};
+
+const heroSloganTitleStyle: CSSProperties = {
+  margin: 0,
+  color: "#171717",
+  fontSize: 38,
+  fontWeight: 700,
+  lineHeight: 0.95,
+  letterSpacing: "-0.03em",
+  textAlign: "center",
+  whiteSpace: "nowrap",
 };
 
 const heroChatFieldStyle: CSSProperties = {

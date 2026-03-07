@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, CirclePlus, SlidersHorizontal } from "lucide-react";
+import {
+  ArrowLeft,
+  ChevronRight,
+  CirclePlus,
+  PanelRightClose,
+  PanelRightOpen,
+} from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useEntranceLocale } from "../../modules/entrance/EntranceLocaleContext";
 
@@ -157,9 +163,16 @@ const looperCopyByLocale = {
   en: {
     back: "Back",
     title: "Looper",
-    filter: "Filter",
-    showLess: "Show Less",
-    showMore: (count: number) => `Show More (${count} more)`,
+    workspaceEyebrow: "Looper Surface",
+    workspaceHint: "The looper stays centered. Switch sources from the library without leaving the performance page.",
+    selectorEyebrow: "Loop Library",
+    selectorTitle: "Choose a loop",
+    selectorCount: (count: number) => `${count} loops`,
+    selectedLoop: "Selected loop",
+    collapseLibrary: "Collapse library",
+    expandLibrary: "Expand library",
+    emptyState: "No exact match for this filter. Showing the full library instead.",
+    activeFilterLabel: "Filter",
     filterLabels: {
       Saved: "Saved",
       Hot: "Hot",
@@ -177,9 +190,16 @@ const looperCopyByLocale = {
   "zh-CN": {
     back: "返回",
     title: "循环器",
-    filter: "筛选",
-    showLess: "收起",
-    showMore: (count: number) => `显示更多（还有 ${count} 项）`,
+    workspaceEyebrow: "Looper 本体",
+    workspaceHint: "looper 固定在页面中央，右侧 Library 切换素材时不用离开当前操作页。",
+    selectorEyebrow: "Loop 选择器",
+    selectorTitle: "选择一个 loop",
+    selectorCount: (count: number) => `${count} 个 loop`,
+    selectedLoop: "当前 loop",
+    collapseLibrary: "收起 Library",
+    expandLibrary: "展开 Library",
+    emptyState: "这个筛选下没有精确结果，已回退显示全部库。",
+    activeFilterLabel: "筛选",
     filterLabels: {
       Saved: "已收藏",
       Hot: "热门",
@@ -196,36 +216,124 @@ const looperCopyByLocale = {
   },
 } as const;
 
+const libraryFilters = new Set(["Saved", "Hot", "New"]);
+
+function LooperDialGraphic() {
+  return (
+    <div className="relative aspect-square w-full max-w-[760px]">
+      <div
+        className="absolute inset-0 rounded-full"
+        style={{
+          background:
+            "linear-gradient(90deg, rgba(206,206,206,0.26) 0%, rgba(206,206,206,0.18) 49.5%, rgba(255,255,255,0.72) 50.5%, rgba(216,216,216,0.18) 100%)",
+          boxShadow:
+            "0 42px 90px rgba(15, 23, 42, 0.16), inset 0 1px 0 rgba(255,255,255,0.82)",
+        }}
+      />
+      <div
+        className="absolute inset-[17%] rounded-full"
+        style={{
+          border: "4px solid rgba(148, 148, 148, 0.16)",
+        }}
+      />
+      <div
+        className="absolute inset-[34%] rounded-full"
+        style={{
+          border: "4px solid rgba(148, 148, 148, 0.16)",
+        }}
+      />
+      <div
+        className="absolute inset-[51%] rounded-full"
+        style={{
+          border: "4px solid rgba(148, 148, 148, 0.16)",
+        }}
+      />
+      <div
+        className="absolute left-1/2 top-[13.5%] h-[36.5%] w-[0.9%] -translate-x-1/2 rounded-full"
+        style={{
+          backgroundColor: "rgba(128, 128, 128, 0.42)",
+        }}
+      />
+      <div
+        className="absolute left-1/2 top-[29%] h-[8.5%] w-[3.2%] -translate-x-1/2 rounded-full"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(136,136,136,0.34) 0%, rgba(136,136,136,0.42) 44%, rgba(255,255,255,0) 44%, rgba(255,255,255,0) 56%, rgba(136,136,136,0.42) 56%, rgba(136,136,136,0.34) 100%)",
+        }}
+      />
+      <div
+        className="absolute left-1/2 top-1/2 h-[12.5%] w-[12.5%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+        style={{
+          background:
+            "radial-gradient(circle at 32% 32%, rgba(214,214,214,0.88) 0%, rgba(182,182,182,0.82) 100%)",
+          boxShadow:
+            "0 0 0 10px rgba(170, 170, 170, 0.1), inset 0 0 0 2px rgba(128,128,128,0.2)",
+        }}
+      />
+    </div>
+  );
+}
+
 export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
   const locale = useEntranceLocale();
   const copy = looperCopyByLocale[locale];
   const [activeFilter, setActiveFilter] = useState("Hot");
-  const [showAll, setShowAll] = useState(false);
-  const INITIAL_VISIBLE_COUNT = 9;
+  const [selectedTrackId, setSelectedTrackId] = useState(tracks[0]?.id ?? "");
+  const [libraryCollapsed, setLibraryCollapsed] = useState(false);
 
   useEffect(() => {
     setActiveFilter(filters.includes(initialFilter) ? initialFilter : "Hot");
-    setShowAll(false);
   }, [initialFilter]);
 
   const filteredTracks = useMemo(() => {
-    if (["Saved", "Hot", "New"].includes(activeFilter)) {
+    if (libraryFilters.has(activeFilter)) {
       return tracks;
     }
+
     return tracks.filter((track) =>
       track.tags.some((tag) => tag.toLowerCase() === activeFilter.toLowerCase()),
     );
   }, [activeFilter]);
 
-  const resultTracks = filteredTracks.length > 0 ? filteredTracks : tracks;
-  const visibleTracks = showAll
-    ? resultTracks
-    : resultTracks.slice(0, INITIAL_VISIBLE_COUNT);
-  const hiddenCount = Math.max(resultTracks.length - INITIAL_VISIBLE_COUNT, 0);
+  const hasFilterFallback =
+    !libraryFilters.has(activeFilter) && filteredTracks.length === 0;
+  const resultTracks = hasFilterFallback ? tracks : filteredTracks;
+
+  useEffect(() => {
+    if (resultTracks.length === 0) {
+      return;
+    }
+
+    if (!resultTracks.some((track) => track.id === selectedTrackId)) {
+      setSelectedTrackId(resultTracks[0].id);
+    }
+  }, [resultTracks, selectedTrackId]);
+
+  const selectedTrack =
+    resultTracks.find((track) => track.id === selectedTrackId) ??
+    resultTracks[0] ??
+    tracks[0];
+  const selectedFacts = useMemo(
+    () => selectedTrack.meta.split(",").map((item) => item.trim()).filter(Boolean),
+    [selectedTrack],
+  );
+  const activeFilterLabel =
+    copy.filterLabels[activeFilter as keyof typeof copy.filterLabels];
 
   return (
-    <section className="w-full" style={{ fontFamily: "var(--app-font-family)" }}>
-      <div className="mb-6 flex items-center justify-between">
+    <section
+      className="relative flex h-full min-h-[960px] w-full flex-col overflow-hidden"
+      style={{
+        fontFamily: "var(--app-font-family)",
+        backgroundColor: "var(--card)",
+      }}
+    >
+      <div
+        className="relative z-20 flex items-start justify-between px-6 pb-0 pt-5 xl:px-8"
+        style={{
+          backgroundColor: "transparent",
+        }}
+      >
         <button
           type="button"
           onClick={onBack}
@@ -234,155 +342,355 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
             color: "var(--foreground)",
             fontSize: "var(--text-sm)",
             fontWeight: "var(--font-weight-medium)",
-            padding: "0 14px",
-            borderRadius: 10,
-            border: "1px solid var(--border)",
-            backgroundColor: "var(--soft-surface)",
+            padding: 0,
+            height: 32,
+            border: "none",
+            backgroundColor: "transparent",
           }}
         >
           <ArrowLeft size={16} strokeWidth={1.8} />
           {copy.back}
         </button>
 
-        <h2
-          style={{
-            color: "var(--foreground)",
-            fontSize: "var(--text-xl)",
-            fontWeight: "var(--font-weight-bold)",
-          }}
-        >
-          {copy.title}
-        </h2>
-
-        <div style={{ width: 60 }} />
-      </div>
-
-      <div className="mb-6 flex items-center gap-2.5 overflow-x-auto pb-1" style={{ WebkitOverflowScrolling: "touch" }}>
-        {filters.map((filter) => {
-          const isActive = activeFilter === filter;
-          const isDrumless = filter === "Drumless Loop";
-          return (
-            <button
-              key={filter}
-              type="button"
-              onClick={() => {
-                setActiveFilter(filter);
-                setShowAll(false);
-              }}
-              className="tablet-touch-target tablet-pressable inline-flex items-center gap-1.5 whitespace-nowrap"
-              style={{
-                padding: "0 18px",
-                borderRadius: 12,
-                border: isActive ? "1px solid var(--chip-active-border)" : "1px solid var(--border)",
-                backgroundColor: isActive ? "var(--chip-active-bg)" : "var(--chip-bg)",
-                color: isActive ? "var(--chip-active-text)" : "var(--chip-text)",
-                fontSize: "var(--text-sm)",
-                fontWeight: isActive ? 700 : 500,
-                lineHeight: 1.1,
-              }}
-            >
-              {isDrumless && <CirclePlus size={15} strokeWidth={1.8} />}
-              {copy.filterLabels[filter as keyof typeof copy.filterLabels]}
-            </button>
-          );
-        })}
-
-        <button
-          type="button"
-          className="tablet-touch-target tablet-pressable ml-auto inline-flex items-center gap-2 whitespace-nowrap"
-          style={{
-            padding: "0 16px",
-            borderRadius: 12,
-            border: "1px solid var(--border)",
-            backgroundColor: "var(--chip-bg)",
-            color: "var(--chip-text)",
-            fontSize: "var(--text-sm)",
-            fontWeight: 500,
-            lineHeight: 1.1,
-          }}
-        >
-          <SlidersHorizontal size={16} strokeWidth={1.8} />
-          {copy.filter}
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-        {visibleTracks.map((track) => (
-          <button
-            key={track.id}
-            type="button"
-            className="tablet-pressable tablet-hover-fade relative overflow-hidden text-left"
+        <div className="text-center">
+          <p
             style={{
-              borderRadius: "var(--radius-card)",
-              minHeight: 250,
-              border: "1px solid var(--border)",
-              backgroundColor: "var(--card)",
-              isolation: "isolate",
+              margin: 0,
+              color: "var(--secondary)",
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
             }}
           >
-            <ImageWithFallback
-              src={track.imageUrl}
-              alt={track.title}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
+            {copy.workspaceEyebrow}
+          </p>
+          <h2
+            style={{
+              margin: "4px 0 0",
+              color: "var(--foreground)",
+              fontSize: "clamp(22px, 2vw, 28px)",
+              fontWeight: "var(--font-weight-bold)",
+            }}
+          >
+            {copy.title}
+          </h2>
+        </div>
 
-            <div
-              className="absolute inset-x-0 bottom-0 z-10"
-              style={{
-                padding: "16px 20px",
-                backgroundColor: "var(--image-overlay-footer)",
-                backdropFilter: "blur(2px)",
-              }}
-            >
+        <div style={{ width: 52 }} />
+      </div>
+
+      <div className="relative min-h-0 flex-1 overflow-hidden">
+        <div className="absolute inset-0 flex min-h-0 items-center justify-center overflow-hidden px-4 py-8 xl:px-8 xl:py-10">
+          <div className="relative z-10 flex h-full w-full max-w-[1120px] flex-col items-center justify-center">
+            <LooperDialGraphic />
+
+            <div className="mt-8 flex max-w-[720px] flex-col items-center gap-3 text-center">
               <h3
                 style={{
-                  color: "var(--on-image-primary)",
-                  fontSize: "clamp(30px, 1.8vw, 40px)",
+                  margin: 0,
+                  color: "var(--foreground)",
+                  fontSize: "clamp(32px, 3.4vw, 56px)",
                   fontWeight: "var(--font-weight-bold)",
-                  lineHeight: 1.08,
-                  marginBottom: 4,
+                  lineHeight: 0.96,
                 }}
               >
-                {track.title}
+                {selectedTrack.title}
               </h3>
               <p
                 style={{
-                  color: "var(--on-image-secondary)",
-                  fontSize: "var(--text-sm)",
-                  fontWeight: "var(--font-weight-medium)",
-                  lineHeight: 1.2,
                   margin: 0,
+                  color: "var(--secondary)",
+                  fontSize: "var(--text-sm)",
+                  fontWeight: 600,
+                  lineHeight: 1.5,
                 }}
               >
-                {track.meta}
+                {copy.workspaceHint}
               </p>
+              <div className="flex flex-wrap items-center justify-center gap-2.5">
+                {selectedFacts.map((fact) => (
+                  <span
+                    key={fact}
+                    className="rounded-full px-4 py-2"
+                    style={{
+                      border: "1px solid rgba(148, 163, 184, 0.16)",
+                      backgroundColor: "var(--card)",
+                      color: "var(--foreground)",
+                      fontSize: 12,
+                      fontWeight: 700,
+                    }}
+                  >
+                    {fact}
+                  </span>
+                ))}
+              </div>
             </div>
-          </button>
-        ))}
-      </div>
+          </div>
+        </div>
 
-      {resultTracks.length > INITIAL_VISIBLE_COUNT && (
-        <div className="flex justify-center" style={{ marginTop: "var(--spacing-6, 24px)" }}>
-          <button
-            type="button"
-            onClick={() => setShowAll((prev) => !prev)}
-            className="tablet-touch-target tablet-pressable tablet-hover-fade"
+        <aside
+          className="absolute inset-y-0 right-0 z-20 flex min-h-[420px] flex-col border-l px-4 py-5 xl:min-h-0 xl:px-5 xl:py-6"
+          style={{
+            borderColor: "var(--border)",
+            backgroundColor: "var(--card)",
+            width: libraryCollapsed ? 104 : 399,
+            transition: "width 220ms ease",
+          }}
+        >
+          <div className="mb-4 flex items-start justify-between gap-3">
+            {libraryCollapsed ? (
+              <div className="flex min-h-[48px] flex-1 items-center justify-center">
+                <span
+                  style={{
+                    color: "var(--secondary)",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: "0.16em",
+                    textTransform: "uppercase",
+                    writingMode: "vertical-rl",
+                    textOrientation: "mixed",
+                  }}
+                >
+                  Loop
+                </span>
+              </div>
+            ) : (
+              <div>
+                <p
+                  style={{
+                    margin: 0,
+                    color: "var(--secondary)",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {copy.selectorEyebrow}
+                </p>
+                <h3
+                  style={{
+                    margin: "8px 0 4px",
+                    color: "var(--foreground)",
+                    fontSize: 20,
+                    fontWeight: "var(--font-weight-bold)",
+                    lineHeight: 1.08,
+                  }}
+                >
+                  {copy.selectorTitle}
+                </h3>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2">
+              {libraryCollapsed ? null : (
+                <span
+                  className="rounded-full border px-3 py-1.5"
+                  style={{
+                    borderColor: "rgba(148, 163, 184, 0.12)",
+                    color: "var(--secondary)",
+                    fontSize: 11,
+                    fontWeight: 700,
+                  }}
+                >
+                  {copy.selectorCount(resultTracks.length)}
+                </span>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setLibraryCollapsed((prev) => !prev)}
+                className="tablet-touch-target tablet-pressable inline-flex items-center justify-center rounded-full"
+                aria-label={libraryCollapsed ? copy.expandLibrary : copy.collapseLibrary}
+                title={libraryCollapsed ? copy.expandLibrary : copy.collapseLibrary}
+                style={{
+                  width: 38,
+                  height: 38,
+                  border: "1px solid var(--border)",
+                  backgroundColor: "var(--soft-surface)",
+                  color: "var(--foreground)",
+                }}
+              >
+                {libraryCollapsed ? (
+                  <PanelRightOpen size={16} strokeWidth={1.8} />
+                ) : (
+                  <PanelRightClose size={16} strokeWidth={1.8} />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {libraryCollapsed ? null : (
+            <>
+              <p
+                style={{
+                  margin: 0,
+                  color: "var(--secondary)",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                }}
+              >
+                {copy.activeFilterLabel}: {activeFilterLabel}
+              </p>
+              <div
+                className="mt-4 flex gap-3 overflow-x-auto pb-2"
+                style={{ WebkitOverflowScrolling: "touch" }}
+              >
+                {filters.map((filter) => {
+                  const isActive = activeFilter === filter;
+                  const isDrumless = filter === "Drumless Loop";
+                  return (
+                    <button
+                      key={filter}
+                      type="button"
+                      onClick={() => setActiveFilter(filter)}
+                      className="tablet-touch-target tablet-pressable inline-flex h-[56px] shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-full border px-7"
+                      style={{
+                        borderColor: isActive
+                          ? "var(--chip-active-border)"
+                          : "rgba(148, 163, 184, 0.18)",
+                        backgroundColor: isActive ? "var(--chip-active-bg)" : "var(--chip-bg)",
+                        color: isActive ? "var(--chip-active-text)" : "var(--chip-text)",
+                        fontSize: 13,
+                        fontWeight: isActive ? 700 : 600,
+                        minWidth: 88,
+                      }}
+                    >
+                      {isDrumless ? <CirclePlus size={14} strokeWidth={1.8} /> : null}
+                      {copy.filterLabels[filter as keyof typeof copy.filterLabels]}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {hasFilterFallback ? (
+                <div
+                  className="mt-4 rounded-[20px] border px-4 py-3"
+                  style={{
+                    borderColor: "rgba(245, 158, 11, 0.24)",
+                    backgroundColor: "rgba(245, 158, 11, 0.08)",
+                    color: "var(--foreground)",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    lineHeight: 1.45,
+                  }}
+                >
+                  {copy.emptyState}
+                </div>
+              ) : null}
+            </>
+          )}
+
+          <div
+            className="flex min-h-0 flex-1 flex-col overflow-y-auto pr-1"
             style={{
-              backgroundColor: "transparent",
-              color: "var(--foreground)",
-              fontSize: "var(--text-sm)",
-              fontWeight: "var(--font-weight-medium)",
-              fontFamily: "var(--app-font-family)",
-              padding: "0 24px",
-              borderRadius: "var(--radius-full, 9999px)",
-              border: "1px solid var(--border)",
-              letterSpacing: "0.04em",
+              maxHeight: "100%",
+              marginTop: libraryCollapsed ? 8 : 16,
+              gap: libraryCollapsed ? 10 : 8,
             }}
           >
-            {showAll ? copy.showLess : copy.showMore(hiddenCount)}
-          </button>
-        </div>
-      )}
+            {resultTracks.map((track) => {
+              const isSelected = track.id === selectedTrack.id;
+
+              return (
+                <button
+                  key={track.id}
+                  type="button"
+                  onClick={() => setSelectedTrackId(track.id)}
+                  className="tablet-pressable text-left"
+                  style={{
+                    borderRadius: libraryCollapsed ? 16 : 20,
+                    border: "none",
+                    backgroundColor: isSelected
+                      ? "var(--soft-surface-strong)"
+                      : "transparent",
+                    boxShadow: isSelected
+                      ? "inset 0 0 0 1px color-mix(in srgb, var(--foreground) 12%, transparent)"
+                      : "none",
+                    padding: libraryCollapsed ? 6 : "10px 10px 10px 12px",
+                  }}
+                >
+                  <div
+                    className={
+                      libraryCollapsed
+                        ? "flex items-center justify-center"
+                        : "flex items-center gap-3"
+                    }
+                  >
+                    <div
+                      className="relative overflow-hidden"
+                      style={{
+                        borderRadius: libraryCollapsed ? 14 : 16,
+                        minHeight: libraryCollapsed ? 68 : 52,
+                        width: libraryCollapsed ? "100%" : 52,
+                        flexShrink: 0,
+                        backgroundColor: "var(--soft-surface)",
+                      }}
+                    >
+                      <ImageWithFallback
+                        src={track.imageUrl}
+                        alt={track.title}
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          background:
+                            "linear-gradient(180deg, rgba(15,23,42,0) 30%, rgba(15,23,42,0.54) 100%)",
+                        }}
+                      />
+                    </div>
+
+                    {libraryCollapsed ? null : (
+                      <div className="min-w-0">
+                      <div className="flex items-center gap-3">
+                        <div className="min-w-0 flex-1">
+                          <h4
+                            className="truncate"
+                            style={{
+                              margin: 0,
+                              color: "var(--foreground)",
+                              fontSize: 15,
+                              fontWeight: "var(--font-weight-bold)",
+                              lineHeight: 1.1,
+                            }}
+                          >
+                            {track.title}
+                          </h4>
+                          <p
+                            className="truncate"
+                            style={{
+                              margin: "4px 0 0",
+                              color: "var(--secondary)",
+                              fontSize: 12,
+                              fontWeight: 600,
+                              lineHeight: 1.35,
+                            }}
+                          >
+                            {track.meta}
+                          </p>
+                        </div>
+
+                        <div className="ml-auto flex items-center justify-end">
+                          <ChevronRight
+                            size={16}
+                            strokeWidth={1.8}
+                            style={{ color: "var(--secondary)", flexShrink: 0 }}
+                          />
+                        </div>
+                      </div>
+                      </div>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </aside>
+      </div>
     </section>
   );
 }
