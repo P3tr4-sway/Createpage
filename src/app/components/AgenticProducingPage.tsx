@@ -19,7 +19,6 @@ import {
   Repeat,
   MicOff,
   SlidersHorizontal,
-  Trash2,
   AudioWaveform,
 } from "lucide-react";
 
@@ -208,7 +207,7 @@ type MusicianTarget = {
   trackMatch: string;
 };
 
-type OverlayMenu = "target" | "style" | "mode" | null;
+type OverlayMenu = "target" | "mode" | null;
 
 type ProducerMessage = {
   id: string;
@@ -284,17 +283,14 @@ const musicianTargets: MusicianTarget[] = [
 const agentModeOptions: Array<{
   id: AgentMode;
   label: string;
-  description: string;
 }> = [
   {
     id: "musician",
     label: "AI Musician",
-    description: "Generate focused parts on a chosen role.",
   },
   {
     id: "producer",
     label: "AI Producer",
-    description: "Chat through structure, direction, and next steps.",
   },
 ];
 
@@ -302,7 +298,7 @@ const initialProducerMessages: ProducerMessage[] = [
   {
     id: "producer-intro",
     role: "agent",
-    text: "I can guide arrangement, assign AI musicians, and keep the session queue moving while you stay inside the timeline.",
+    text: "Tell me the section, mood, or next move. I will turn it into a concrete pass and route it to the right AI musician.",
     timestamp: "Ready",
   },
 ];
@@ -358,15 +354,6 @@ const initialGenerationHistory: GenerationHistoryItem[] = [
   },
 ];
 
-const styleOptions = [
-  "Neo Soul",
-  "Indie Pop",
-  "Afrobeat",
-  "Synthwave",
-  "House",
-  "Cinematic",
-];
-
 export function AgenticProducingPage({
   onBack,
   previewMode = false,
@@ -385,7 +372,7 @@ export function AgenticProducingPage({
   const [openOverlayMenu, setOpenOverlayMenu] = useState<OverlayMenu>(null);
   const [musicianTargetId, setMusicianTargetId] =
     useState<MusicianTargetId>("ai-drummer");
-  const [styleIndex, setStyleIndex] = useState(0);
+  const [styleDraft, setStyleDraft] = useState("");
   const [lyricsDraft, setLyricsDraft] = useState(
     "Falling through the city lights, give me a slow-burn chorus with space.",
   );
@@ -425,7 +412,7 @@ export function AgenticProducingPage({
   const selectedTrack = tracks.find((track) => track.id === selectedTrackId) ?? tracks[0];
   const selectedMusicianTarget =
     musicianTargets.find((target) => target.id === musicianTargetId) ?? musicianTargets[0];
-  const selectedStyle = styleOptions[styleIndex];
+  const selectedStyle = styleDraft.trim() || "Freeform";
   const producerWorkspaceVisible = showAgentOverlay && agentMode === "producer" && producerWorkspaceOpen;
 
   useEffect(() => {
@@ -543,7 +530,7 @@ export function AgenticProducingPage({
       {
         id: createUiId("message"),
         role: "agent",
-        text: `I’m steering this into a ${selectedStyle} session. First move: ${selectedMusicianTarget.label} owns the next pass while I keep the queue and generation history synchronized on the right.`,
+        text: `Locked. I am shaping this into a ${selectedStyle} direction and sending the next pass to ${selectedMusicianTarget.label}. Queue and recent outputs stay visible on the right.`,
         timestamp: "Just now",
       },
     ]);
@@ -694,6 +681,7 @@ export function AgenticProducingPage({
               <button
                 type="button"
                 onClick={onBack}
+                aria-label="Close DAW"
                 className="tablet-icon-target tablet-pressable inline-flex items-center justify-center"
                 style={{
                   width: 44,
@@ -728,6 +716,7 @@ export function AgenticProducingPage({
             <div className="flex items-center gap-2">
               <button
                 type="button"
+                aria-label="Undo"
                 className="tablet-icon-target tablet-pressable inline-flex items-center justify-center"
                 style={toolbarIconStyle}
               >
@@ -735,6 +724,7 @@ export function AgenticProducingPage({
               </button>
               <button
                 type="button"
+                aria-label="Import audio"
                 className="tablet-icon-target tablet-pressable inline-flex items-center justify-center"
                 style={toolbarIconStyle}
               >
@@ -793,18 +783,8 @@ export function AgenticProducingPage({
                   <div>
                     <div
                       style={{
-                        color: "var(--agentic-track-title)",
-                        fontSize: previewMode ? 14 : 16,
-                        fontWeight: 700,
-                      }}
-                    >
-                      Arrangement
-                    </div>
-                    <div
-                      style={{
                         color: "var(--agentic-muted)",
                         fontSize: previewMode ? 11 : 12,
-                        marginTop: 2,
                       }}
                     >
                       {totalBars} bars • {tempo} BPM • {tracks.length} tracks
@@ -814,13 +794,14 @@ export function AgenticProducingPage({
                   <button
                     type="button"
                     onClick={addTrack}
+                    aria-label="Add track"
                     className="tablet-touch-target tablet-pressable inline-flex items-center justify-center"
                     style={{
                       width: previewMode ? 28 : 32,
                       height: previewMode ? 28 : 32,
                       borderRadius: 10,
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      backgroundColor: "rgba(255,255,255,0.04)",
+                      border: "none",
+                      backgroundColor: "transparent",
                       color: "var(--agentic-contrast)",
                     }}
                   >
@@ -925,10 +906,11 @@ export function AgenticProducingPage({
                             <button
                               type="button"
                               onClick={() => toggleMuted(track.id)}
+                              aria-label={`${isMuted ? "Unmute" : "Mute"} ${track.name}`}
                               style={{
                                 ...trackTogglePillStyle,
-                                width: previewMode ? 32 : 36,
-                                height: previewMode ? 32 : 36,
+                                width: 44,
+                                height: 44,
                                 backgroundColor: isMuted
                                   ? "rgba(239, 68, 68, 0.22)"
                                   : "rgba(255,255,255,0.06)",
@@ -942,10 +924,11 @@ export function AgenticProducingPage({
                             <button
                               type="button"
                               onClick={() => toggleSolo(track.id)}
+                              aria-label={`${isSolo ? "Disable solo for" : "Solo"} ${track.name}`}
                               style={{
                                 ...trackTogglePillStyle,
-                                width: previewMode ? 32 : 36,
-                                height: previewMode ? 32 : 36,
+                                width: 44,
+                                height: 44,
                                 backgroundColor: isSolo
                                   ? "rgba(250, 204, 21, 0.24)"
                                   : "rgba(255,255,255,0.06)",
@@ -955,19 +938,6 @@ export function AgenticProducingPage({
                               }}
                             >
                               S
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => deleteTrack(track.id)}
-                              disabled={tracks.length <= 1}
-                              style={{
-                                ...trackMoreStyle,
-                                width: previewMode ? 34 : 38,
-                                height: previewMode ? 34 : 38,
-                                opacity: tracks.length <= 1 ? 0.45 : 1,
-                              }}
-                            >
-                              <Trash2 size={previewMode ? 15 : 16} strokeWidth={2.1} />
                             </button>
                           </div>
                         </div>
@@ -1006,7 +976,8 @@ export function AgenticProducingPage({
                         top: 0,
                         bottom: 0,
                         width: 1,
-                        backgroundColor: "rgba(255,255,255,0.22)",
+                        backgroundColor: "var(--agentic-border-strong)",
+                        zIndex: 1,
                       }}
                     />
                     {Array.from({ length: totalBars }, (_, barIndex) => {
@@ -1031,12 +1002,9 @@ export function AgenticProducingPage({
                               left: previewMode ? 10 : 14,
                               top: previewMode ? 9 : 13,
                               zIndex: 2,
-                              color:
-                                label === 1
-                                  ? "#F8FAFC"
-                                  : "rgba(226,232,240,0.78)",
+                              color: "rgba(226,232,240,0.78)",
                               fontSize: previewMode ? 12 : 15,
-                              fontWeight: label === 1 ? 700 : 600,
+                              fontWeight: 600,
                               textShadow: "0 1px 0 rgba(0,0,0,0.3)",
                             }}
                           >
@@ -1110,7 +1078,8 @@ export function AgenticProducingPage({
                               top: 0,
                               bottom: 0,
                               width: 1,
-                              backgroundColor: "rgba(255,255,255,0.18)",
+                              backgroundColor: "rgba(255,255,255,0.16)",
+                              zIndex: 1,
                             }}
                           />
                           {rowIndex % 2 === 1 ? (
@@ -1199,8 +1168,8 @@ export function AgenticProducingPage({
                       left: playheadViewportX,
                       top: 0,
                       bottom: 0,
-                      width: 20,
-                      transform: "translateX(-10px)",
+                      width: 44,
+                      transform: "translateX(-22px)",
                       background: "transparent",
                       border: "none",
                       padding: 0,
@@ -1265,13 +1234,13 @@ export function AgenticProducingPage({
                 </div>
 
                 <div className="flex items-center" style={{ gap: previewMode ? 8 : 10 }}>
-                  <button type="button" style={bottomIconStyle}>
+                  <button type="button" style={bottomIconStyle} aria-label="Waveform tools">
                     <AudioWaveform size={20} strokeWidth={1.8} />
                   </button>
-                  <button type="button" style={bottomIconStyle}>
+                  <button type="button" style={bottomIconStyle} aria-label="Microphone monitor">
                     <MicOff size={20} strokeWidth={1.8} />
                   </button>
-                  <button type="button" style={bottomIconStyle}>
+                  <button type="button" style={bottomIconStyle} aria-label="Mixer controls">
                     <SlidersHorizontal size={20} strokeWidth={1.8} />
                   </button>
                 </div>
@@ -1281,6 +1250,7 @@ export function AgenticProducingPage({
                 <button
                   type="button"
                   onClick={() => seekToBeat(0)}
+                  aria-label="Return to start"
                   style={transportStyle}
                 >
                   <SkipBack size={previewMode ? 20 : 24} strokeWidth={2.1} />
@@ -1293,6 +1263,7 @@ export function AgenticProducingPage({
                     }
                     setIsPlaying((prev) => !prev);
                   }}
+                  aria-label={isPlaying ? "Pause playback" : "Start playback"}
                   style={{
                     ...transportStyle,
                     width: previewMode ? 52 : 58,
@@ -1310,6 +1281,7 @@ export function AgenticProducingPage({
                 </button>
                 <button
                   type="button"
+                  aria-label="Record"
                   style={{ ...transportStyle, color: "var(--agentic-danger)" }}
                 >
                   <Circle size={previewMode ? 18 : 22} fill="currentColor" strokeWidth={2} />
@@ -1346,20 +1318,20 @@ export function AgenticProducingPage({
 
           {showAgentOverlay ? (
             <>
-              {producerWorkspaceVisible ? (
-                <div style={producerWorkspaceShellStyle(bottomTransportHeight)}>
-                  <div style={{ pointerEvents: "auto" }}>
-                    <ProducerWorkspacePanel
-                      messages={producerMessages}
-                      audioQueue={audioQueue}
-                      generationHistory={generationHistory}
-                      onClose={() => setProducerWorkspaceOpen(false)}
-                    />
-                  </div>
-                </div>
-              ) : null}
-
               <div style={overlayDockShellStyle(bottomTransportHeight)}>
+                {producerWorkspaceVisible ? (
+                  <div style={producerWorkspacePopoverStyle}>
+                    <div style={{ height: "100%", pointerEvents: "auto" }}>
+                      <ProducerWorkspacePanel
+                        messages={producerMessages}
+                        audioQueue={audioQueue}
+                        generationHistory={generationHistory}
+                        onClose={() => setProducerWorkspaceOpen(false)}
+                      />
+                    </div>
+                  </div>
+                ) : null}
+
                 <div
                   ref={overlayDockRef}
                   className="flex items-end"
@@ -1370,14 +1342,10 @@ export function AgenticProducingPage({
                       openMenu={openOverlayMenu}
                       targets={musicianTargets}
                       selectedTarget={selectedMusicianTarget}
-                      selectedStyle={selectedStyle}
-                      styleOptions={styleOptions}
+                      styleDraft={styleDraft}
                       lyricsDraft={lyricsDraft}
                       onTargetToggle={() =>
                         setOpenOverlayMenu((prev) => (prev === "target" ? null : "target"))
-                      }
-                      onStyleToggle={() =>
-                        setOpenOverlayMenu((prev) => (prev === "style" ? null : "style"))
                       }
                       onModeToggle={() =>
                         setOpenOverlayMenu((prev) => (prev === "mode" ? null : "mode"))
@@ -1386,10 +1354,7 @@ export function AgenticProducingPage({
                         setMusicianTargetId(targetId);
                         setOpenOverlayMenu(null);
                       }}
-                      onSelectStyle={(nextIndex) => {
-                        setStyleIndex(nextIndex);
-                        setOpenOverlayMenu(null);
-                      }}
+                      onStyleChange={setStyleDraft}
                       onLyricsChange={setLyricsDraft}
                       onGenerate={handleMusicianGenerate}
                       onSelectMode={selectAgentMode}
@@ -1402,6 +1367,10 @@ export function AgenticProducingPage({
                       openMenu={openOverlayMenu}
                       onDraftChange={setProducerDraft}
                       onDraftSubmit={handleProducerSubmit}
+                      onOpenWorkspace={() => {
+                        setOpenOverlayMenu(null);
+                        setProducerWorkspaceOpen(true);
+                      }}
                       onModeToggle={() =>
                         setOpenOverlayMenu((prev) => (prev === "mode" ? null : "mode"))
                       }
@@ -1423,15 +1392,13 @@ interface MusicianComposerBarProps {
   openMenu: OverlayMenu;
   targets: MusicianTarget[];
   selectedTarget: MusicianTarget;
-  selectedStyle: string;
-  styleOptions: string[];
+  styleDraft: string;
   lyricsDraft: string;
   currentMode: AgentMode;
   onTargetToggle: () => void;
-  onStyleToggle: () => void;
   onModeToggle: () => void;
   onSelectTarget: (targetId: MusicianTargetId) => void;
-  onSelectStyle: (styleIndex: number) => void;
+  onStyleChange: (value: string) => void;
   onLyricsChange: (value: string) => void;
   onGenerate: () => void;
   onSelectMode: (mode: AgentMode) => void;
@@ -1441,23 +1408,28 @@ function MusicianComposerBar({
   openMenu,
   targets,
   selectedTarget,
-  selectedStyle,
-  styleOptions,
+  styleDraft,
   lyricsDraft,
   currentMode,
   onTargetToggle,
-  onStyleToggle,
   onModeToggle,
   onSelectTarget,
-  onSelectStyle,
+  onStyleChange,
   onLyricsChange,
   onGenerate,
   onSelectMode,
 }: MusicianComposerBarProps) {
   return (
     <div className="flex-1" style={overlayBarStyle}>
-      <div className="flex flex-wrap items-center" style={{ gap: 14 }}>
-        <div style={{ ...overlayFieldWrapStyle, flex: "0 0 220px", position: "relative" }}>
+      <div className="flex items-center" style={{ gap: 14 }}>
+        <div className="flex items-center" style={{ flex: "1 1 auto", gap: 14, minWidth: 0 }}>
+          <div
+            style={{
+              ...overlayFieldWrapStyle,
+              flex: selectedTarget.showsLyrics ? "0 0 220px" : "1 1 0",
+              position: "relative",
+            }}
+          >
           <button
             type="button"
             onClick={onTargetToggle}
@@ -1488,84 +1460,53 @@ function MusicianComposerBar({
                       color: "var(--foreground)",
                     }}
                   >
-                    <span>
-                      <span style={{ display: "block" }}>{target.label}</span>
-                      <span style={overlayMenuMetaStyle}>{target.helper}</span>
-                    </span>
+                    <span>{target.label}</span>
                     {isActive ? <span style={overlayMenuDotStyle} /> : null}
                   </button>
                 );
               })}
             </div>
           ) : null}
-        </div>
+          </div>
 
-        <div style={{ ...overlayFieldWrapStyle, flex: "0 0 220px", position: "relative" }}>
-          <button
-            type="button"
-            onClick={onStyleToggle}
-            className="flex items-center justify-between"
-            style={overlayFieldButtonStyle}
+          <div
+            style={{
+              ...overlayFieldWrapStyle,
+              flex: selectedTarget.showsLyrics ? "0 0 220px" : "1 1 0",
+            }}
           >
-            <span>
+            <label style={{ ...overlayLyricsFieldStyle, display: "flex", flexDirection: "column", justifyContent: "center" }}>
               <span style={overlayFieldLabelStyle}>Style</span>
-              <span style={overlayFieldValueStyle}>{selectedStyle}</span>
-            </span>
-            <ChevronDown size={18} strokeWidth={2} />
-          </button>
+              <input
+                type="text"
+                value={styleDraft}
+                onChange={(event) => onStyleChange(event.target.value)}
+                placeholder="Enter a style"
+                className="min-w-0 bg-transparent outline-none"
+                style={overlayTextFieldInputStyle}
+              />
+            </label>
+          </div>
 
-          {openMenu === "style" ? (
-            <div style={overlayMenuStyle}>
-              <div style={overlayMenuTitleStyle}>Style</div>
-              {styleOptions.map((styleOption, index) => {
-                const isActive = styleOption === selectedStyle;
-                return (
-                  <button
-                    key={styleOption}
-                    type="button"
-                    onClick={() => onSelectStyle(index)}
-                    className="flex w-full items-center justify-between text-left"
-                    style={{
-                      ...overlayMenuItemStyle,
-                      backgroundColor: isActive ? "var(--soft-surface-strong)" : "transparent",
-                      color: "var(--foreground)",
-                    }}
-                  >
-                    <span>{styleOption}</span>
-                    {isActive ? <span style={overlayMenuDotStyle} /> : null}
-                  </button>
-                );
-              })}
-            </div>
+          {selectedTarget.showsLyrics ? (
+            <label style={{ ...overlayFieldWrapStyle, ...overlayLyricsFieldStyle, flex: "1 1 320px" }}>
+              <span style={overlayFieldLabelStyle}>Lyrics</span>
+              <textarea
+                value={lyricsDraft}
+                onChange={(event) => onLyricsChange(event.target.value)}
+                rows={1}
+                placeholder="Shape the topline or paste a hook..."
+                style={overlayLyricsInputStyle}
+              />
+            </label>
           ) : null}
         </div>
 
-        {selectedTarget.showsLyrics ? (
-          <label style={{ ...overlayFieldWrapStyle, ...overlayLyricsFieldStyle, flex: "1 1 320px" }}>
-            <span style={overlayFieldLabelStyle}>Lyrics</span>
-            <textarea
-              value={lyricsDraft}
-              onChange={(event) => onLyricsChange(event.target.value)}
-              rows={1}
-              placeholder="Shape the topline or paste a hook..."
-              style={overlayLyricsInputStyle}
-            />
-          </label>
-        ) : null}
-
-        <div
-          className="flex items-center"
-          style={{
-            marginLeft: "auto",
-            gap: 10,
-            flex: selectedTarget.showsLyrics ? "0 0 auto" : "1 1 280px",
-            justifyContent: "flex-end",
-          }}
-        >
+        <div className="flex items-center" style={{ gap: 10, flex: "0 0 auto" }}>
           <button type="button" onClick={onGenerate} style={generateButtonStyle}>
             Generate
           </button>
-          <ModeSelector
+          <ModeToggleButton
             open={openMenu === "mode"}
             currentMode={currentMode}
             onToggle={onModeToggle}
@@ -1584,6 +1525,7 @@ interface ProducerComposerBarProps {
   currentMode: AgentMode;
   onDraftChange: (value: string) => void;
   onDraftSubmit: () => void;
+  onOpenWorkspace: () => void;
   onModeToggle: () => void;
   onSelectMode: (mode: AgentMode) => void;
 }
@@ -1595,6 +1537,7 @@ function ProducerComposerBar({
   currentMode,
   onDraftChange,
   onDraftSubmit,
+  onOpenWorkspace,
   onModeToggle,
   onSelectMode,
 }: ProducerComposerBarProps) {
@@ -1618,11 +1561,20 @@ function ProducerComposerBar({
           />
         </div>
 
+        <button
+          type="button"
+          onClick={onOpenWorkspace}
+          style={producerWorkspaceButtonStyle}
+          aria-label="Open AI Producer workspace"
+        >
+          <AudioWaveform size={18} strokeWidth={2} />
+        </button>
+
         <button type="button" onClick={onDraftSubmit} style={generateButtonStyle}>
           {workspaceOpen ? "Send" : "Start"}
         </button>
 
-        <ModeSelector
+        <ModeToggleButton
           open={openMenu === "mode"}
           currentMode={currentMode}
           onToggle={onModeToggle}
@@ -1633,50 +1585,50 @@ function ProducerComposerBar({
   );
 }
 
-interface ModeSelectorProps {
+interface ModeToggleButtonProps {
   open: boolean;
   currentMode: AgentMode;
   onToggle: () => void;
   onSelectMode: (mode: AgentMode) => void;
 }
 
-function ModeSelector({
+function ModeToggleButton({
   open,
   currentMode,
   onToggle,
   onSelectMode,
-}: ModeSelectorProps) {
+}: ModeToggleButtonProps) {
+  const currentModeLabel =
+    agentModeOptions.find((mode) => mode.id === currentMode)?.label ?? "AI Musician";
+  const nextMode = currentMode === "musician" ? "producer" : "musician";
+  const nextModeLabel =
+    agentModeOptions.find((mode) => mode.id === nextMode)?.label ?? "AI Producer";
+
   return (
     <div style={{ position: "relative", flex: "0 0 auto" }}>
-      <button type="button" onClick={onToggle} style={generateChevronStyle} aria-label="Select AI mode">
-        <ChevronDown size={18} strokeWidth={2.2} />
+      <button
+        type="button"
+        onClick={onToggle}
+        style={modeToggleButtonStyle}
+        aria-label={`Current mode ${currentModeLabel}. Open switcher.`}
+      >
+        {currentModeLabel}
       </button>
 
       {open ? (
-        <div style={{ ...overlayMenuStyle, left: "auto", right: 0, width: 264 }}>
-          <div style={overlayMenuTitleStyle}>Mode</div>
-          {agentModeOptions.map((mode) => {
-            const isActive = mode.id === currentMode;
-            return (
-              <button
-                key={mode.id}
-                type="button"
-                onClick={() => onSelectMode(mode.id)}
-                className="flex w-full items-center justify-between text-left"
-                style={{
-                  ...overlayMenuItemStyle,
-                  backgroundColor: isActive ? "var(--soft-surface-strong)" : "transparent",
-                  color: "var(--foreground)",
-                }}
-              >
-                <span>
-                  <span style={{ display: "block" }}>{mode.label}</span>
-                  <span style={overlayMenuMetaStyle}>{mode.description}</span>
-                </span>
-                {isActive ? <span style={overlayMenuDotStyle} /> : null}
-              </button>
-            );
-          })}
+        <div style={{ ...overlayMenuStyle, left: 0, right: 0, width: "100%", minWidth: 0 }}>
+          <button
+            type="button"
+            onClick={() => onSelectMode(nextMode)}
+            className="flex w-full items-center justify-between text-left"
+            style={{
+              ...overlayMenuItemStyle,
+              backgroundColor: "transparent",
+              color: "var(--foreground)",
+            }}
+          >
+            <span>{nextModeLabel}</span>
+          </button>
         </div>
       ) : null}
     </div>
@@ -1700,8 +1652,8 @@ function ProducerWorkspacePanel({
     <div style={producerPanelStyle}>
       <div className="flex items-center justify-between" style={producerPanelHeaderStyle}>
         <div>
-          <div style={producerPanelEyebrowStyle}>AI Producer Workspace</div>
-          <div style={producerPanelTitleStyle}>Chat on the left, queue on the right.</div>
+          <div style={producerPanelEyebrowStyle}>AI Producer</div>
+          <div style={producerPanelTitleStyle}>Shape the next move for this session.</div>
         </div>
 
         <button type="button" onClick={onClose} style={producerPanelCloseStyle} aria-label="Close AI Producer workspace">
@@ -1711,11 +1663,11 @@ function ProducerWorkspacePanel({
 
       <div
         className="flex min-h-0 flex-1"
-        style={{ gap: 16, padding: 16, flexWrap: "wrap" }}
+        style={{ gap: 16, padding: 16, flexWrap: "nowrap", overflow: "hidden" }}
       >
         <div style={producerChatCardStyle}>
           <div style={producerSectionHeaderStyle}>
-            <div style={producerSectionEyebrowStyle}>Chat</div>
+            <div style={producerSectionEyebrowStyle}>Conversation</div>
             <div style={producerSectionMetaStyle}>Direction, notes, and next actions</div>
           </div>
 
@@ -1747,15 +1699,15 @@ function ProducerWorkspacePanel({
 
         <div
           className="flex min-h-0 flex-col"
-          style={{ flex: "0 0 320px", width: "min(320px, 100%)", gap: 16 }}
+          style={{ flex: "0 0 320px", width: "min(320px, 100%)", gap: 16, overflowY: "auto" }}
         >
           <div style={producerRailCardStyle}>
             <div style={producerSectionHeaderStyle}>
-              <div style={producerSectionEyebrowStyle}>Audio Queue</div>
-              <div style={producerSectionMetaStyle}>What is actively rendering now</div>
+              <div style={producerSectionEyebrowStyle}>Render Queue</div>
+              <div style={producerSectionMetaStyle}>Active and queued generations</div>
             </div>
 
-            <div className="flex flex-col" style={{ gap: 10 }}>
+            <div className="flex flex-col overflow-y-auto" style={{ gap: 10 }}>
               {audioQueue.map((item) => (
                 <div key={item.id} style={producerListItemStyle}>
                   <div className="flex items-start justify-between" style={{ gap: 12 }}>
@@ -1775,11 +1727,11 @@ function ProducerWorkspacePanel({
 
           <div style={producerRailCardStyle}>
             <div style={producerSectionHeaderStyle}>
-              <div style={producerSectionEyebrowStyle}>Generation History</div>
-              <div style={producerSectionMetaStyle}>Recent outputs and role handoffs</div>
+              <div style={producerSectionEyebrowStyle}>Recent Passes</div>
+              <div style={producerSectionMetaStyle}>Latest outputs and handoffs</div>
             </div>
 
-            <div className="flex flex-col" style={{ gap: 10 }}>
+            <div className="flex flex-col overflow-y-auto" style={{ gap: 10 }}>
               {generationHistory.map((item) => (
                 <div key={item.id} style={producerListItemStyle}>
                   <div className="flex items-start justify-between" style={{ gap: 12 }}>
@@ -1818,6 +1770,7 @@ const trackTogglePillStyle: CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
+  cursor: "pointer",
 };
 
 const trackMoreStyle: CSSProperties = {
@@ -1828,6 +1781,7 @@ const trackMoreStyle: CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
+  cursor: "pointer",
 };
 
 const bottomIconStyle: CSSProperties = {
@@ -1840,6 +1794,7 @@ const bottomIconStyle: CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
+  cursor: "pointer",
 };
 
 const transportStyle: CSSProperties = {
@@ -1852,9 +1807,11 @@ const transportStyle: CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
+  cursor: "pointer",
 };
 
 const bottomPillStyle: CSSProperties = {
+  minWidth: 44,
   height: 44,
   padding: "0 13px",
   borderRadius: 9999,
@@ -1867,6 +1824,7 @@ const bottomPillStyle: CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   gap: 6,
+  cursor: "pointer",
 };
 
 const overlayDockShellStyle = (bottomTransportHeight: number): CSSProperties => ({
@@ -1879,16 +1837,17 @@ const overlayDockShellStyle = (bottomTransportHeight: number): CSSProperties => 
   pointerEvents: "none",
 });
 
-const producerWorkspaceShellStyle = (bottomTransportHeight: number): CSSProperties => ({
+const producerWorkspacePopoverStyle: CSSProperties = {
   position: "absolute",
-  left: "50%",
-  bottom: bottomTransportHeight + 118,
-  transform: "translateX(-50%)",
-  width: "min(1120px, calc(100% - 56px))",
-  height: "min(500px, calc(100% - 164px))",
-  zIndex: 24,
+  left: 0,
+  right: 0,
+  bottom: "calc(100% + 14px)",
+  width: "100%",
+  height: "min(40vh, 360px)",
+  maxHeight: "calc(100vh - 196px)",
+  zIndex: 1,
   pointerEvents: "none",
-});
+};
 
 const overlayBarStyle: CSSProperties = {
   minHeight: 80,
@@ -1957,6 +1916,20 @@ const overlayLyricsInputStyle: CSSProperties = {
   minHeight: 20,
 };
 
+const overlayTextFieldInputStyle: CSSProperties = {
+  width: "100%",
+  border: "none",
+  background: "transparent",
+  color: "var(--foreground)",
+  fontSize: 16,
+  fontWeight: 600,
+  lineHeight: 1.25,
+  outline: "none",
+  fontFamily: "var(--app-font-family)",
+  padding: 0,
+  minHeight: 20,
+};
+
 const producerInputShellStyle: CSSProperties = {
   minHeight: 56,
   display: "flex",
@@ -1989,12 +1962,30 @@ const generateButtonStyle: CSSProperties = {
   cursor: "pointer",
 };
 
-const generateChevronStyle: CSSProperties = {
+const producerWorkspaceButtonStyle: CSSProperties = {
   width: 56,
   height: 56,
-  border: "none",
-  backgroundColor: "var(--foreground)",
-  color: "var(--background)",
+  border: "1px solid var(--border)",
+  backgroundColor: "var(--soft-surface)",
+  color: "var(--foreground)",
+  borderRadius: 18,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  cursor: "pointer",
+  flex: "0 0 auto",
+};
+
+const modeToggleButtonStyle: CSSProperties = {
+  height: 56,
+  minWidth: 176,
+  padding: "0 26px",
+  border: "1px solid var(--border)",
+  backgroundColor: "var(--soft-surface)",
+  color: "var(--foreground)",
+  fontSize: 16,
+  fontWeight: 700,
+  letterSpacing: "0",
   borderRadius: 9999,
   cursor: "pointer",
 };
@@ -2060,7 +2051,7 @@ const producerPanelStyle: CSSProperties = {
 };
 
 const producerPanelHeaderStyle: CSSProperties = {
-  padding: "16px 18px",
+  padding: "18px 22px",
   borderBottom: "1px solid var(--border)",
   backgroundColor: "var(--float-surface-muted)",
 };
@@ -2074,16 +2065,17 @@ const producerPanelEyebrowStyle: CSSProperties = {
 };
 
 const producerPanelTitleStyle: CSSProperties = {
-  marginTop: 4,
+  marginTop: 6,
   color: "var(--foreground)",
-  fontSize: 18,
+  fontSize: 20,
   fontWeight: 700,
   letterSpacing: "-0.01em",
+  lineHeight: 1.2,
 };
 
 const producerPanelCloseStyle: CSSProperties = {
-  width: 40,
-  height: 40,
+  width: 44,
+  height: 44,
   borderRadius: 9999,
   border: "1px solid var(--border)",
   backgroundColor: "var(--float-surface)",
@@ -2101,20 +2093,23 @@ const producerChatCardStyle: CSSProperties = {
   borderRadius: 22,
   border: "1px solid var(--border)",
   backgroundColor: "var(--float-surface-soft)",
-  padding: 16,
+  padding: 18,
   display: "flex",
   flexDirection: "column",
 };
 
 const producerRailCardStyle: CSSProperties = {
+  minHeight: 0,
   borderRadius: 22,
   border: "1px solid var(--border)",
   backgroundColor: "var(--float-surface-soft)",
-  padding: 14,
+  padding: 16,
+  display: "flex",
+  flexDirection: "column",
 };
 
 const producerSectionHeaderStyle: CSSProperties = {
-  marginBottom: 12,
+  marginBottom: 14,
 };
 
 const producerSectionEyebrowStyle: CSSProperties = {
@@ -2126,10 +2121,11 @@ const producerSectionEyebrowStyle: CSSProperties = {
 };
 
 const producerSectionMetaStyle: CSSProperties = {
-  marginTop: 4,
+  marginTop: 5,
   color: "var(--foreground)",
-  fontSize: 14,
+  fontSize: 15,
   fontWeight: 600,
+  lineHeight: 1.35,
 };
 
 const producerMessagesWrapStyle: CSSProperties = {
@@ -2138,28 +2134,28 @@ const producerMessagesWrapStyle: CSSProperties = {
 
 const producerAgentBubbleStyle: CSSProperties = {
   borderRadius: 14,
-  padding: "12px 14px",
+  padding: "13px 16px",
   backgroundColor: "var(--chat-agent-bg)",
   color: "var(--chat-agent-fg)",
   border: "1px solid var(--chat-agent-border)",
-  fontSize: 14,
-  lineHeight: 1.5,
+  fontSize: 15,
+  lineHeight: 1.55,
 };
 
 const producerUserBubbleStyle: CSSProperties = {
   borderRadius: 16,
-  padding: "12px 14px",
+  padding: "13px 16px",
   backgroundColor: "var(--chat-user-bg)",
   color: "var(--chat-user-fg)",
   border: "1px solid var(--chat-user-border)",
-  fontSize: 14,
-  lineHeight: 1.5,
+  fontSize: 15,
+  lineHeight: 1.55,
 };
 
 const producerMessageTimestampStyle: CSSProperties = {
   marginTop: 8,
   color: "var(--muted-foreground)",
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: 600,
 };
 
@@ -2167,12 +2163,12 @@ const producerListItemStyle: CSSProperties = {
   borderRadius: 16,
   border: "1px solid var(--border)",
   backgroundColor: "var(--float-surface)",
-  padding: "12px 12px 13px",
+  padding: "13px 14px 14px",
 };
 
 const producerListItemTitleStyle: CSSProperties = {
   color: "var(--foreground)",
-  fontSize: 14,
+  fontSize: 15,
   fontWeight: 700,
   lineHeight: 1.3,
 };
@@ -2180,15 +2176,15 @@ const producerListItemTitleStyle: CSSProperties = {
 const producerListItemMetaStyle: CSSProperties = {
   marginTop: 4,
   color: "var(--muted-foreground)",
-  fontSize: 12,
+  fontSize: 13,
   fontWeight: 500,
-  lineHeight: 1.4,
+  lineHeight: 1.45,
 };
 
 const producerListItemSubtleStyle: CSSProperties = {
   marginTop: 10,
   color: "var(--foreground)",
-  fontSize: 12,
+  fontSize: 13,
   fontWeight: 500,
   lineHeight: 1.35,
   opacity: 0.78,
@@ -2196,7 +2192,7 @@ const producerListItemSubtleStyle: CSSProperties = {
 
 const producerHistoryTimestampStyle: CSSProperties = {
   color: "var(--muted-foreground)",
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: 700,
   whiteSpace: "nowrap",
 };

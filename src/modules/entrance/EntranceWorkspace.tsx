@@ -1,7 +1,6 @@
 import {
   ArrowLeft,
   Bot,
-  ChevronRight,
   Moon,
   Repeat,
   Sparkles,
@@ -607,8 +606,8 @@ export function EntranceWorkspace() {
         onClick: () => setFullscreenView("agentic-producing"),
       },
       {
-        label: "Make a loop",
-        meta: "Lock a groove in seconds.",
+        label: "Open Looper",
+        meta: "Build a loop and lock the groove fast.",
         icon: Repeat,
         accent: "rgba(20, 184, 166, 0.18)",
         onClick: () => {
@@ -617,8 +616,8 @@ export function EntranceWorkspace() {
         },
       },
       {
-        label: "Catch a riff",
-        meta: "Save a playable idea before it goes.",
+        label: "Try a guitar riff",
+        meta: "Open a playable guitar idea and start from it.",
         icon: Sparkles,
         accent: "rgba(244, 114, 182, 0.18)",
         onClick: () => openGuitar(guitarClips[0]),
@@ -634,33 +633,65 @@ export function EntranceWorkspace() {
     [handleScrollTo, openGuitar],
   );
 
-  const continueProject = useMemo<SidebarProject>(
-    () => ({
-      id: "daw-1",
-      title: "Late Night Arrangement",
-      meta: "Edited 2h ago",
-      status: "Song draft",
-      onClick: () => setFullscreenView("agentic-producing"),
-    }),
-    [],
-  );
-
-  const sidebarUtilityActions = useMemo(
+  const sidebarProjects = useMemo<SidebarProject[]>(
     () => [
       {
-        label: "Projects",
-        onClick: () => setProjectsOpen(true),
+        id: "daw-1",
+        title: "Late Night Arrangement",
+        meta: "Edited 2h ago",
+        status: "Song draft",
+        onClick: () => setFullscreenView("agentic-producing"),
       },
       {
-        label: "Templates",
-        onClick: () => setActiveSubView("top-templates"),
+        id: "loop-1",
+        title: "Neo Soul Pocket Loop",
+        meta: "Edited yesterday",
+        status: "Looper",
+        onClick: () => {
+          setLooperInitialFilter("Hot");
+          setActiveSubView("looper");
+        },
       },
       {
-        label: "Explore",
-        onClick: () => handleScrollTo("community"),
+        id: "guitar-1",
+        title: "Dream Guitar Bed",
+        meta: "Edited yesterday",
+        status: "Guitar idea",
+        onClick: () => openGuitar(guitarClips[0]),
+      },
+      {
+        id: "template-1",
+        title: "House Drum Starter",
+        meta: "Edited 3d ago",
+        status: "Template",
+        onClick: () => openTemplate(topTemplates[8]),
+      },
+      {
+        id: "backing-1",
+        title: "Blues Club Backing Kit",
+        meta: "Edited 4d ago",
+        status: "Backing track",
+        onClick: () => {
+          setBackingTrackInitialFilter("Blues");
+          setActiveSubView("instant-backing-track");
+        },
+      },
+      {
+        id: "template-2",
+        title: "Indie Pop Writer Room",
+        meta: "Edited 5d ago",
+        status: "Template",
+        onClick: () => openTemplate(topTemplates[6]),
+      },
+      {
+        id: "guitar-2",
+        title: "Ambient Swells Notes",
+        meta: "Edited last week",
+        status: "Guitar idea",
+        onClick: () => openGuitar(guitarClips[2]),
       },
     ],
-    [handleScrollTo],
+    [openGuitar, openTemplate],
   );
 
   const quickActions = useMemo<QuickAction[]>(
@@ -856,9 +887,9 @@ export function EntranceWorkspace() {
               </div>
             </section>
 
-            <section style={sidebarSectionStyle}>
+            <section style={{ ...sidebarSectionStyle, display: "flex", minHeight: 0, flex: 1, flexDirection: "column" }}>
               <div className="mb-3 flex items-center justify-between">
-                <p style={sidebarSectionLabelStyle}>My Project</p>
+                <p style={sidebarSectionLabelStyle}>My Projects</p>
                 <button
                   type="button"
                   onClick={() => setProjectsOpen(true)}
@@ -869,21 +900,12 @@ export function EntranceWorkspace() {
                 </button>
               </div>
 
-              <SidebarContinueCard project={continueProject} />
-            </section>
-
-            <div className="mt-auto" style={sidebarFooterStyle}>
-              <p style={sidebarSectionLabelStyle}>Tools</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {sidebarUtilityActions.map((action) => (
-                  <SidebarUtilityButton
-                    key={action.label}
-                    label={action.label}
-                    onClick={action.onClick}
-                  />
+              <div className="min-h-0 flex-1 overflow-y-auto" style={sidebarProjectListStyle}>
+                {sidebarProjects.map((project) => (
+                  <SidebarProjectListItem key={project.id} project={project} />
                 ))}
               </div>
-            </div>
+            </section>
           </div>
         </div>
       </aside>
@@ -991,7 +1013,7 @@ export function EntranceWorkspace() {
                   }}
                 >
                   <span style={heroPreviewHintEyebrowStyle}>Full DAW</span>
-                  <span style={heroPreviewHintLabelStyle}>Tap anywhere to open</span>
+                  <span style={heroPreviewHintLabelStyle}>Tap anywhere to start.</span>
                 </div>
                 <div
                   aria-hidden="true"
@@ -1548,44 +1570,20 @@ function SidebarStartAction({
   );
 }
 
-function SidebarContinueCard({ project }: { project: SidebarProject }) {
+function SidebarProjectListItem({ project }: { project: SidebarProject }) {
   return (
     <button
       type="button"
       onClick={project.onClick}
-      className="tablet-touch-target tablet-pressable flex w-full items-center justify-between text-left"
-      style={sidebarContinueCardStyle}
+      className="tablet-touch-target tablet-pressable flex w-full items-start text-left"
+      style={sidebarProjectItemStyle}
     >
       <span className="min-w-0">
-        <span style={sidebarContinueTitleStyle}>{project.title}</span>
-        <span style={sidebarContinueMetaStyle}>
-          {project.meta} · {project.status}
+        <span style={sidebarProjectTitleStyle}>{project.title}</span>
+        <span style={sidebarProjectMetaStyle}>
+          {project.status} · {project.meta}
         </span>
       </span>
-      <ChevronRight
-        size={15}
-        strokeWidth={1.9}
-        style={{ color: "var(--secondary)", flexShrink: 0 }}
-      />
-    </button>
-  );
-}
-
-function SidebarUtilityButton({
-  label,
-  onClick,
-}: {
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="tablet-touch-target tablet-pressable"
-      style={sidebarUtilityButtonStyle}
-    >
-      {label}
     </button>
   );
 }
@@ -2002,50 +2000,45 @@ const sidebarActionIconStyle: CSSProperties = {
   boxShadow: "none",
 };
 
-const sidebarContinueCardStyle: CSSProperties = {
-  width: "100%",
-  minHeight: 84,
-  padding: "16px 18px",
-  borderRadius: 20,
-  border: "1px solid color-mix(in srgb, var(--border) 72%, transparent)",
-  background:
-    "linear-gradient(180deg, color-mix(in srgb, var(--surface-glass-strong) 92%, rgba(255,255,255,0.08) 8%) 0%, color-mix(in srgb, var(--surface-glass) 96%, transparent) 100%)",
-  boxShadow: "0 10px 28px rgba(0,0,0,0.05)",
+const sidebarProjectListStyle: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 4,
+  paddingRight: 2,
 };
 
-const sidebarContinueTitleStyle: CSSProperties = {
+const sidebarProjectItemStyle: CSSProperties = {
+  width: "100%",
+  minHeight: 58,
+  padding: "10px 12px",
+  borderRadius: 16,
+  border: "1px solid transparent",
+  backgroundColor: "transparent",
+  color: "var(--foreground)",
+  cursor: "pointer",
+};
+
+const sidebarProjectTitleStyle: CSSProperties = {
   display: "block",
   color: "var(--foreground)",
-  fontSize: 17,
-  fontWeight: 700,
+  fontSize: 15,
+  fontWeight: 650,
   lineHeight: 1.2,
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
 };
 
-const sidebarContinueMetaStyle: CSSProperties = {
+const sidebarProjectMetaStyle: CSSProperties = {
   display: "block",
-  marginTop: 6,
+  marginTop: 4,
   color: "var(--secondary)",
   fontSize: 12,
   fontWeight: 500,
   lineHeight: 1.35,
-};
-
-const sidebarFooterStyle: CSSProperties = {
-  marginTop: 28,
-  paddingTop: 22,
-  borderTop: "1px solid color-mix(in srgb, var(--border) 76%, transparent)",
-};
-
-const sidebarUtilityButtonStyle: CSSProperties = {
-  height: 36,
-  padding: "0 14px",
-  borderRadius: 999,
-  border: "1px solid color-mix(in srgb, var(--border) 72%, transparent)",
-  backgroundColor: "transparent",
-  color: "var(--secondary)",
-  fontSize: 12,
-  fontWeight: 700,
-  cursor: "pointer",
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
 };
 
 const topTitleStyle: CSSProperties = {
