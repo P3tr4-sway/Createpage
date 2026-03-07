@@ -650,6 +650,8 @@ export function AgenticProducingPage({
   const locale = useEntranceLocale();
   const copy = agenticCopyByLocale[locale];
   const localizedTargets = getMusicianTargetsForLocale(locale);
+  const previewInitialBeat = 6;
+  const previewPlayheadTargetRatio = 2 / 3;
   const [tracks, setTracks] = useState(() => getInitialTracksForLocale(locale));
   const [selectedTrackId, setSelectedTrackId] = useState(
     () => getInitialTracksForLocale(locale)[0].id,
@@ -676,7 +678,11 @@ export function AgenticProducingPage({
     useState<AudioQueueItem[]>(() => getInitialAudioQueueForLocale(locale));
   const [generationHistory, setGenerationHistory] =
     useState<GenerationHistoryItem[]>(() => getInitialGenerationHistoryForLocale(locale));
+  const [previewViewportWidth, setPreviewViewportWidth] = useState(() =>
+    previewMode ? 1280 : 0,
+  );
 
+  const previewRootRef = useRef<HTMLElement | null>(null);
   const timelinePaneRef = useRef<HTMLDivElement | null>(null);
   const timelineBodyRef = useRef<HTMLDivElement | null>(null);
   const overlayDockRef = useRef<HTMLDivElement | null>(null);
@@ -689,8 +695,18 @@ export function AgenticProducingPage({
   const trackRowHeight = previewMode ? 76 : 92;
   const bottomTransportHeight = previewMode ? 72 : 94;
   const pixelsPerBeat = previewMode ? 26 : 36;
-  const timelineLeadingInset = previewMode ? 20 : 36;
-  const timelineTrailingInset = previewMode ? 52 : 72;
+  const previewPlayheadViewportX = previewMode
+    ? Math.max(previewViewportWidth * previewPlayheadTargetRatio - trackPanelWidth, 0)
+    : 0;
+  const previewTimelinePaneWidth = previewMode
+    ? Math.max(previewViewportWidth - trackPanelWidth, 0)
+    : 0;
+  const timelineLeadingInset = previewMode
+    ? Math.max(20, previewPlayheadViewportX - previewInitialBeat * pixelsPerBeat)
+    : 36;
+  const timelineTrailingInset = previewMode
+    ? Math.max(52, previewTimelinePaneWidth - previewPlayheadViewportX + 24)
+    : 72;
   const beatsPerBar = 4;
   const totalBars = 24;
   const tempo = 65;
@@ -731,6 +747,27 @@ export function AgenticProducingPage({
     setAudioQueue(getInitialAudioQueueForLocale(locale));
     setGenerationHistory(getInitialGenerationHistoryForLocale(locale));
   }, [copy.defaultLyricsDraft, locale]);
+
+  useEffect(() => {
+    if (!previewMode) return;
+
+    const previewRoot = previewRootRef.current;
+    if (!previewRoot) return;
+
+    const updatePreviewViewportWidth = () => {
+      const { width } = previewRoot.getBoundingClientRect();
+      if (width > 0) {
+        setPreviewViewportWidth(width);
+      }
+    };
+
+    updatePreviewViewportWidth();
+
+    const observer = new ResizeObserver(updatePreviewViewportWidth);
+    observer.observe(previewRoot);
+
+    return () => observer.disconnect();
+  }, [previewMode]);
 
   useEffect(() => {
     const handlePointerDown = (event: PointerEvent) => {
@@ -952,6 +989,23 @@ export function AgenticProducingPage({
     if (!timelineBody) return;
 
     const markerX = timelineLeadingInset + currentBeat * pixelsPerBeat;
+    const maxScrollLeft = Math.max(
+      timelineBody.scrollWidth - timelineBody.clientWidth,
+      0,
+    );
+
+    if (previewMode) {
+      const nextScrollLeft = Math.min(
+        Math.max(markerX - previewPlayheadViewportX, 0),
+        maxScrollLeft,
+      );
+
+      if (Math.abs(timelineBody.scrollLeft - nextScrollLeft) > 1) {
+        timelineBody.scrollTo({ left: nextScrollLeft });
+      }
+      return;
+    }
+
     const viewportStart = timelineBody.scrollLeft;
     const viewportEnd = viewportStart + timelineBody.clientWidth;
     const leftPadding = 48;
@@ -964,10 +1018,19 @@ export function AgenticProducingPage({
 
     if (markerX > viewportEnd - rightPadding) {
       timelineBody.scrollTo({
-        left: Math.min(markerX - timelineBody.clientWidth + rightPadding, timelineContentWidth),
+        left: Math.min(
+          markerX - timelineBody.clientWidth + rightPadding,
+          maxScrollLeft,
+        ),
       });
     }
-  }, [currentBeat, pixelsPerBeat, timelineContentWidth, timelineLeadingInset]);
+  }, [
+    currentBeat,
+    pixelsPerBeat,
+    previewMode,
+    previewPlayheadViewportX,
+    timelineLeadingInset,
+  ]);
 
   const transportPosition = formatTransportPosition(
     currentBeat,
@@ -977,6 +1040,7 @@ export function AgenticProducingPage({
 
   return (
     <section
+      ref={previewRootRef}
       className="flex h-full w-full overflow-hidden"
       style={{
         backgroundColor: "var(--agentic-bg)",
