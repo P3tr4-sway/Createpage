@@ -333,7 +333,7 @@ export function EntranceWorkspace() {
                   <div className="flex flex-col gap-2.5">
                     {createActions.map((action) => (
                       <SidebarStartAction
-                        key={action.label}
+                        key={action.id}
                         label={action.label}
                         meta={action.meta}
                         icon={action.icon}

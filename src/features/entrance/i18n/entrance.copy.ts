@@ -1,5 +1,10 @@
 import type { Locale } from "@/features/entrance/EntranceLocaleContext";
 import type { HeroPromptSuggestion } from "../model/entrance.types";
+import type {
+  CreateActionCopy,
+  QuickActionCopy,
+  SidebarProjectCopy,
+} from "../workspace/EntranceWorkspace.types";
 
 export const LOCALE_STORAGE_KEY = "lavadaw-locale";
 
@@ -20,6 +25,51 @@ export const getInitialLocale = (): Locale => {
 
   const browserLocale = (window.navigator.languages?.[0] ?? window.navigator.language ?? "").toLowerCase();
   return browserLocale.startsWith("zh") ? "zh-CN" : "en";
+};
+
+export type EntranceWorkspaceCopy = {
+  contentTitles: Record<
+    | "home"
+    | "looper"
+    | "backingTrack"
+    | "quickActions"
+    | "topSongs"
+    | "topTemplates"
+    | "tutorials",
+    string
+  >;
+  back: string;
+  seeAll: string;
+  viewAll: string;
+  start: string;
+  myProjects: string;
+  switchToLightMode: string;
+  switchToDarkMode: string;
+  languageSelectorAriaLabel: string;
+  openFullWorkspaceAriaLabel: string;
+  sidebarHeroTitle: string;
+  sidebarHeroCopy: string;
+  heroPreviewEyebrow: string;
+  heroPreviewLabel: string;
+  heroPromptPlaceholder: string;
+  heroPromptStart: string;
+  heroPromptShowMore: string;
+  heroPromptEmpty: string;
+  heroPromptSuggestions: HeroPromptSuggestion[];
+  launchTitle: string;
+  launchDescription: string;
+  browseEyebrow: string;
+  browseTitle: string;
+  tutorialTitle: string;
+  tutorialPartUnit: string;
+  createActions: CreateActionCopy[];
+  sidebarProjects: SidebarProjectCopy[];
+  quickActions: QuickActionCopy[];
+  quickActionsHeading: string;
+  quickActionsHint: string;
+  quickActionsPageDescription: string;
+  looperLaunchTitle: string;
+  looperLaunchDescription: string;
 };
 
 export const copyByLocale = {
@@ -85,54 +135,65 @@ export const copyByLocale = {
     tutorialPartUnit: "parts",
     createActions: [
       {
+        id: "start-song",
         label: "Start a song",
         meta: "Build a full idea fast.",
       },
       {
+        id: "open-looper",
         label: "Open Looper",
         meta: "Build a loop and lock the groove fast.",
       },
       {
+        id: "try-guitar-riff",
         label: "Try a guitar riff",
         meta: "Open a playable guitar idea and start from it.",
       },
       {
+        id: "jam-vibe",
         label: "Jam a vibe",
         meta: "Start loose and explore a feeling.",
       },
     ],
     sidebarProjects: [
       {
+        id: "late-night-arrangement",
         title: "Late Night Arrangement",
         meta: "Edited 2h ago",
         status: "Song draft",
       },
       {
+        id: "neo-soul-pocket-loop",
         title: "Neo Soul Pocket Loop",
         meta: "Edited yesterday",
         status: "Looper",
       },
       {
+        id: "dream-guitar-bed",
         title: "Dream Guitar Bed",
         meta: "Edited yesterday",
         status: "Guitar idea",
       },
       {
+        id: "house-drum-starter",
         title: "House Drum Starter",
         meta: "Edited 3d ago",
         status: "Template",
       },
       {
+        id: "blues-club-backing-kit",
         title: "Blues Club Backing Kit",
         meta: "Edited 4d ago",
         status: "Backing track",
       },
       {
+        id: "indie-pop-writer-room",
         title: "Indie Pop Writer Room",
         meta: "Edited 5d ago",
         status: "Template",
       },
       {
+        id: "ambient-swells-notes",
         title: "Ambient Swells Notes",
         meta: "Edited last week",
         status: "Guitar idea",
@@ -140,31 +201,37 @@ export const copyByLocale = {
     ],
     quickActions: [
       {
+        id: "make-song",
         title: "Make a Song",
         meta: "Open the full workspace and start arranging immediately.",
         tag: "Song",
       },
       {
+        id: "jam-right-now",
         title: "Jam Right Now",
         meta: "Jump to the AI jam prompt and start with a vibe.",
         tag: "Jam",
       },
       {
+        id: "start-rock-loop",
         title: "Start a Rock Loop",
         meta: "Open Looper with a rock-ready filter and browse fast riffs.",
         tag: "Rock",
       },
       {
+        id: "start-blues-jam",
         title: "Start a Blues Jam",
         meta: "Open backing tracks already pointed at blues-friendly grooves.",
         tag: "Blues",
       },
       {
+        id: "make-hip-hop-idea",
         title: "Make a Hip-Hop Idea",
         meta: "Launch a trap and hip-hop leaning starter session.",
         tag: "Hip-Hop",
       },
       {
+        id: "solo-guitar-take",
         title: "Solo a Guitar Take",
         meta: "Open a featured guitar clip and jump into a lead-focused flow.",
         tag: "Guitar",
@@ -238,54 +305,65 @@ export const copyByLocale = {
     tutorialPartUnit: "节",
     createActions: [
       {
+        id: "start-song",
         label: "开始一首歌",
         meta: "快速搭起一个完整想法。",
       },
       {
+        id: "open-looper",
         label: "打开循环器",
         meta: "快速做一个 loop，把 groove 锁住。",
       },
       {
+        id: "try-guitar-riff",
         label: "试试吉他 riff",
         meta: "打开一个可演奏的吉他灵感直接开始。",
       },
       {
+        id: "jam-vibe",
         label: "来段即兴 vibe",
         meta: "轻松起步，先探索一种感觉。",
       },
     ],
     sidebarProjects: [
       {
+        id: "late-night-arrangement",
         title: "深夜编曲",
         meta: "2 小时前编辑",
         status: "歌曲草稿",
       },
       {
+        id: "neo-soul-pocket-loop",
         title: "Neo Soul 律动 Loop",
         meta: "昨天编辑",
         status: "循环器",
       },
       {
+        id: "dream-guitar-bed",
         title: "梦境吉他铺底",
         meta: "昨天编辑",
         status: "吉他灵感",
       },
       {
+        id: "house-drum-starter",
         title: "House 鼓组起步模板",
         meta: "3 天前编辑",
         status: "模板",
       },
       {
+        id: "blues-club-backing-kit",
         title: "布鲁斯俱乐部伴奏包",
         meta: "4 天前编辑",
         status: "伴奏",
       },
       {
+        id: "indie-pop-writer-room",
         title: "独立流行写作房",
         meta: "5 天前编辑",
         status: "模板",
       },
       {
+        id: "ambient-swells-notes",
         title: "环境音 Swells 记录",
         meta: "上周编辑",
         status: "吉他灵感",
@@ -293,31 +371,37 @@ export const copyByLocale = {
     ],
     quickActions: [
       {
+        id: "make-song",
         title: "做一首歌",
         meta: "直接打开完整工作区，立刻开始编排。",
         tag: "歌曲",
       },
       {
+        id: "jam-right-now",
         title: "立刻 Jam",
         meta: "跳到 AI Jam 提示词，从一种 vibe 开始。",
         tag: "即兴",
       },
       {
+        id: "start-rock-loop",
         title: "开始一个摇滚 Loop",
         meta: "用摇滚筛选直接打开 Looper，快速浏览 riff。",
         tag: "摇滚",
       },
       {
+        id: "start-blues-jam",
         title: "开始一段蓝调 Jam",
         meta: "打开已定位到蓝调 groove 的伴奏页面。",
         tag: "蓝调",
       },
       {
+        id: "make-hip-hop-idea",
         title: "做一个 Hip-Hop 灵感",
         meta: "启动偏 trap / hip-hop 的起始 session。",
         tag: "Hip-Hop",
       },
       {
+        id: "solo-guitar-take",
         title: "弹一段吉他 Solo",
         meta: "打开精选吉他片段，直接进入 lead 流程。",
         tag: "吉他",
@@ -329,41 +413,4 @@ export const copyByLocale = {
     looperLaunchTitle: "循环器",
     looperLaunchDescription: "马上开弹。",
   },
-} as const satisfies Record<
-  Locale,
-  {
-    contentTitles: Record<"home" | "looper" | "backingTrack" | "quickActions" | "topSongs" | "topTemplates" | "tutorials", string>;
-    back: string;
-    seeAll: string;
-    viewAll: string;
-    start: string;
-    myProjects: string;
-    switchToLightMode: string;
-    switchToDarkMode: string;
-    languageSelectorAriaLabel: string;
-    openFullWorkspaceAriaLabel: string;
-    sidebarHeroTitle: string;
-    sidebarHeroCopy: string;
-    heroPreviewEyebrow: string;
-    heroPreviewLabel: string;
-    heroPromptPlaceholder: string;
-    heroPromptStart: string;
-    heroPromptShowMore: string;
-    heroPromptEmpty: string;
-    heroPromptSuggestions: HeroPromptSuggestion[];
-    launchTitle: string;
-    launchDescription: string;
-    browseEyebrow: string;
-    browseTitle: string;
-    tutorialTitle: string;
-    tutorialPartUnit: string;
-    createActions: Array<{ label: string; meta: string }>;
-    sidebarProjects: Array<{ title: string; meta: string; status: string }>;
-    quickActions: Array<{ title: string; meta: string; tag: string }>;
-    quickActionsHeading: string;
-    quickActionsHint: string;
-    quickActionsPageDescription: string;
-    looperLaunchTitle: string;
-    looperLaunchDescription: string;
-  }
->;
+} as const satisfies Record<Locale, EntranceWorkspaceCopy>;

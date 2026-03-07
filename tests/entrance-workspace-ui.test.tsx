@@ -115,7 +115,7 @@ describe("Entrance workspace browse components", () => {
     const handleBrowseClick = vi.fn();
     const actions: QuickAction[] = [
       {
-        id: "a1",
+        id: "make-song",
         title: "Late-night jazz fusion",
         meta: "Turn a motif into a section",
         tag: "Jazz Fusion",
@@ -125,6 +125,7 @@ describe("Entrance workspace browse components", () => {
     ];
     const items: BrowseItem[] = [
       {
+        id: "neon-hearts",
         title: "Neon Hearts",
         author: "Ava Li",
         imageUrl: "https://example.com/song.jpg",

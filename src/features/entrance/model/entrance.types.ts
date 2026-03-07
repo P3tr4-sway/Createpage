@@ -1,4 +1,5 @@
 export type BrowseItem = {
+  id: string;
   title: string;
   author: string;
   imageUrl: string;
@@ -12,7 +13,6 @@ export type ShowcaseComment = {
 };
 
 export type GuitarClip = BrowseItem & {
-  id: string;
   email: string;
   comments: ShowcaseComment[];
 };

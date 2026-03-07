@@ -2,6 +2,7 @@ import type { BrowseItem, GuitarClip } from "./entrance.types";
 
 export const topSongs: BrowseItem[] = [
   {
+    id: "midnight-echoes",
     title: "Midnight Echoes",
     author: "Albert Flores",
     avatarInitial: "A",
@@ -9,6 +10,7 @@ export const topSongs: BrowseItem[] = [
       "https://images.unsplash.com/photo-1656283384093-1e227e621fad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "city-after-rain",
     title: "City After Rain",
     author: "Guy Hawkins",
     avatarInitial: "G",
@@ -16,6 +18,7 @@ export const topSongs: BrowseItem[] = [
       "https://images.unsplash.com/photo-1518132977555-6bce51766237?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "golden-hour-drive",
     title: "Golden Hour Drive",
     author: "Floyd Miles",
     avatarInitial: "F",
@@ -23,6 +26,7 @@ export const topSongs: BrowseItem[] = [
       "https://images.unsplash.com/photo-1768943913492-bb89bf0672af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "broken-neon",
     title: "Broken Neon",
     author: "Jenny Wilson",
     avatarInitial: "J",
@@ -30,6 +34,7 @@ export const topSongs: BrowseItem[] = [
       "https://images.unsplash.com/photo-1761638174184-122e41283194?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "slow-motion-heart",
     title: "Slow Motion Heart",
     author: "Devon Lane",
     avatarInitial: "D",
@@ -37,6 +42,7 @@ export const topSongs: BrowseItem[] = [
       "https://images.unsplash.com/photo-1700224174799-1ac666263d3e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "static-in-my-head",
     title: "Static in My Head",
     author: "Cody Fisher",
     avatarInitial: "C",
@@ -44,6 +50,7 @@ export const topSongs: BrowseItem[] = [
       "https://images.unsplash.com/photo-1761503556208-d8d9efd02d28?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "velvet-sunrise",
     title: "Velvet Sunrise",
     author: "Ava Brooks",
     avatarInitial: "A",
@@ -51,6 +58,7 @@ export const topSongs: BrowseItem[] = [
       "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "glass-heart-motel",
     title: "Glass Heart Motel",
     author: "Noah Bennett",
     avatarInitial: "N",
@@ -58,6 +66,7 @@ export const topSongs: BrowseItem[] = [
       "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "slow-burn-arcade",
     title: "Slow Burn Arcade",
     author: "Maya Lewis",
     avatarInitial: "M",
@@ -65,6 +74,7 @@ export const topSongs: BrowseItem[] = [
       "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "ocean-room-session",
     title: "Ocean Room Session",
     author: "Luca Martin",
     avatarInitial: "L",
@@ -72,6 +82,7 @@ export const topSongs: BrowseItem[] = [
       "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "neon-weather",
     title: "Neon Weather",
     author: "Sofia Turner",
     avatarInitial: "S",
@@ -79,6 +90,7 @@ export const topSongs: BrowseItem[] = [
       "https://images.unsplash.com/photo-1499364615650-ec38552f4f34?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "lunar-exit",
     title: "Lunar Exit",
     author: "Ethan Ross",
     avatarInitial: "E",
@@ -86,6 +98,7 @@ export const topSongs: BrowseItem[] = [
       "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "afterglow-signals",
     title: "Afterglow Signals",
     author: "Chloe Hayes",
     avatarInitial: "C",
@@ -93,6 +106,7 @@ export const topSongs: BrowseItem[] = [
       "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "broken-halo-drive",
     title: "Broken Halo Drive",
     author: "Kai Morgan",
     avatarInitial: "K",
@@ -103,6 +117,7 @@ export const topSongs: BrowseItem[] = [
 
 export const topJamTracks: BrowseItem[] = [
   {
+    id: "midnight-pocket-jam",
     title: "Midnight Pocket Jam",
     author: "Marcus Bell",
     avatarInitial: "M",
@@ -110,6 +125,7 @@ export const topJamTracks: BrowseItem[] = [
       "https://images.unsplash.com/photo-1760507388320-2500b019f3ba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "lo-fi-room-groove",
     title: "Lo-Fi Room Groove",
     author: "Nadia Osei",
     avatarInitial: "N",
@@ -117,6 +133,7 @@ export const topJamTracks: BrowseItem[] = [
       "https://images.unsplash.com/photo-1741190745018-50ed4935c493?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "trap-bounce-jam",
     title: "Trap Bounce Jam",
     author: "Ray Santos",
     avatarInitial: "R",
@@ -124,6 +141,7 @@ export const topJamTracks: BrowseItem[] = [
       "https://images.unsplash.com/photo-1659117675918-69ec794c64f2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "ambient-drift-bed",
     title: "Ambient Drift Bed",
     author: "Sam Ekow",
     avatarInitial: "S",
@@ -131,6 +149,7 @@ export const topJamTracks: BrowseItem[] = [
       "https://images.unsplash.com/photo-1696245843884-3fbc53aad9a3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "rnb-pocket-jam",
     title: "R&B Pocket Jam",
     author: "Tara Kim",
     avatarInitial: "T",
@@ -138,6 +157,7 @@ export const topJamTracks: BrowseItem[] = [
       "https://images.unsplash.com/photo-1761596897055-5c2ae7f56290?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "cinematic-lift-track",
     title: "Cinematic Lift Track",
     author: "Zara Mensah",
     avatarInitial: "Z",
@@ -145,6 +165,7 @@ export const topJamTracks: BrowseItem[] = [
       "https://images.unsplash.com/photo-1656231267321-282e40e05d24?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "indie-night-drive",
     title: "Indie Night Drive",
     author: "Harper Lane",
     avatarInitial: "H",
@@ -152,6 +173,7 @@ export const topJamTracks: BrowseItem[] = [
       "https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "open-chords-at-dusk",
     title: "Open Chords at Dusk",
     author: "Owen Cruz",
     avatarInitial: "O",
@@ -159,6 +181,7 @@ export const topJamTracks: BrowseItem[] = [
       "https://images.unsplash.com/photo-1511379938547-c1f69419868d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "basement-funk-run",
     title: "Basement Funk Run",
     author: "Mila Stone",
     avatarInitial: "M",
@@ -166,6 +189,7 @@ export const topJamTracks: BrowseItem[] = [
       "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "blue-room-jam-track",
     title: "Blue Room Jam Track",
     author: "Theo Price",
     avatarInitial: "T",
@@ -173,6 +197,7 @@ export const topJamTracks: BrowseItem[] = [
       "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "tape-echo-cruise",
     title: "Tape Echo Cruise",
     author: "Ella Chen",
     avatarInitial: "E",
@@ -180,6 +205,7 @@ export const topJamTracks: BrowseItem[] = [
       "https://images.unsplash.com/photo-1516280440614-37939bbacd81?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "velvet-delay-jam",
     title: "Velvet Delay Jam",
     author: "Jaden Holt",
     avatarInitial: "J",
@@ -187,6 +213,7 @@ export const topJamTracks: BrowseItem[] = [
       "https://images.unsplash.com/photo-1507838153414-b4b713384a76?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "late-bus-bounce",
     title: "Late Bus Bounce",
     author: "Nina Flores",
     avatarInitial: "N",
@@ -194,6 +221,7 @@ export const topJamTracks: BrowseItem[] = [
       "https://images.unsplash.com/photo-1548420329-2f116f28d2e9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
   },
   {
+    id: "golden-string-drift",
     title: "Golden String Drift",
     author: "Zion Park",
     avatarInitial: "Z",
@@ -203,6 +231,7 @@ export const topJamTracks: BrowseItem[] = [
 ];
 
 export const hipHopStarterTemplate: BrowseItem = {
+  id: "hip-hop-starter-session",
   title: "Hip-Hop Starter Session",
   author: "LavaDAW",
   avatarInitial: "L",

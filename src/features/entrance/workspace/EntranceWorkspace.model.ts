@@ -1,6 +1,5 @@
 import { Bot, Repeat, Sparkles } from "lucide-react";
-import type { Locale } from "@/features/entrance/EntranceLocaleContext";
-import { copyByLocale } from "@/features/entrance/i18n/entrance.copy";
+import type { EntranceWorkspaceCopy } from "@/features/entrance/i18n/entrance.copy";
 import type {
   BrowseItem,
   GuitarClip,
@@ -13,8 +12,6 @@ import type {
   SidebarAction,
   SidebarProject,
 } from "@/features/entrance/workspace/EntranceWorkspace.types";
-
-type EntranceWorkspaceCopy = (typeof copyByLocale)[Locale];
 
 interface CreateActionsOptions {
   copy: EntranceWorkspaceCopy;
@@ -49,6 +46,29 @@ interface QuickActionsOptions {
   onOpenGuitar: (item: GuitarClip) => void;
 }
 
+const FEATURED_GUITAR_CLIP_ID = "g1";
+const AMBIENT_GUITAR_CLIP_ID = "g3";
+const ROCK_LOOP_GUITAR_CLIP_ID = "g4";
+const BLUES_JAM_GUITAR_CLIP_ID = "g5";
+const MAKE_SONG_TOP_SONG_ID = "midnight-echoes";
+const JAM_NOW_TOP_SONG_ID = "city-after-rain";
+const HOUSE_DRUM_TEMPLATE_ID = "basement-funk-run";
+const INDIE_POP_TEMPLATE_ID = "indie-night-drive";
+
+function getRequiredById<T extends { id: string }>(
+  items: readonly T[],
+  id: T["id"],
+  collectionName: string,
+): T {
+  const item = items.find((entry) => entry.id === id);
+
+  if (!item) {
+    throw new Error(`${collectionName} is missing required item "${id}".`);
+  }
+
+  return item;
+}
+
 export function buildCreateActions({
   copy,
   guitarClips,
@@ -57,31 +77,41 @@ export function buildCreateActions({
   onOpenGuitar,
   onScrollTo,
 }: CreateActionsOptions): SidebarAction[] {
+  const startSongCopy = getRequiredById(copy.createActions, "start-song", "copy.createActions");
+  const openLooperCopy = getRequiredById(copy.createActions, "open-looper", "copy.createActions");
+  const tryGuitarRiffCopy = getRequiredById(copy.createActions, "try-guitar-riff", "copy.createActions");
+  const jamVibeCopy = getRequiredById(copy.createActions, "jam-vibe", "copy.createActions");
+  const featuredGuitarClip = getRequiredById(guitarClips, FEATURED_GUITAR_CLIP_ID, "guitarClips");
+
   return [
     {
-      label: copy.createActions[0].label,
-      meta: copy.createActions[0].meta,
+      id: startSongCopy.id,
+      label: startSongCopy.label,
+      meta: startSongCopy.meta,
       icon: Bot,
       accent: "rgba(99, 102, 241, 0.18)",
       onClick: onOpenWorkspace,
     },
     {
-      label: copy.createActions[1].label,
-      meta: copy.createActions[1].meta,
+      id: openLooperCopy.id,
+      label: openLooperCopy.label,
+      meta: openLooperCopy.meta,
       icon: Repeat,
       accent: "rgba(20, 184, 166, 0.18)",
       onClick: () => onOpenLooper("Hot"),
     },
     {
-      label: copy.createActions[2].label,
-      meta: copy.createActions[2].meta,
+      id: tryGuitarRiffCopy.id,
+      label: tryGuitarRiffCopy.label,
+      meta: tryGuitarRiffCopy.meta,
       icon: Sparkles,
       accent: "rgba(244, 114, 182, 0.18)",
-      onClick: () => onOpenGuitar(guitarClips[0]),
+      onClick: () => onOpenGuitar(featuredGuitarClip),
     },
     {
-      label: copy.createActions[3].label,
-      meta: copy.createActions[3].meta,
+      id: jamVibeCopy.id,
+      label: jamVibeCopy.label,
+      meta: jamVibeCopy.meta,
       icon: Sparkles,
       accent: "rgba(250, 204, 21, 0.2)",
       onClick: () => onScrollTo("launch"),
@@ -99,55 +129,95 @@ export function buildSidebarProjects({
   onOpenTemplate,
   onOpenBackingTrack,
 }: SidebarProjectsOptions): SidebarProject[] {
+  const lateNightArrangementCopy = getRequiredById(
+    copy.sidebarProjects,
+    "late-night-arrangement",
+    "copy.sidebarProjects",
+  );
+  const neoSoulPocketLoopCopy = getRequiredById(
+    copy.sidebarProjects,
+    "neo-soul-pocket-loop",
+    "copy.sidebarProjects",
+  );
+  const dreamGuitarBedCopy = getRequiredById(
+    copy.sidebarProjects,
+    "dream-guitar-bed",
+    "copy.sidebarProjects",
+  );
+  const houseDrumStarterCopy = getRequiredById(
+    copy.sidebarProjects,
+    "house-drum-starter",
+    "copy.sidebarProjects",
+  );
+  const bluesClubBackingKitCopy = getRequiredById(
+    copy.sidebarProjects,
+    "blues-club-backing-kit",
+    "copy.sidebarProjects",
+  );
+  const indiePopWriterRoomCopy = getRequiredById(
+    copy.sidebarProjects,
+    "indie-pop-writer-room",
+    "copy.sidebarProjects",
+  );
+  const ambientSwellsNotesCopy = getRequiredById(
+    copy.sidebarProjects,
+    "ambient-swells-notes",
+    "copy.sidebarProjects",
+  );
+  const featuredGuitarClip = getRequiredById(guitarClips, FEATURED_GUITAR_CLIP_ID, "guitarClips");
+  const ambientGuitarClip = getRequiredById(guitarClips, AMBIENT_GUITAR_CLIP_ID, "guitarClips");
+  const houseDrumTemplate = getRequiredById(topJamTracks, HOUSE_DRUM_TEMPLATE_ID, "topJamTracks");
+  const indiePopTemplate = getRequiredById(topJamTracks, INDIE_POP_TEMPLATE_ID, "topJamTracks");
+
   return [
     {
-      id: "daw-1",
-      title: copy.sidebarProjects[0].title,
-      meta: copy.sidebarProjects[0].meta,
-      status: copy.sidebarProjects[0].status,
+      id: lateNightArrangementCopy.id,
+      title: lateNightArrangementCopy.title,
+      meta: lateNightArrangementCopy.meta,
+      status: lateNightArrangementCopy.status,
       onClick: onOpenWorkspace,
     },
     {
-      id: "loop-1",
-      title: copy.sidebarProjects[1].title,
-      meta: copy.sidebarProjects[1].meta,
-      status: copy.sidebarProjects[1].status,
+      id: neoSoulPocketLoopCopy.id,
+      title: neoSoulPocketLoopCopy.title,
+      meta: neoSoulPocketLoopCopy.meta,
+      status: neoSoulPocketLoopCopy.status,
       onClick: () => onOpenLooper("Hot"),
     },
     {
-      id: "guitar-1",
-      title: copy.sidebarProjects[2].title,
-      meta: copy.sidebarProjects[2].meta,
-      status: copy.sidebarProjects[2].status,
-      onClick: () => onOpenGuitar(guitarClips[0]),
+      id: dreamGuitarBedCopy.id,
+      title: dreamGuitarBedCopy.title,
+      meta: dreamGuitarBedCopy.meta,
+      status: dreamGuitarBedCopy.status,
+      onClick: () => onOpenGuitar(featuredGuitarClip),
     },
     {
-      id: "template-1",
-      title: copy.sidebarProjects[3].title,
-      meta: copy.sidebarProjects[3].meta,
-      status: copy.sidebarProjects[3].status,
-      onClick: () => onOpenTemplate(topJamTracks[8]),
+      id: houseDrumStarterCopy.id,
+      title: houseDrumStarterCopy.title,
+      meta: houseDrumStarterCopy.meta,
+      status: houseDrumStarterCopy.status,
+      onClick: () => onOpenTemplate(houseDrumTemplate),
     },
     {
-      id: "backing-1",
-      title: copy.sidebarProjects[4].title,
-      meta: copy.sidebarProjects[4].meta,
-      status: copy.sidebarProjects[4].status,
+      id: bluesClubBackingKitCopy.id,
+      title: bluesClubBackingKitCopy.title,
+      meta: bluesClubBackingKitCopy.meta,
+      status: bluesClubBackingKitCopy.status,
       onClick: () => onOpenBackingTrack("Blues"),
     },
     {
-      id: "template-2",
-      title: copy.sidebarProjects[5].title,
-      meta: copy.sidebarProjects[5].meta,
-      status: copy.sidebarProjects[5].status,
-      onClick: () => onOpenTemplate(topJamTracks[6]),
+      id: indiePopWriterRoomCopy.id,
+      title: indiePopWriterRoomCopy.title,
+      meta: indiePopWriterRoomCopy.meta,
+      status: indiePopWriterRoomCopy.status,
+      onClick: () => onOpenTemplate(indiePopTemplate),
     },
     {
-      id: "guitar-2",
-      title: copy.sidebarProjects[6].title,
-      meta: copy.sidebarProjects[6].meta,
-      status: copy.sidebarProjects[6].status,
-      onClick: () => onOpenGuitar(guitarClips[2]),
+      id: ambientSwellsNotesCopy.id,
+      title: ambientSwellsNotesCopy.title,
+      meta: ambientSwellsNotesCopy.meta,
+      status: ambientSwellsNotesCopy.status,
+      onClick: () => onOpenGuitar(ambientGuitarClip),
     },
   ];
 }
@@ -164,54 +234,66 @@ export function buildQuickActions({
   onOpenTemplate,
   onOpenGuitar,
 }: QuickActionsOptions): QuickAction[] {
+  const makeSongCopy = getRequiredById(copy.quickActions, "make-song", "copy.quickActions");
+  const jamRightNowCopy = getRequiredById(copy.quickActions, "jam-right-now", "copy.quickActions");
+  const startRockLoopCopy = getRequiredById(copy.quickActions, "start-rock-loop", "copy.quickActions");
+  const startBluesJamCopy = getRequiredById(copy.quickActions, "start-blues-jam", "copy.quickActions");
+  const makeHipHopIdeaCopy = getRequiredById(copy.quickActions, "make-hip-hop-idea", "copy.quickActions");
+  const soloGuitarTakeCopy = getRequiredById(copy.quickActions, "solo-guitar-take", "copy.quickActions");
+  const makeSongPreview = getRequiredById(topSongs, MAKE_SONG_TOP_SONG_ID, "topSongs");
+  const jamRightNowPreview = getRequiredById(topSongs, JAM_NOW_TOP_SONG_ID, "topSongs");
+  const rockLoopPreview = getRequiredById(guitarClips, ROCK_LOOP_GUITAR_CLIP_ID, "guitarClips");
+  const bluesJamPreview = getRequiredById(guitarClips, BLUES_JAM_GUITAR_CLIP_ID, "guitarClips");
+  const featuredGuitarClip = getRequiredById(guitarClips, FEATURED_GUITAR_CLIP_ID, "guitarClips");
+
   return [
     {
-      id: "make-song",
-      title: copy.quickActions[0].title,
-      meta: copy.quickActions[0].meta,
-      tag: copy.quickActions[0].tag,
-      imageUrl: topSongs[0].imageUrl,
+      id: makeSongCopy.id,
+      title: makeSongCopy.title,
+      meta: makeSongCopy.meta,
+      tag: makeSongCopy.tag,
+      imageUrl: makeSongPreview.imageUrl,
       onClick: onOpenWorkspace,
     },
     {
-      id: "jam-now",
-      title: copy.quickActions[1].title,
-      meta: copy.quickActions[1].meta,
-      tag: copy.quickActions[1].tag,
-      imageUrl: topSongs[1].imageUrl,
+      id: jamRightNowCopy.id,
+      title: jamRightNowCopy.title,
+      meta: jamRightNowCopy.meta,
+      tag: jamRightNowCopy.tag,
+      imageUrl: jamRightNowPreview.imageUrl,
       onClick: () => onScrollTo("launch"),
     },
     {
-      id: "rock-loop",
-      title: copy.quickActions[2].title,
-      meta: copy.quickActions[2].meta,
-      tag: copy.quickActions[2].tag,
-      imageUrl: guitarClips[3].imageUrl,
+      id: startRockLoopCopy.id,
+      title: startRockLoopCopy.title,
+      meta: startRockLoopCopy.meta,
+      tag: startRockLoopCopy.tag,
+      imageUrl: rockLoopPreview.imageUrl,
       onClick: () => onOpenLooper("Rock"),
     },
     {
-      id: "blues-jam",
-      title: copy.quickActions[3].title,
-      meta: copy.quickActions[3].meta,
-      tag: copy.quickActions[3].tag,
-      imageUrl: guitarClips[4].imageUrl,
+      id: startBluesJamCopy.id,
+      title: startBluesJamCopy.title,
+      meta: startBluesJamCopy.meta,
+      tag: startBluesJamCopy.tag,
+      imageUrl: bluesJamPreview.imageUrl,
       onClick: () => onOpenBackingTrack("Blues"),
     },
     {
-      id: "hiphop-song",
-      title: copy.quickActions[4].title,
-      meta: copy.quickActions[4].meta,
-      tag: copy.quickActions[4].tag,
+      id: makeHipHopIdeaCopy.id,
+      title: makeHipHopIdeaCopy.title,
+      meta: makeHipHopIdeaCopy.meta,
+      tag: makeHipHopIdeaCopy.tag,
       imageUrl: hipHopStarterTemplate.imageUrl,
       onClick: () => onOpenTemplate(hipHopStarterTemplate),
     },
     {
-      id: "guitar-solo",
-      title: copy.quickActions[5].title,
-      meta: copy.quickActions[5].meta,
-      tag: copy.quickActions[5].tag,
-      imageUrl: guitarClips[0].imageUrl,
-      onClick: () => onOpenGuitar(guitarClips[0]),
+      id: soloGuitarTakeCopy.id,
+      title: soloGuitarTakeCopy.title,
+      meta: soloGuitarTakeCopy.meta,
+      tag: soloGuitarTakeCopy.tag,
+      imageUrl: featuredGuitarClip.imageUrl,
+      onClick: () => onOpenGuitar(featuredGuitarClip),
     },
   ];
 }
@@ -245,6 +327,7 @@ export function buildTutorialBrowseItems(
   tutorialPartUnit: string,
 ): BrowseItem[] {
   return courses.map((course) => ({
+    id: course.id,
     title: course.title,
     author: `${course.lessons.length} ${tutorialPartUnit} · ${course.duration}`,
     avatarInitial: course.mentor.slice(0, 1),

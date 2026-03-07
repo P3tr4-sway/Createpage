@@ -227,7 +227,7 @@ export function TopListColumn({
       >
         {items.map((item) => (
           <button
-            key={item.title}
+            key={item.id}
             type="button"
             onClick={() => onItemClick(item)}
             className="tablet-touch-target tablet-pressable flex items-center gap-3 rounded-[20px] text-left"
@@ -293,7 +293,7 @@ export function TopBrowsePage({
       <div className="grid grid-cols-2 gap-4">
         {items.map((item) => (
           <button
-            key={`${item.title}-${item.author}`}
+            key={item.id}
             type="button"
             onClick={() => onItemClick(item)}
             className="tablet-pressable relative overflow-hidden rounded-[28px] text-left"
