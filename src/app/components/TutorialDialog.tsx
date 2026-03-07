@@ -2,6 +2,7 @@ import { useMemo, type CSSProperties, type ReactNode } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { BookOpen, Clock3, PlayCircle, X } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { useEntranceLocale } from "../../modules/entrance/EntranceLocaleContext";
 
 const FONT = "var(--app-font-family)";
 
@@ -119,7 +120,44 @@ interface TutorialDialogProps {
   tutorial: TutorialCourse | null;
 }
 
+const tutorialDialogCopyByLocale = {
+  en: {
+    closeAriaLabel: "Close tutorial dialog",
+    tutorial: "Tutorial",
+    lessons: "Lessons",
+    discussion: "Discussion",
+    mentor: "Mentor",
+    lessonUnit: "lessons",
+    messageUnit: "messages",
+    partLabel: (index: number) => `Part ${index}`,
+    levelLabels: {
+      Beginner: "Beginner",
+      Intermediate: "Intermediate",
+      "All levels": "All levels",
+    },
+    levelSuffix: "level",
+  },
+  "zh-CN": {
+    closeAriaLabel: "关闭教程弹窗",
+    tutorial: "教程",
+    lessons: "课程内容",
+    discussion: "讨论",
+    mentor: "导师",
+    lessonUnit: "节课程",
+    messageUnit: "条消息",
+    partLabel: (index: number) => `第 ${index} 节`,
+    levelLabels: {
+      Beginner: "初级",
+      Intermediate: "中级",
+      "All levels": "全级别",
+    },
+    levelSuffix: "难度",
+  },
+} as const;
+
 export function TutorialDialog({ open, onOpenChange, tutorial }: TutorialDialogProps) {
+  const locale = useEntranceLocale();
+  const copy = tutorialDialogCopyByLocale[locale];
   const portalContainer = useMemo(
     () =>
       typeof document === "undefined"
@@ -180,7 +218,7 @@ export function TutorialDialog({ open, onOpenChange, tutorial }: TutorialDialogP
             <button
               type="button"
               onClick={() => onOpenChange(false)}
-              aria-label="Close tutorial dialog"
+              aria-label={copy.closeAriaLabel}
               className="tablet-icon-target tablet-pressable absolute top-5 right-5 z-10 flex items-center justify-center"
               style={{
                 width: 40,
@@ -219,7 +257,7 @@ export function TutorialDialog({ open, onOpenChange, tutorial }: TutorialDialogP
                     textTransform: "uppercase",
                   }}
                 >
-                  Tutorial
+                  {copy.tutorial}
                 </p>
                 <DialogPrimitive.Title
                   style={{
@@ -246,9 +284,12 @@ export function TutorialDialog({ open, onOpenChange, tutorial }: TutorialDialogP
                   {tutorial.summary}
                 </DialogPrimitive.Description>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <MetaChip icon={<BookOpen size={14} strokeWidth={1.8} />} label={`${tutorial.lessons.length} lessons`} />
+                  <MetaChip icon={<BookOpen size={14} strokeWidth={1.8} />} label={`${tutorial.lessons.length} ${copy.lessonUnit}`} />
                   <MetaChip icon={<Clock3 size={14} strokeWidth={1.8} />} label={tutorial.duration} />
-                  <MetaChip icon={<PlayCircle size={14} strokeWidth={1.8} />} label={`${tutorial.level} level`} />
+                  <MetaChip
+                    icon={<PlayCircle size={14} strokeWidth={1.8} />}
+                    label={`${copy.levelLabels[tutorial.level as keyof typeof copy.levelLabels] ?? tutorial.level} ${copy.levelSuffix}`}
+                  />
                 </div>
               </div>
             </div>
@@ -256,8 +297,8 @@ export function TutorialDialog({ open, onOpenChange, tutorial }: TutorialDialogP
             <div className="flex-1 overflow-y-auto" style={{ padding: "24px 24px 28px" }}>
               <section>
                 <div className="mb-3 flex items-center justify-between">
-                  <h3 style={sectionTitleStyle}>Lessons</h3>
-                  <p style={sectionHintStyle}>Mentor: {tutorial.mentor}</p>
+                  <h3 style={sectionTitleStyle}>{copy.lessons}</h3>
+                  <p style={sectionHintStyle}>{copy.mentor}: {tutorial.mentor}</p>
                 </div>
 
                 <div className="flex flex-col gap-2">
@@ -273,7 +314,7 @@ export function TutorialDialog({ open, onOpenChange, tutorial }: TutorialDialogP
                     >
                       <div className="flex items-center justify-between gap-4">
                         <div className="min-w-0">
-                          <p style={lessonIndexStyle}>Part {index + 1}</p>
+                          <p style={lessonIndexStyle}>{copy.partLabel(index + 1)}</p>
                           <h4 style={lessonTitleStyle}>{lesson.title}</h4>
                         </div>
                         <span style={lessonDurationStyle}>{lesson.duration}</span>
@@ -286,8 +327,8 @@ export function TutorialDialog({ open, onOpenChange, tutorial }: TutorialDialogP
 
               <section style={{ marginTop: 24 }}>
                 <div className="mb-3 flex items-center justify-between">
-                  <h3 style={sectionTitleStyle}>Discussion</h3>
-                  <p style={sectionHintStyle}>{tutorial.discussions.length} messages</p>
+                  <h3 style={sectionTitleStyle}>{copy.discussion}</h3>
+                  <p style={sectionHintStyle}>{tutorial.discussions.length} {copy.messageUnit}</p>
                 </div>
 
                 <div className="flex flex-col gap-2">

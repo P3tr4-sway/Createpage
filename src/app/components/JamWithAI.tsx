@@ -2,14 +2,32 @@ import { useState } from "react";
 import { Send } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { useHasCoarsePointer } from "./ui/use-mobile";
+import { useEntranceLocale } from "../../modules/entrance/EntranceLocaleContext";
 
-const promptSuggestions = [
-  "Lo-fi 75 bpm",
-  "Neo-soul E major",
-  "Ambient wide pads",
-];
+const promptSuggestionsByLocale = {
+  en: ["Lo-fi 75 bpm", "Neo-soul E major", "Ambient wide pads"],
+  "zh-CN": ["Lo-fi 75 BPM", "Neo-Soul E 大调", "宽阔的 Ambient Pad"],
+} as const;
+
+const jamCopyByLocale = {
+  en: {
+    title: "Jam",
+    subtitle: "Start with a vibe.",
+    placeholder: "Describe a vibe",
+    action: "Jam",
+  },
+  "zh-CN": {
+    title: "即兴",
+    subtitle: "从一种 vibe 开始。",
+    placeholder: "描述一种感觉",
+    action: "开始 Jam",
+  },
+} as const;
 
 export function JamWithAI() {
+  const locale = useEntranceLocale();
+  const copy = jamCopyByLocale[locale];
+  const promptSuggestions = promptSuggestionsByLocale[locale];
   const [inputValue, setInputValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const shouldReduceMotion = useReducedMotion();
@@ -34,7 +52,7 @@ export function JamWithAI() {
               fontFamily: "var(--app-font-family)",
             }}
           >
-            Jam
+            {copy.title}
           </h3>
         </div>
       </div>
@@ -48,7 +66,7 @@ export function JamWithAI() {
           fontFamily: "var(--app-font-family)",
         }}
       >
-        Start with a vibe.
+        {copy.subtitle}
       </p>
 
       <div className="flex flex-1 items-center justify-center py-5">
@@ -156,7 +174,7 @@ export function JamWithAI() {
             onChange={(e) => setInputValue(e.target.value)}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            placeholder="Describe a vibe"
+            placeholder={copy.placeholder}
             className="flex-1 bg-transparent outline-none"
             style={{
               color: "var(--foreground)",
@@ -185,7 +203,7 @@ export function JamWithAI() {
           whileHover={hasCoarsePointer ? undefined : { scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
         >
-          Jam
+          {copy.action}
           <Send size={14} strokeWidth={1.5} />
         </motion.button>
       </div>

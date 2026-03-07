@@ -12,6 +12,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { useEntranceLocale } from "../../modules/entrance/EntranceLocaleContext";
 
 const FONT = "var(--app-font-family)";
 
@@ -81,12 +82,59 @@ const songComments = [
   { id: 3, user: "Ken", text: "Could be a great template base for remix." },
 ];
 
+const templateSheetCopyByLocale = {
+  en: {
+    playSongPreview: "Play song preview",
+    playGuitarPreview: "Play guitar clip preview",
+    playTemplatePreview: "Play template preview",
+    closeDetailSheet: "Close detail sheet",
+    song: "Song",
+    guitarClip: "Guitar Clip",
+    template: "Template",
+    guitarist: "Guitarist",
+    creator: "Creator",
+    likeItem: "Like item",
+    saveItem: "Save item",
+    comments: "Comments",
+    commentCount: (count: string) => `${count} comments`,
+    remixCount: (count: string) => `${count} remixes`,
+    openSong: "Open Song",
+    watchClip: "Watch Clip",
+    useTemplate: "Use This Template",
+    moreBy: (author: string) => `More by ${author}`,
+    albumArtAlt: (index: number) => `Album art ${index}`,
+  },
+  "zh-CN": {
+    playSongPreview: "播放歌曲预览",
+    playGuitarPreview: "播放吉他片段预览",
+    playTemplatePreview: "播放模板预览",
+    closeDetailSheet: "关闭详情弹窗",
+    song: "歌曲",
+    guitarClip: "吉他片段",
+    template: "模板",
+    guitarist: "吉他手",
+    creator: "创作者",
+    likeItem: "点赞项目",
+    saveItem: "收藏项目",
+    comments: "评论",
+    commentCount: (count: string) => `${count} 条评论`,
+    remixCount: (count: string) => `${count} 次 remix`,
+    openSong: "打开歌曲",
+    watchClip: "观看片段",
+    useTemplate: "使用此模板",
+    moreBy: (author: string) => `${author} 的更多内容`,
+    albumArtAlt: (index: number) => `专辑封面 ${index}`,
+  },
+} as const;
+
 export function TemplateSheet({
   open,
   onClose,
   template,
   mode = "template",
 }: TemplateSheetProps) {
+  const locale = useEntranceLocale();
+  const copy = templateSheetCopyByLocale[locale];
   if (!template) return null;
   const isSong = mode === "song";
   const isGuitar = mode === "guitar";
@@ -172,7 +220,13 @@ export function TemplateSheet({
               <div className="absolute inset-0 flex items-center justify-center">
                 <button
                   type="button"
-                  aria-label={isSong ? "Play song preview" : isGuitar ? "Play guitar clip preview" : "Play template preview"}
+                  aria-label={
+                    isSong
+                      ? copy.playSongPreview
+                      : isGuitar
+                        ? copy.playGuitarPreview
+                        : copy.playTemplatePreview
+                  }
                   className="tablet-icon-target tablet-pressable tablet-hover-fade flex items-center justify-center"
                   style={{
                     width: 56,
@@ -192,7 +246,7 @@ export function TemplateSheet({
               <button
                 type="button"
                 onClick={onClose}
-                aria-label="Close detail sheet"
+                aria-label={copy.closeDetailSheet}
                 className="tablet-icon-target tablet-pressable tablet-hover-fade absolute top-4 right-4 flex items-center justify-center"
                 style={{
                   width: 40,
@@ -220,7 +274,7 @@ export function TemplateSheet({
                     textTransform: "uppercase",
                   }}
                 >
-                  {isSong ? "Song" : isGuitar ? "Guitar Clip" : "Template"}
+                  {isSong ? copy.song : isGuitar ? copy.guitarClip : copy.template}
                 </p>
                 <h3
                   style={{
@@ -277,7 +331,7 @@ export function TemplateSheet({
                         margin: 0,
                       }}
                     >
-                      {isGuitar ? "Guitarist" : "Creator"}
+                      {isGuitar ? copy.guitarist : copy.creator}
                     </p>
                     {isGuitar && template.email ? (
                       <p
@@ -300,7 +354,7 @@ export function TemplateSheet({
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    aria-label="Like item"
+                    aria-label={copy.likeItem}
                     className="tablet-icon-target tablet-pressable tablet-hover-fade flex items-center justify-center"
                     style={{
                       width: 40,
@@ -315,7 +369,7 @@ export function TemplateSheet({
                   </button>
                   <button
                     type="button"
-                    aria-label="Save item"
+                    aria-label={copy.saveItem}
                     className="tablet-icon-target tablet-pressable tablet-hover-fade flex items-center justify-center"
                     style={{
                       width: 40,
@@ -345,8 +399,8 @@ export function TemplateSheet({
                   }
                   label={
                     isSong || isGuitar
-                      ? `${stats.comments} comments`
-                      : `${stats.remixes} remixes`
+                      ? copy.commentCount(stats.comments)
+                      : copy.remixCount(stats.remixes)
                   }
                 />
               </div>
@@ -398,7 +452,7 @@ export function TemplateSheet({
                 }}
               >
                 <Music size={18} strokeWidth={1.8} />
-                {isSong ? "Open Song" : isGuitar ? "Watch Clip" : "Use This Template"}
+                {isSong ? copy.openSong : isGuitar ? copy.watchClip : copy.useTemplate}
               </button>
 
               {/* Divider */}
@@ -423,7 +477,7 @@ export function TemplateSheet({
                       textTransform: "uppercase",
                     }}
                   >
-                    Comments
+                    {copy.comments}
                   </p>
                   <div className="flex flex-col gap-2">
                     {commentList.map((comment) => (
@@ -479,7 +533,7 @@ export function TemplateSheet({
                       textTransform: "uppercase",
                     }}
                   >
-                    More by {template.author}
+                    {copy.moreBy(template.author)}
                   </p>
                   <div className="grid grid-cols-3 gap-3">
                     {albumArt.map((src, i) => (
@@ -490,7 +544,7 @@ export function TemplateSheet({
                       >
                         <ImageWithFallback
                           src={src}
-                          alt={`Album art ${i + 1}`}
+                          alt={copy.albumArtAlt(i + 1)}
                           className="absolute inset-0 h-full w-full object-cover"
                         />
                       </div>

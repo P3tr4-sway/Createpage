@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, CirclePlus, SlidersHorizontal } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { useEntranceLocale } from "../../modules/entrance/EntranceLocaleContext";
 
 interface LooperPageProps {
   onBack: () => void;
@@ -152,7 +153,52 @@ const tracks: LooperTrackItem[] = [
   },
 ];
 
+const looperCopyByLocale = {
+  en: {
+    back: "Back",
+    title: "Looper",
+    filter: "Filter",
+    showLess: "Show Less",
+    showMore: (count: number) => `Show More (${count} more)`,
+    filterLabels: {
+      Saved: "Saved",
+      Hot: "Hot",
+      New: "New",
+      Pop: "Pop",
+      Rock: "Rock",
+      "R&B": "R&B",
+      Metal: "Metal",
+      "Neo-Soul": "Neo-Soul",
+      EDM: "EDM",
+      Latin: "Latin",
+      "Drumless Loop": "Drumless Loop",
+    },
+  },
+  "zh-CN": {
+    back: "返回",
+    title: "循环器",
+    filter: "筛选",
+    showLess: "收起",
+    showMore: (count: number) => `显示更多（还有 ${count} 项）`,
+    filterLabels: {
+      Saved: "已收藏",
+      Hot: "热门",
+      New: "最新",
+      Pop: "流行",
+      Rock: "摇滚",
+      "R&B": "R&B",
+      Metal: "金属",
+      "Neo-Soul": "Neo-Soul",
+      EDM: "EDM",
+      Latin: "拉丁",
+      "Drumless Loop": "无鼓 Loop",
+    },
+  },
+} as const;
+
 export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
+  const locale = useEntranceLocale();
+  const copy = looperCopyByLocale[locale];
   const [activeFilter, setActiveFilter] = useState("Hot");
   const [showAll, setShowAll] = useState(false);
   const INITIAL_VISIBLE_COUNT = 9;
@@ -195,7 +241,7 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
           }}
         >
           <ArrowLeft size={16} strokeWidth={1.8} />
-          Back
+          {copy.back}
         </button>
 
         <h2
@@ -205,7 +251,7 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
             fontWeight: "var(--font-weight-bold)",
           }}
         >
-          Looper
+          {copy.title}
         </h2>
 
         <div style={{ width: 60 }} />
@@ -236,7 +282,7 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
               }}
             >
               {isDrumless && <CirclePlus size={15} strokeWidth={1.8} />}
-              {filter}
+              {copy.filterLabels[filter as keyof typeof copy.filterLabels]}
             </button>
           );
         })}
@@ -256,7 +302,7 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
           }}
         >
           <SlidersHorizontal size={16} strokeWidth={1.8} />
-          Filter
+          {copy.filter}
         </button>
       </div>
 
@@ -333,7 +379,7 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
               letterSpacing: "0.04em",
             }}
           >
-            {showAll ? "Show Less" : `Show More (${hiddenCount} more)`}
+            {showAll ? copy.showLess : copy.showMore(hiddenCount)}
           </button>
         </div>
       )}

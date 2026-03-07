@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Search, Music, Clock, MoreHorizontal, X } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { useEntranceLocale } from "../../modules/entrance/EntranceLocaleContext";
 
 export interface ProjectEntry {
   id: string;
@@ -122,12 +123,77 @@ const typeColorMap: Record<string, string> = {
 
 const FONT = "var(--app-font-family)";
 
+const projectsCopyByLocale = {
+  en: {
+    closeAriaLabel: "Close my projects dialog",
+    title: "My Projects",
+    projectsLabel: (count: number) => `${count} projects`,
+    searchPlaceholder: "Search projects…",
+    filterLabels: {
+      all: "All",
+      track: "Song",
+      loop: "Loop",
+      remix: "Remix",
+      stem: "Stem",
+    },
+    typeLabels: {
+      track: "Song",
+      loop: "Loop",
+      remix: "Remix",
+      stem: "Stem",
+    },
+    updatedAtLabels: {
+      "2 hours ago": "2 hours ago",
+      "5 hours ago": "5 hours ago",
+      Yesterday: "Yesterday",
+      "2 days ago": "2 days ago",
+      "3 days ago": "3 days ago",
+      "4 days ago": "4 days ago",
+      "5 days ago": "5 days ago",
+      "1 week ago": "1 week ago",
+    },
+    noProjects: "No projects found",
+  },
+  "zh-CN": {
+    closeAriaLabel: "关闭我的项目弹窗",
+    title: "我的项目",
+    projectsLabel: (count: number) => `${count} 个项目`,
+    searchPlaceholder: "搜索项目…",
+    filterLabels: {
+      all: "全部",
+      track: "歌曲",
+      loop: "Loop",
+      remix: "Remix",
+      stem: "Stem",
+    },
+    typeLabels: {
+      track: "歌曲",
+      loop: "Loop",
+      remix: "Remix",
+      stem: "Stem",
+    },
+    updatedAtLabels: {
+      "2 hours ago": "2 小时前",
+      "5 hours ago": "5 小时前",
+      Yesterday: "昨天",
+      "2 days ago": "2 天前",
+      "3 days ago": "3 天前",
+      "4 days ago": "4 天前",
+      "5 days ago": "5 天前",
+      "1 week ago": "1 周前",
+    },
+    noProjects: "没有找到项目",
+  },
+} as const;
+
 interface ProjectsSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
+  const locale = useEntranceLocale();
+  const copy = projectsCopyByLocale[locale];
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const portalContainer = useMemo(
@@ -196,7 +262,7 @@ export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
             <button
               type="button"
               onClick={() => onOpenChange(false)}
-              aria-label="Close my projects dialog"
+              aria-label={copy.closeAriaLabel}
               className="tablet-icon-target tablet-pressable absolute top-5 right-5 z-10 flex items-center justify-center"
               style={{
                 width: 40,
@@ -225,7 +291,7 @@ export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
                   fontFamily: FONT,
                 }}
               >
-                My Projects
+                {copy.title}
               </DialogPrimitive.Title>
               <DialogPrimitive.Description
                 style={{
@@ -235,7 +301,7 @@ export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
                   fontFamily: FONT,
                 }}
               >
-                {allProjects.length} projects
+                {copy.projectsLabel(allProjects.length)}
               </DialogPrimitive.Description>
             </div>
 
@@ -256,7 +322,7 @@ export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search projects…"
+                  placeholder={copy.searchPlaceholder}
                   className="flex-1 bg-transparent outline-none"
                   style={{
                     color: "var(--foreground)",
@@ -301,7 +367,7 @@ export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
                     letterSpacing: "0.04em",
                   }}
                 >
-                  {f === "all" ? "All" : f === "track" ? "Song" : f}
+                  {copy.filterLabels[f as keyof typeof copy.filterLabels]}
                 </button>
               ))}
             </div>
@@ -377,8 +443,8 @@ export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
                             textTransform: "capitalize",
                             opacity: 0.8,
                           }}
-                        >
-                          {project.type === "track" ? "Song" : project.type}
+                          >
+                          {copy.typeLabels[project.type]}
                         </span>
                         {project.bpm && (
                           <span
@@ -416,7 +482,7 @@ export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
                             fontFamily: FONT,
                           }}
                         >
-                          {project.updatedAt}
+                          {copy.updatedAtLabels[project.updatedAt as keyof typeof copy.updatedAtLabels]}
                         </span>
                       </div>
                       <MoreHorizontal
@@ -441,7 +507,7 @@ export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
                         marginTop: 12,
                       }}
                     >
-                      No projects found
+                      {copy.noProjects}
                     </p>
                   </div>
                 )}

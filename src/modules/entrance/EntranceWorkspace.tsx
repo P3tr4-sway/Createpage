@@ -1,6 +1,7 @@
 import {
   ArrowLeft,
   Bot,
+  ChevronDown,
   ChevronRight,
   Moon,
   Repeat,
@@ -34,6 +35,10 @@ import {
   tutorialCourses,
   type TutorialCourse,
 } from "../../app/components/TutorialDialog";
+import {
+  EntranceLocaleProvider,
+  type Locale,
+} from "./EntranceLocaleContext";
 
 type SectionId = "studio" | "launch" | "community";
 type FullscreenView = "agentic-producing" | null;
@@ -98,33 +103,372 @@ type HeroPromptSuggestion = {
   prompt: string;
 };
 
-const heroPromptSuggestions: HeroPromptSuggestion[] = [
-  {
-    tag: "Jazz Fusion",
-    title: "Late-night jazz fusion",
-    prompt: "Make a late-night jazz fusion groove.",
-  },
-  {
-    tag: "Neo Soul",
-    title: "Loose neo-soul pocket",
-    prompt: "Start a loose neo-soul jam.",
-  },
-  {
-    tag: "Indie Pop",
-    title: "Hopeful indie pop chorus",
-    prompt: "Write a bright indie pop hook.",
-  },
-  {
-    tag: "Trap",
-    title: "Dark minimal trap beat",
-    prompt: "Create a dark minimal trap beat.",
-  },
-  {
-    tag: "Ambient",
-    title: "Weightless ambient scene",
-    prompt: "Make a weightless ambient sketch.",
-  },
+const LOCALE_STORAGE_KEY = "lavadaw-locale";
+
+const localeOptions: Array<{ value: Locale; label: string }> = [
+  { value: "en", label: "English" },
+  { value: "zh-CN", label: "简体中文" },
 ];
+
+const getInitialLocale = (): Locale => {
+  if (typeof window === "undefined") {
+    return "en";
+  }
+
+  const storedLocale = window.localStorage.getItem(LOCALE_STORAGE_KEY);
+  if (storedLocale === "en" || storedLocale === "zh-CN") {
+    return storedLocale;
+  }
+
+  const browserLocale = (window.navigator.languages?.[0] ?? window.navigator.language ?? "").toLowerCase();
+  return browserLocale.startsWith("zh") ? "zh-CN" : "en";
+};
+
+const copyByLocale = {
+  en: {
+    contentTitles: {
+      home: "Create",
+      looper: "Looper",
+      backingTrack: "Backing Track",
+      quickActions: "Quick Actions",
+      topSongs: "Top Songs",
+      topTemplates: "Top Templates",
+      tutorials: "Tutorials",
+    },
+    back: "Back",
+    seeAll: "See all",
+    viewAll: "View all",
+    start: "Start",
+    myProjects: "My Projects",
+    switchToLightMode: "Switch to light mode",
+    switchToDarkMode: "Switch to dark mode",
+    languageSelectorAriaLabel: "Select language",
+    openFullWorkspaceAriaLabel: "Open full workspace",
+    sidebarHeroTitle: "Start from what you want to make.",
+    sidebarHeroCopy: "No DAW thinking first. Pick the idea in your head and jump straight into that flow.",
+    heroPreviewEyebrow: "Full DAW",
+    heroPreviewLabel: "Tap anywhere to start.",
+    heroPromptPlaceholder: "Start with your AI Music Producer.",
+    heroPromptStart: "Start",
+    heroPromptShowMore: "Show more",
+    heroPromptEmpty: "No matching starter prompt yet. Try words like jazz, trap, ambient, or neo-soul.",
+    heroPromptSuggestions: [
+      {
+        tag: "Jazz Fusion",
+        title: "Late-night jazz fusion",
+        prompt: "Make a late-night jazz fusion groove.",
+      },
+      {
+        tag: "Neo Soul",
+        title: "Loose neo-soul pocket",
+        prompt: "Start a loose neo-soul jam.",
+      },
+      {
+        tag: "Indie Pop",
+        title: "Hopeful indie pop chorus",
+        prompt: "Write a bright indie pop hook.",
+      },
+      {
+        tag: "Trap",
+        title: "Dark minimal trap beat",
+        prompt: "Create a dark minimal trap beat.",
+      },
+      {
+        tag: "Ambient",
+        title: "Weightless ambient scene",
+        prompt: "Make a weightless ambient sketch.",
+      },
+    ] as HeroPromptSuggestion[],
+    launchTitle: "Choose how to start.",
+    launchDescription: "Pick one path. You can switch later.",
+    browseEyebrow: "Browse",
+    browseTitle: "Songs, templates, and tutorials in one scroll.",
+    tutorialTitle: "Tutorial",
+    tutorialPartUnit: "parts",
+    createActions: [
+      {
+        label: "Start a song",
+        meta: "Build a full idea fast.",
+      },
+      {
+        label: "Open Looper",
+        meta: "Build a loop and lock the groove fast.",
+      },
+      {
+        label: "Try a guitar riff",
+        meta: "Open a playable guitar idea and start from it.",
+      },
+      {
+        label: "Jam a vibe",
+        meta: "Start loose and explore a feeling.",
+      },
+    ],
+    sidebarProjects: [
+      {
+        title: "Late Night Arrangement",
+        meta: "Edited 2h ago",
+        status: "Song draft",
+      },
+      {
+        title: "Neo Soul Pocket Loop",
+        meta: "Edited yesterday",
+        status: "Looper",
+      },
+      {
+        title: "Dream Guitar Bed",
+        meta: "Edited yesterday",
+        status: "Guitar idea",
+      },
+      {
+        title: "House Drum Starter",
+        meta: "Edited 3d ago",
+        status: "Template",
+      },
+      {
+        title: "Blues Club Backing Kit",
+        meta: "Edited 4d ago",
+        status: "Backing track",
+      },
+      {
+        title: "Indie Pop Writer Room",
+        meta: "Edited 5d ago",
+        status: "Template",
+      },
+      {
+        title: "Ambient Swells Notes",
+        meta: "Edited last week",
+        status: "Guitar idea",
+      },
+    ],
+    quickActions: [
+      {
+        title: "Make a Song",
+        meta: "Open the full workspace and start arranging immediately.",
+        tag: "Song",
+      },
+      {
+        title: "Jam Right Now",
+        meta: "Jump to the AI jam prompt and start with a vibe.",
+        tag: "Jam",
+      },
+      {
+        title: "Start a Rock Loop",
+        meta: "Open Looper with a rock-ready filter and browse fast riffs.",
+        tag: "Rock",
+      },
+      {
+        title: "Start a Blues Jam",
+        meta: "Open backing tracks already pointed at blues-friendly grooves.",
+        tag: "Blues",
+      },
+      {
+        title: "Make a Hip-Hop Idea",
+        meta: "Launch a trap and hip-hop leaning starter session.",
+        tag: "Hip-Hop",
+      },
+      {
+        title: "Solo a Guitar Take",
+        meta: "Open a featured guitar clip and jump into a lead-focused flow.",
+        tag: "Guitar",
+      },
+    ],
+    quickActionsHeading: "Quick Actions",
+    quickActionsHint: "Swipe horizontally to jump into a concrete session, loop, jam, or guitar flow.",
+    quickActionsPageDescription: "Pick a concrete starting point and jump directly into the right flow.",
+    looperLaunchTitle: "Looper",
+    looperLaunchDescription: "Play fast.",
+  },
+  "zh-CN": {
+    contentTitles: {
+      home: "创作",
+      looper: "循环器",
+      backingTrack: "伴奏",
+      quickActions: "快捷开始",
+      topSongs: "热门歌曲",
+      topTemplates: "热门模板",
+      tutorials: "教程",
+    },
+    back: "返回",
+    seeAll: "查看全部",
+    viewAll: "全部查看",
+    start: "开始",
+    myProjects: "我的项目",
+    switchToLightMode: "切换到浅色模式",
+    switchToDarkMode: "切换到深色模式",
+    languageSelectorAriaLabel: "选择语言",
+    openFullWorkspaceAriaLabel: "打开完整工作区",
+    sidebarHeroTitle: "从你想做的内容开始。",
+    sidebarHeroCopy: "先别想着 DAW。直接选脑海里的想法，马上进入对应流程。",
+    heroPreviewEyebrow: "完整 DAW",
+    heroPreviewLabel: "点击任意位置开始。",
+    heroPromptPlaceholder: "从你的 AI 音乐制作人开始。",
+    heroPromptStart: "开始",
+    heroPromptShowMore: "显示更多",
+    heroPromptEmpty: "还没有匹配的起始提示词。试试 jazz、trap、ambient 或 neo-soul 之类的关键词。",
+    heroPromptSuggestions: [
+      {
+        tag: "爵士融合",
+        title: "深夜爵士融合",
+        prompt: "做一个深夜感的爵士融合 groove。",
+      },
+      {
+        tag: "新灵魂",
+        title: "松弛的新灵魂律动",
+        prompt: "开始一段松弛的新灵魂 jam。",
+      },
+      {
+        tag: "独立流行",
+        title: "有希望感的独立流行副歌",
+        prompt: "写一个明亮的独立流行 hook。",
+      },
+      {
+        tag: "陷阱",
+        title: "极简暗黑 Trap Beat",
+        prompt: "做一个暗黑极简的 trap beat。",
+      },
+      {
+        tag: "氛围",
+        title: "失重感氛围场景",
+        prompt: "做一个有失重感的 ambient 草图。",
+      },
+    ] as HeroPromptSuggestion[],
+    launchTitle: "选择你的开始方式。",
+    launchDescription: "先选一条路径，之后仍然可以切换。",
+    browseEyebrow: "浏览",
+    browseTitle: "歌曲、模板和教程，一次滑动看完。",
+    tutorialTitle: "教程",
+    tutorialPartUnit: "节",
+    createActions: [
+      {
+        label: "开始一首歌",
+        meta: "快速搭起一个完整想法。",
+      },
+      {
+        label: "打开循环器",
+        meta: "快速做一个 loop，把 groove 锁住。",
+      },
+      {
+        label: "试试吉他 riff",
+        meta: "打开一个可演奏的吉他灵感直接开始。",
+      },
+      {
+        label: "来段即兴 vibe",
+        meta: "轻松起步，先探索一种感觉。",
+      },
+    ],
+    sidebarProjects: [
+      {
+        title: "深夜编曲",
+        meta: "2 小时前编辑",
+        status: "歌曲草稿",
+      },
+      {
+        title: "Neo Soul 律动 Loop",
+        meta: "昨天编辑",
+        status: "循环器",
+      },
+      {
+        title: "梦境吉他铺底",
+        meta: "昨天编辑",
+        status: "吉他灵感",
+      },
+      {
+        title: "House 鼓组起步模板",
+        meta: "3 天前编辑",
+        status: "模板",
+      },
+      {
+        title: "布鲁斯俱乐部伴奏包",
+        meta: "4 天前编辑",
+        status: "伴奏",
+      },
+      {
+        title: "独立流行写作房",
+        meta: "5 天前编辑",
+        status: "模板",
+      },
+      {
+        title: "环境音 Swells 记录",
+        meta: "上周编辑",
+        status: "吉他灵感",
+      },
+    ],
+    quickActions: [
+      {
+        title: "做一首歌",
+        meta: "直接打开完整工作区，立刻开始编排。",
+        tag: "歌曲",
+      },
+      {
+        title: "立刻 Jam",
+        meta: "跳到 AI Jam 提示词，从一种 vibe 开始。",
+        tag: "即兴",
+      },
+      {
+        title: "开始一个摇滚 Loop",
+        meta: "用摇滚筛选直接打开 Looper，快速浏览 riff。",
+        tag: "摇滚",
+      },
+      {
+        title: "开始一段蓝调 Jam",
+        meta: "打开已定位到蓝调 groove 的伴奏页面。",
+        tag: "蓝调",
+      },
+      {
+        title: "做一个 Hip-Hop 灵感",
+        meta: "启动偏 trap / hip-hop 的起始 session。",
+        tag: "Hip-Hop",
+      },
+      {
+        title: "弹一段吉他 Solo",
+        meta: "打开精选吉他片段，直接进入 lead 流程。",
+        tag: "吉他",
+      },
+    ],
+    quickActionsHeading: "快捷开始",
+    quickActionsHint: "横向滑动，直接进入具体的 session、loop、jam 或吉他流程。",
+    quickActionsPageDescription: "挑一个明确的起点，直接跳进对应工作流。",
+    looperLaunchTitle: "循环器",
+    looperLaunchDescription: "马上开弹。",
+  },
+} as const satisfies Record<
+  Locale,
+  {
+    contentTitles: Record<"home" | "looper" | "backingTrack" | "quickActions" | "topSongs" | "topTemplates" | "tutorials", string>;
+    back: string;
+    seeAll: string;
+    viewAll: string;
+    start: string;
+    myProjects: string;
+    switchToLightMode: string;
+    switchToDarkMode: string;
+    languageSelectorAriaLabel: string;
+    openFullWorkspaceAriaLabel: string;
+    sidebarHeroTitle: string;
+    sidebarHeroCopy: string;
+    heroPreviewEyebrow: string;
+    heroPreviewLabel: string;
+    heroPromptPlaceholder: string;
+    heroPromptStart: string;
+    heroPromptShowMore: string;
+    heroPromptEmpty: string;
+    heroPromptSuggestions: HeroPromptSuggestion[];
+    launchTitle: string;
+    launchDescription: string;
+    browseEyebrow: string;
+    browseTitle: string;
+    tutorialTitle: string;
+    tutorialPartUnit: string;
+    createActions: Array<{ label: string; meta: string }>;
+    sidebarProjects: Array<{ title: string; meta: string; status: string }>;
+    quickActions: Array<{ title: string; meta: string; tag: string }>;
+    quickActionsHeading: string;
+    quickActionsHint: string;
+    quickActionsPageDescription: string;
+    looperLaunchTitle: string;
+    looperLaunchDescription: string;
+  }
+>;
 
 const topSongs: BrowseItem[] = [
   {
@@ -428,13 +772,24 @@ export function EntranceWorkspace() {
   const [selectedTutorial, setSelectedTutorial] = useState<TutorialCourse | null>(null);
   const [heroPromptValue, setHeroPromptValue] = useState("");
   const [heroPromptOpen, setHeroPromptOpen] = useState(false);
+  const [locale, setLocale] = useState<Locale>(getInitialLocale);
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
   const isDark = mounted ? resolvedTheme === "dark" : true;
+  const copy = copyByLocale[locale];
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem(LOCALE_STORAGE_KEY, locale);
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   useEffect(() => {
     if (activeSubView !== "home" || !pendingScrollTarget) {
@@ -600,15 +955,15 @@ export function EntranceWorkspace() {
   const createActions = useMemo<SidebarAction[]>(
     () => [
       {
-        label: "Start a song",
-        meta: "Build a full idea fast.",
+        label: copy.createActions[0].label,
+        meta: copy.createActions[0].meta,
         icon: Bot,
         accent: "rgba(99, 102, 241, 0.18)",
         onClick: () => setFullscreenView("agentic-producing"),
       },
       {
-        label: "Open Looper",
-        meta: "Build a loop and lock the groove fast.",
+        label: copy.createActions[1].label,
+        meta: copy.createActions[1].meta,
         icon: Repeat,
         accent: "rgba(20, 184, 166, 0.18)",
         onClick: () => {
@@ -617,37 +972,37 @@ export function EntranceWorkspace() {
         },
       },
       {
-        label: "Try a guitar riff",
-        meta: "Open a playable guitar idea and start from it.",
+        label: copy.createActions[2].label,
+        meta: copy.createActions[2].meta,
         icon: Sparkles,
         accent: "rgba(244, 114, 182, 0.18)",
         onClick: () => openGuitar(guitarClips[0]),
       },
       {
-        label: "Jam a vibe",
-        meta: "Start loose and explore a feeling.",
+        label: copy.createActions[3].label,
+        meta: copy.createActions[3].meta,
         icon: Sparkles,
         accent: "rgba(250, 204, 21, 0.2)",
         onClick: () => handleScrollTo("launch"),
       },
     ],
-    [handleScrollTo, openGuitar],
+    [copy.createActions, handleScrollTo, openGuitar],
   );
 
   const sidebarProjects = useMemo<SidebarProject[]>(
     () => [
       {
         id: "daw-1",
-        title: "Late Night Arrangement",
-        meta: "Edited 2h ago",
-        status: "Song draft",
+        title: copy.sidebarProjects[0].title,
+        meta: copy.sidebarProjects[0].meta,
+        status: copy.sidebarProjects[0].status,
         onClick: () => setFullscreenView("agentic-producing"),
       },
       {
         id: "loop-1",
-        title: "Neo Soul Pocket Loop",
-        meta: "Edited yesterday",
-        status: "Looper",
+        title: copy.sidebarProjects[1].title,
+        meta: copy.sidebarProjects[1].meta,
+        status: copy.sidebarProjects[1].status,
         onClick: () => {
           setLooperInitialFilter("Hot");
           setActiveSubView("looper");
@@ -655,23 +1010,23 @@ export function EntranceWorkspace() {
       },
       {
         id: "guitar-1",
-        title: "Dream Guitar Bed",
-        meta: "Edited yesterday",
-        status: "Guitar idea",
+        title: copy.sidebarProjects[2].title,
+        meta: copy.sidebarProjects[2].meta,
+        status: copy.sidebarProjects[2].status,
         onClick: () => openGuitar(guitarClips[0]),
       },
       {
         id: "template-1",
-        title: "House Drum Starter",
-        meta: "Edited 3d ago",
-        status: "Template",
+        title: copy.sidebarProjects[3].title,
+        meta: copy.sidebarProjects[3].meta,
+        status: copy.sidebarProjects[3].status,
         onClick: () => openTemplate(topTemplates[8]),
       },
       {
         id: "backing-1",
-        title: "Blues Club Backing Kit",
-        meta: "Edited 4d ago",
-        status: "Backing track",
+        title: copy.sidebarProjects[4].title,
+        meta: copy.sidebarProjects[4].meta,
+        status: copy.sidebarProjects[4].status,
         onClick: () => {
           setBackingTrackInitialFilter("Blues");
           setActiveSubView("instant-backing-track");
@@ -679,45 +1034,45 @@ export function EntranceWorkspace() {
       },
       {
         id: "template-2",
-        title: "Indie Pop Writer Room",
-        meta: "Edited 5d ago",
-        status: "Template",
+        title: copy.sidebarProjects[5].title,
+        meta: copy.sidebarProjects[5].meta,
+        status: copy.sidebarProjects[5].status,
         onClick: () => openTemplate(topTemplates[6]),
       },
       {
         id: "guitar-2",
-        title: "Ambient Swells Notes",
-        meta: "Edited last week",
-        status: "Guitar idea",
+        title: copy.sidebarProjects[6].title,
+        meta: copy.sidebarProjects[6].meta,
+        status: copy.sidebarProjects[6].status,
         onClick: () => openGuitar(guitarClips[2]),
       },
     ],
-    [openGuitar, openTemplate],
+    [copy.sidebarProjects, openGuitar, openTemplate],
   );
 
   const quickActions = useMemo<QuickAction[]>(
     () => [
       {
         id: "make-song",
-        title: "Make a Song",
-        meta: "Open the full workspace and start arranging immediately.",
-        tag: "Song",
+        title: copy.quickActions[0].title,
+        meta: copy.quickActions[0].meta,
+        tag: copy.quickActions[0].tag,
         imageUrl: topSongs[0].imageUrl,
         onClick: () => setFullscreenView("agentic-producing"),
       },
       {
         id: "jam-now",
-        title: "Jam Right Now",
-        meta: "Jump to the AI jam prompt and start with a vibe.",
-        tag: "Jam",
+        title: copy.quickActions[1].title,
+        meta: copy.quickActions[1].meta,
+        tag: copy.quickActions[1].tag,
         imageUrl: topSongs[1].imageUrl,
         onClick: () => handleScrollTo("launch"),
       },
       {
         id: "rock-loop",
-        title: "Start a Rock Loop",
-        meta: "Open Looper with a rock-ready filter and browse fast riffs.",
-        tag: "Rock",
+        title: copy.quickActions[2].title,
+        meta: copy.quickActions[2].meta,
+        tag: copy.quickActions[2].tag,
         imageUrl: guitarClips[3].imageUrl,
         onClick: () => {
           setLooperInitialFilter("Rock");
@@ -726,9 +1081,9 @@ export function EntranceWorkspace() {
       },
       {
         id: "blues-jam",
-        title: "Start a Blues Jam",
-        meta: "Open backing tracks already pointed at blues-friendly grooves.",
-        tag: "Blues",
+        title: copy.quickActions[3].title,
+        meta: copy.quickActions[3].meta,
+        tag: copy.quickActions[3].tag,
         imageUrl: guitarClips[4].imageUrl,
         onClick: () => {
           setBackingTrackInitialFilter("Blues");
@@ -737,37 +1092,37 @@ export function EntranceWorkspace() {
       },
       {
         id: "hiphop-song",
-        title: "Make a Hip-Hop Idea",
-        meta: "Launch a trap and hip-hop leaning starter session.",
-        tag: "Hip-Hop",
+        title: copy.quickActions[4].title,
+        meta: copy.quickActions[4].meta,
+        tag: copy.quickActions[4].tag,
         imageUrl: hipHopStarterTemplate.imageUrl,
         onClick: () => openTemplate(hipHopStarterTemplate),
       },
       {
         id: "guitar-solo",
-        title: "Solo a Guitar Take",
-        meta: "Open a featured guitar clip and jump into a lead-focused flow.",
-        tag: "Guitar",
+        title: copy.quickActions[5].title,
+        meta: copy.quickActions[5].meta,
+        tag: copy.quickActions[5].tag,
         imageUrl: guitarClips[0].imageUrl,
         onClick: () => openGuitar(guitarClips[0]),
       },
     ],
-    [handleScrollTo, openGuitar, openTemplate],
+    [copy.quickActions, handleScrollTo, openGuitar, openTemplate],
   );
 
   const filteredHeroPromptSuggestions = useMemo(() => {
     const query = heroPromptValue.trim().toLowerCase();
 
     if (!query) {
-      return heroPromptSuggestions;
+      return copy.heroPromptSuggestions;
     }
 
-    return heroPromptSuggestions.filter((suggestion) =>
+    return copy.heroPromptSuggestions.filter((suggestion) =>
       [suggestion.tag, suggestion.title, suggestion.prompt].some((value) =>
         value.toLowerCase().includes(query),
       ),
     );
-  }, [heroPromptValue]);
+  }, [copy.heroPromptSuggestions, heroPromptValue]);
 
   const visibleHeroPromptSuggestions = useMemo(
     () => filteredHeroPromptSuggestions.slice(0, 3),
@@ -787,27 +1142,27 @@ export function EntranceWorkspace() {
     () =>
       tutorialCourses.map((course) => ({
         title: course.title,
-        author: `${course.lessons.length} parts · ${course.duration}`,
+        author: `${course.lessons.length} ${copy.tutorialPartUnit} · ${course.duration}`,
         avatarInitial: course.mentor.slice(0, 1),
         imageUrl: course.imageUrl,
       })),
-    [],
+    [copy.tutorialPartUnit],
   );
 
   const contentTitle =
     activeSubView === "home"
-      ? "Create"
+      ? copy.contentTitles.home
       : activeSubView === "looper"
-        ? "Looper"
+        ? copy.contentTitles.looper
         : activeSubView === "instant-backing-track"
-          ? "Backing Track"
+          ? copy.contentTitles.backingTrack
           : activeSubView === "quick-actions"
-            ? "Quick Actions"
+            ? copy.contentTitles.quickActions
           : activeSubView === "top-songs"
-            ? "Top Songs"
+            ? copy.contentTitles.topSongs
             : activeSubView === "top-templates"
-            ? "Top Templates"
-              : "Tutorials";
+              ? copy.contentTitles.topTemplates
+              : copy.contentTitles.tutorials;
   const homePreviewCanvasWidth = 1280;
   const homePreviewZoom = 1.14;
   const homePreviewFocusX = 0.42;
@@ -816,17 +1171,22 @@ export function EntranceWorkspace() {
   const mainContentInlinePadding = 32;
 
   if (fullscreenView === "agentic-producing") {
-    return <AgenticProducingPage onBack={() => setFullscreenView(null)} />;
+    return (
+      <EntranceLocaleProvider locale={locale}>
+        <AgenticProducingPage onBack={() => setFullscreenView(null)} />
+      </EntranceLocaleProvider>
+    );
   }
 
   return (
-    <div
-      className="relative flex h-full w-full overflow-hidden"
-      style={{
-        fontFamily: "var(--app-font-family)",
-        background: shellTone.appBg,
-      }}
-    >
+    <EntranceLocaleProvider locale={locale}>
+      <div
+        className="relative flex h-full w-full overflow-hidden"
+        style={{
+          fontFamily: "var(--app-font-family)",
+          background: shellTone.appBg,
+        }}
+      >
         <aside
           className="relative flex h-full shrink-0 flex-col"
           style={{
@@ -847,15 +1207,39 @@ export function EntranceWorkspace() {
             <h1 style={railHeadingStyle}>LavaDAW</h1>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setTheme(isDark ? "light" : "dark")}
-            className="tablet-icon-target tablet-pressable"
-            style={iconButtonStyle}
-            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {isDark ? <Sun size={16} strokeWidth={1.9} /> : <Moon size={16} strokeWidth={1.9} />}
-          </button>
+          <div className="flex items-center gap-2">
+            <div className="relative" style={languageSelectWrapStyle}>
+              <select
+                value={locale}
+                onChange={(event) => setLocale(event.target.value as Locale)}
+                className="tablet-touch-target"
+                style={languageSelectStyle}
+                aria-label={copy.languageSelectorAriaLabel}
+              >
+                {localeOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                aria-hidden="true"
+                size={14}
+                strokeWidth={1.8}
+                style={languageSelectIconStyle}
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setTheme(isDark ? "light" : "dark")}
+              className="tablet-icon-target tablet-pressable"
+              style={iconButtonStyle}
+              aria-label={isDark ? copy.switchToLightMode : copy.switchToDarkMode}
+            >
+              {isDark ? <Sun size={16} strokeWidth={1.9} /> : <Moon size={16} strokeWidth={1.9} />}
+            </button>
+          </div>
         </div>
 
         <div
@@ -864,15 +1248,13 @@ export function EntranceWorkspace() {
         >
           <div className="flex flex-col" style={{ minHeight: "100%" }}>
             <section style={sidebarHeroSectionStyle}>
-              <h2 style={sidebarHeroTitleStyle}>Start from what you want to make.</h2>
-              <p style={sidebarHeroCopyStyle}>
-                No DAW thinking first. Pick the idea in your head and jump straight into that flow.
-              </p>
+              <h2 style={sidebarHeroTitleStyle}>{copy.sidebarHeroTitle}</h2>
+              <p style={sidebarHeroCopyStyle}>{copy.sidebarHeroCopy}</p>
             </section>
 
             <section style={sidebarSectionStyle}>
               <div className="mb-3">
-                <p style={sidebarSectionLabelStyle}>Start</p>
+                <p style={sidebarSectionLabelStyle}>{copy.start}</p>
               </div>
               <div className="flex flex-col gap-2.5">
                 {createActions.map((action) => (
@@ -890,14 +1272,14 @@ export function EntranceWorkspace() {
 
             <section style={{ ...sidebarSectionStyle, display: "flex", minHeight: 0, flex: 1, flexDirection: "column" }}>
               <div className="mb-3 flex items-center justify-between">
-                <p style={sidebarSectionLabelStyle}>My Projects</p>
+                <p style={sidebarSectionLabelStyle}>{copy.myProjects}</p>
                 <button
                   type="button"
                   onClick={() => setProjectsOpen(true)}
                   className="tablet-touch-target tablet-pressable"
                   style={inlineLinkButtonStyle}
                 >
-                  View all
+                  {copy.viewAll}
                 </button>
               </div>
 
@@ -935,7 +1317,7 @@ export function EntranceWorkspace() {
               style={secondaryButtonStyle}
             >
               <ArrowLeft size={15} strokeWidth={1.9} />
-              Back
+              {copy.back}
             </button>
           ) : (
             <div />
@@ -971,7 +1353,7 @@ export function EntranceWorkspace() {
                     setFullscreenView("agentic-producing");
                   }
                 }}
-                aria-label="Open full workspace"
+                aria-label={copy.openFullWorkspaceAriaLabel}
                 className="tablet-pressable relative block w-full overflow-visible text-left"
                 style={{
                   height: "clamp(520px, calc(100vh - 248px), 620px)",
@@ -1013,8 +1395,8 @@ export function EntranceWorkspace() {
                     boxShadow: "0 18px 38px rgba(15,23,42,0.14)",
                   }}
                 >
-                  <span style={heroPreviewHintEyebrowStyle}>Full DAW</span>
-                  <span style={heroPreviewHintLabelStyle}>Tap anywhere to start.</span>
+                  <span style={heroPreviewHintEyebrowStyle}>{copy.heroPreviewEyebrow}</span>
+                  <span style={heroPreviewHintLabelStyle}>{copy.heroPreviewLabel}</span>
                 </div>
                 <div
                   aria-hidden="true"
@@ -1058,7 +1440,7 @@ export function EntranceWorkspace() {
                             setHeroPromptOpen(true);
                           }
                         }}
-                        placeholder="Start with your AI Music Producer."
+                        placeholder={copy.heroPromptPlaceholder}
                         className="tablet-touch-target min-w-0 flex-1 bg-transparent text-left outline-none placeholder:text-[var(--secondary)]"
                         style={heroChatInputStyle}
                       />
@@ -1068,7 +1450,7 @@ export function EntranceWorkspace() {
                         className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-full"
                         style={heroChatSendStyle}
                       >
-                        Start
+                        {copy.heroPromptStart}
                       </button>
                     </div>
                     <AnimatePresence>
@@ -1091,7 +1473,7 @@ export function EntranceWorkspace() {
                                 <>
                                   {filteredHeroPromptSuggestions.length > 3 ? (
                                     <div aria-hidden="true" style={heroPromptOverflowHintStyle}>
-                                      Show more
+                                      {copy.heroPromptShowMore}
                                     </div>
                                   ) : null}
                                   {visibleHeroPromptSuggestions.map((suggestion, index) => (
@@ -1121,10 +1503,7 @@ export function EntranceWorkspace() {
                                 </>
                               ) : (
                                 <div style={heroPromptEmptyStyle}>
-                                  <p style={heroPromptEmptyTextStyle}>
-                                    No matching starter prompt yet. Try words like jazz, trap, ambient,
-                                    or neo-soul.
-                                  </p>
+                                  <p style={heroPromptEmptyTextStyle}>{copy.heroPromptEmpty}</p>
                                 </div>
                               )}
                             </div>
@@ -1151,15 +1530,19 @@ export function EntranceWorkspace() {
               <section ref={launchRef} style={sectionStyle}>
                 <div className="mb-4 flex items-center justify-between">
                   <div>
-                    <h3 style={sectionTitleStyle}>Choose how to start.</h3>
-                    <p style={sectionDescriptionStyle}>Pick one path. You can switch later.</p>
+                    <h3 style={sectionTitleStyle}>{copy.launchTitle}</h3>
+                    <p style={sectionDescriptionStyle}>{copy.launchDescription}</p>
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-5">
                   <div className="grid items-stretch gap-5 lg:grid-cols-2">
                     <div className="flex min-h-full flex-col">
-                      <LoopLaunchPanel onLaunch={handleLaunch} />
+                      <LoopLaunchPanel
+                        onLaunch={handleLaunch}
+                        title={copy.looperLaunchTitle}
+                        description={copy.looperLaunchDescription}
+                      />
                     </div>
 
                     <div className="flex min-h-full flex-col">
@@ -1171,6 +1554,9 @@ export function EntranceWorkspace() {
                     <QuickAccessCarousel
                       actions={quickActions}
                       onSeeAll={() => setActiveSubView("quick-actions")}
+                      heading={copy.quickActionsHeading}
+                      hint={copy.quickActionsHint}
+                      seeAllLabel={copy.seeAll}
                     />
                   </div>
                 </div>
@@ -1179,34 +1565,36 @@ export function EntranceWorkspace() {
               <section ref={communityRef} style={{ ...sectionStyle, paddingBottom: 0 }}>
                 <div className="mb-4 flex items-center justify-between">
                   <div>
-                    <p style={eyebrowStyle}>Browse</p>
-                    <h3 style={sectionTitleStyle}>Songs, templates, and tutorials in one scroll.</h3>
+                    <p style={eyebrowStyle}>{copy.browseEyebrow}</p>
+                    <h3 style={sectionTitleStyle}>{copy.browseTitle}</h3>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-[0.92fr_0.92fr_1.16fr] gap-5">
                   <TopListColumn
-                    title="Top Songs"
+                    title={copy.contentTitles.topSongs}
                     items={topSongs}
                     onItemClick={openSong}
                     onOpenDetail={() => setActiveSubView("top-songs")}
+                    seeAllLabel={copy.seeAll}
                   />
                   <TopListColumn
-                    title="Top Templates"
+                    title={copy.contentTitles.topTemplates}
                     items={topTemplates}
                     onItemClick={openTemplate}
                     onOpenDetail={() => setActiveSubView("top-templates")}
+                    seeAllLabel={copy.seeAll}
                   />
                   <div className="rounded-[30px]" style={panelStyle}>
                     <div className="mb-3 flex items-center justify-between">
-                      <p style={miniSectionTitleStyle}>Tutorial</p>
+                      <p style={miniSectionTitleStyle}>{copy.tutorialTitle}</p>
                       <button
                         type="button"
                         onClick={() => setActiveSubView("tutorials")}
                         className="tablet-touch-target tablet-pressable"
                         style={inlineLinkButtonStyle}
                       >
-                        See all
+                        {copy.seeAll}
                       </button>
                     </div>
 
@@ -1236,7 +1624,9 @@ export function EntranceWorkspace() {
                           />
                           <div className="absolute bottom-0 left-0 right-0" style={{ padding: 14 }}>
                             <p style={imageCardTitleStyle}>{course.title}</p>
-                            <p style={imageCardMetaStyle}>{course.lessons.length} parts · {course.duration}</p>
+                            <p style={imageCardMetaStyle}>
+                              {course.lessons.length} {copy.tutorialPartUnit} · {course.duration}
+                            </p>
                           </div>
                         </button>
                       ))}
@@ -1262,24 +1652,29 @@ export function EntranceWorkspace() {
               <QuickActionsPage
                 actions={quickActions}
                 onBack={() => setActiveSubView("home")}
+                title={copy.contentTitles.quickActions}
+                description={copy.quickActionsPageDescription}
+                backLabel={copy.back}
               />
             ) : activeSubView === "top-songs" ? (
               <TopBrowsePage
-                title="Top Songs"
+                title={copy.contentTitles.topSongs}
                 items={topSongs}
                 onBack={() => setActiveSubView("home")}
                 onItemClick={openSong}
+                backLabel={copy.back}
               />
             ) : activeSubView === "top-templates" ? (
               <TopBrowsePage
-                title="Top Templates"
+                title={copy.contentTitles.topTemplates}
                 items={topTemplates}
                 onBack={() => setActiveSubView("home")}
                 onItemClick={openTemplate}
+                backLabel={copy.back}
               />
             ) : (
               <TopBrowsePage
-                title="Tutorials"
+                title={copy.contentTitles.tutorials}
                 items={tutorialBrowseItems}
                 onBack={() => setActiveSubView("home")}
                 onItemClick={(item) => {
@@ -1290,6 +1685,7 @@ export function EntranceWorkspace() {
                     openTutorial(tutorial);
                   }
                 }}
+                backLabel={copy.back}
               />
             )}
           </div>
@@ -1320,7 +1716,8 @@ export function EntranceWorkspace() {
         onOpenChange={setTutorialOpen}
         tutorial={selectedTutorial}
       />
-    </div>
+      </div>
+    </EntranceLocaleProvider>
   );
 }
 
@@ -1501,8 +1898,12 @@ function ScaledPreviewCanvas({
 
 function LoopLaunchPanel({
   onLaunch,
+  title,
+  description,
 }: {
   onLaunch: (id: ActionId) => void;
+  title: string;
+  description: string;
 }) {
   return (
     <button
@@ -1513,11 +1914,11 @@ function LoopLaunchPanel({
     >
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h3 style={loopLaunchTitleStyle}>Looper</h3>
+          <h3 style={loopLaunchTitleStyle}>{title}</h3>
         </div>
       </div>
 
-      <p style={loopLaunchDescriptionStyle}>Play fast.</p>
+      <p style={loopLaunchDescriptionStyle}>{description}</p>
 
       <div className="flex flex-1 items-center justify-center py-6">
         <div style={loopGraphicWrapStyle}>
@@ -1667,9 +2068,15 @@ function QuickActionCard({
 function QuickAccessCarousel({
   actions,
   onSeeAll,
+  heading,
+  hint,
+  seeAllLabel,
 }: {
   actions: QuickAction[];
   onSeeAll: () => void;
+  heading: string;
+  hint: string;
+  seeAllLabel: string;
 }) {
   const { containerRef, isDragging, dragBind } = useDragScroll("x");
 
@@ -1677,10 +2084,8 @@ function QuickAccessCarousel({
     <div style={templateStripStyle}>
       <div className="mb-3 flex items-center justify-between">
         <div>
-          <p style={miniSectionTitleStyle}>Quick Actions</p>
-          <p style={templateStripHintStyle}>
-            Swipe horizontally to jump into a concrete session, loop, jam, or guitar flow.
-          </p>
+          <p style={miniSectionTitleStyle}>{heading}</p>
+          <p style={templateStripHintStyle}>{hint}</p>
         </div>
         <button
           type="button"
@@ -1688,7 +2093,7 @@ function QuickAccessCarousel({
           className="tablet-touch-target tablet-pressable"
           style={inlineLinkButtonStyle}
         >
-          See all
+          {seeAllLabel}
         </button>
       </div>
 
@@ -1726,9 +2131,15 @@ function QuickAccessCarousel({
 function QuickActionsPage({
   actions,
   onBack,
+  title,
+  description,
+  backLabel,
 }: {
   actions: QuickAction[];
   onBack: () => void;
+  title: string;
+  description: string;
+  backLabel: string;
 }) {
   return (
     <section>
@@ -1740,16 +2151,14 @@ function QuickActionsPage({
           style={secondaryButtonStyle}
         >
           <ArrowLeft size={15} strokeWidth={1.9} />
-          Back
+          {backLabel}
         </button>
-        <h3 style={sectionTitleStyle}>Quick Actions</h3>
+        <h3 style={sectionTitleStyle}>{title}</h3>
         <div style={{ width: 72 }} />
       </div>
 
       <div className="mb-6">
-        <p style={sectionDescriptionStyle}>
-          Pick a concrete starting point and jump directly into the right flow.
-        </p>
+        <p style={sectionDescriptionStyle}>{description}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -1766,11 +2175,13 @@ function TopListColumn({
   items,
   onItemClick,
   onOpenDetail,
+  seeAllLabel,
 }: {
   title: string;
   items: BrowseItem[];
   onItemClick: (item: BrowseItem) => void;
   onOpenDetail: () => void;
+  seeAllLabel: string;
 }) {
   const { containerRef, isDragging, dragBind } = useDragScroll("y");
 
@@ -1779,7 +2190,7 @@ function TopListColumn({
       <div className="mb-3 flex items-center justify-between">
         <p style={miniSectionTitleStyle}>{title}</p>
         <button type="button" onClick={onOpenDetail} className="tablet-touch-target tablet-pressable" style={inlineLinkButtonStyle}>
-          See all
+          {seeAllLabel}
         </button>
       </div>
 
@@ -1839,11 +2250,13 @@ function TopBrowsePage({
   items,
   onBack,
   onItemClick,
+  backLabel,
 }: {
   title: string;
   items: BrowseItem[];
   onBack: () => void;
   onItemClick: (item: BrowseItem) => void;
+  backLabel: string;
 }) {
   return (
     <section>
@@ -1855,7 +2268,7 @@ function TopBrowsePage({
           style={secondaryButtonStyle}
         >
           <ArrowLeft size={15} strokeWidth={1.9} />
-          Back
+          {backLabel}
         </button>
         <h3 style={sectionTitleStyle}>{title}</h3>
         <div style={{ width: 72 }} />
@@ -1922,6 +2335,35 @@ const iconButtonStyle: CSSProperties = {
   backgroundColor: "transparent",
   color: "var(--foreground)",
   cursor: "pointer",
+};
+
+const languageSelectWrapStyle: CSSProperties = {
+  position: "relative",
+  minWidth: 118,
+};
+
+const languageSelectStyle: CSSProperties = {
+  width: "100%",
+  height: 44,
+  padding: "0 34px 0 14px",
+  borderRadius: 999,
+  border: "1px solid color-mix(in srgb, var(--border) 78%, transparent)",
+  backgroundColor: "color-mix(in srgb, var(--card) 78%, transparent)",
+  color: "var(--foreground)",
+  fontSize: 13,
+  fontWeight: 600,
+  appearance: "none",
+  outline: "none",
+  cursor: "pointer",
+};
+
+const languageSelectIconStyle: CSSProperties = {
+  position: "absolute",
+  top: "50%",
+  right: 13,
+  transform: "translateY(-50%)",
+  color: "var(--secondary)",
+  pointerEvents: "none",
 };
 
 const sidebarHeroSectionStyle: CSSProperties = {

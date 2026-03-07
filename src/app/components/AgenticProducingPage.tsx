@@ -21,6 +21,7 @@ import {
   SlidersHorizontal,
   AudioWaveform,
 } from "lucide-react";
+import { useEntranceLocale } from "../../modules/entrance/EntranceLocaleContext";
 
 interface AgenticProducingPageProps {
   onBack?: () => void;
@@ -354,12 +355,305 @@ const initialGenerationHistory: GenerationHistoryItem[] = [
   },
 ];
 
+const agenticCopyByLocale = {
+  en: {
+    defaultLyricsDraft: "Falling through the city lights, give me a slow-burn chorus with space.",
+    selectedStyleFallback: "Freeform",
+    justNow: "Just now",
+    ready: "Ready",
+    closeDaw: "Close DAW",
+    projectTitle: "New Project 20250408",
+    undo: "Undo",
+    importAudio: "Import audio",
+    save: "Save",
+    addTrack: "Add track",
+    trackName: (index: number) => `Track ${index}`,
+    ideaLane: "Idea lane",
+    barsUnit: "bars",
+    tracksUnit: "tracks",
+    mute: "Mute",
+    unmute: "Unmute",
+    solo: "Solo",
+    disableSolo: "Disable solo for",
+    barLabel: (bar: number, count: number) => `Bar ${bar} • ${count} bars`,
+    playheadAt: (position: string) => `Playhead at ${position}`,
+    waveformTools: "Waveform tools",
+    microphoneMonitor: "Microphone monitor",
+    mixerControls: "Mixer controls",
+    returnToStart: "Return to start",
+    pausePlayback: "Pause playback",
+    startPlayback: "Start playback",
+    record: "Record",
+    loop: "Loop",
+    aiMusician: "AI Musician",
+    chooseAiMusician: "Choose AI Musician",
+    style: "Style",
+    enterStyle: "Enter a style",
+    lyrics: "Lyrics",
+    lyricsPlaceholder: "Shape the topline or paste a hook...",
+    generate: "Generate",
+    currentModeAria: (mode: string) => `Current mode ${mode}. Open switcher.`,
+    aiProducerPlaceholder: "Start with your AI Music Producer.",
+    openProducerWorkspace: "Open AI Producer workspace",
+    send: "Send",
+    start: "Start",
+    aiProducer: "AI Producer",
+    producerTitle: "Shape the next move for this session.",
+    closeProducerWorkspace: "Close AI Producer workspace",
+    conversation: "Conversation",
+    conversationMeta: "Direction, notes, and next actions",
+    renderQueue: "Render Queue",
+    renderQueueMeta: "Active and queued generations",
+    recentPasses: "Recent Passes",
+    recentPassesMeta: "Latest outputs and handoffs",
+    producerSubmitReply: (style: string, target: string) =>
+      `Locked. I am shaping this into a ${style} direction and sending the next pass to ${target}. Queue and recent outputs stay visible on the right.`,
+    producerBrief: "Producer brief",
+    producerSessionDirection: (style: string) => `${style} • Session direction`,
+    producerDispatch: "Dispatching tasks to AI musicians",
+    producerChatDirected: (style: string) => `${style} • chat-directed`,
+    musicianPassTitle: (label: string) => `${label} pass`,
+    lyricDraftMeta: (style: string) => `${style} • lyric-guided draft`,
+    instrumentalPassMeta: (style: string) => `${style} • instrumental pass`,
+    lyricProgress: "Shaping topline + lyric cadence",
+    instrumentalProgress: "Rendering arrangement take",
+    statusGenerating: "Generating",
+    statusQueued: "Queued",
+    statusReady: "Ready",
+    statusLabels: {
+      Generating: "Generating",
+      Queued: "Queued",
+      Ready: "Ready",
+    },
+  },
+  "zh-CN": {
+    defaultLyricsDraft: "灯火从城市上空滑过，给我一个带空间感、慢慢升温的副歌。",
+    selectedStyleFallback: "自由风格",
+    justNow: "刚刚",
+    ready: "就绪",
+    closeDaw: "关闭 DAW",
+    projectTitle: "新建项目 20250408",
+    undo: "撤销",
+    importAudio: "导入音频",
+    save: "保存",
+    addTrack: "添加轨道",
+    trackName: (index: number) => `轨道 ${index}`,
+    ideaLane: "灵感轨道",
+    barsUnit: "小节",
+    tracksUnit: "轨道",
+    mute: "静音",
+    unmute: "取消静音",
+    solo: "独奏",
+    disableSolo: "取消独奏",
+    barLabel: (bar: number, count: number) => `第 ${bar} 小节 · ${count} 小节`,
+    playheadAt: (position: string) => `播放头位置 ${position}`,
+    waveformTools: "波形工具",
+    microphoneMonitor: "麦克风监听",
+    mixerControls: "混音控制",
+    returnToStart: "回到开头",
+    pausePlayback: "暂停播放",
+    startPlayback: "开始播放",
+    record: "录音",
+    loop: "循环",
+    aiMusician: "AI 乐手",
+    chooseAiMusician: "选择 AI 乐手",
+    style: "风格",
+    enterStyle: "输入风格",
+    lyrics: "歌词",
+    lyricsPlaceholder: "整理 topline，或直接粘贴一个 hook……",
+    generate: "生成",
+    currentModeAria: (mode: string) => `当前模式为 ${mode}。打开切换器。`,
+    aiProducerPlaceholder: "从你的 AI 音乐制作人开始。",
+    openProducerWorkspace: "打开 AI 制作人工作区",
+    send: "发送",
+    start: "开始",
+    aiProducer: "AI 制作人",
+    producerTitle: "为这个 session 决定下一步。",
+    closeProducerWorkspace: "关闭 AI 制作人工作区",
+    conversation: "对话",
+    conversationMeta: "方向、备注和下一步动作",
+    renderQueue: "渲染队列",
+    renderQueueMeta: "正在进行和排队中的生成任务",
+    recentPasses: "最近生成",
+    recentPassesMeta: "最新输出与交接结果",
+    producerSubmitReply: (style: string, target: string) =>
+      `已锁定。我会把它整理成 ${style} 方向，并把下一轮 pass 发给 ${target}。右侧会继续显示队列和最近输出。`,
+    producerBrief: "制作人简报",
+    producerSessionDirection: (style: string) => `${style} · Session 方向`,
+    producerDispatch: "正在把任务分发给 AI 乐手",
+    producerChatDirected: (style: string) => `${style} · 聊天驱动`,
+    musicianPassTitle: (label: string) => `${label} Pass`,
+    lyricDraftMeta: (style: string) => `${style} · 歌词引导草稿`,
+    instrumentalPassMeta: (style: string) => `${style} · 器乐 Pass`,
+    lyricProgress: "正在整理 topline 与歌词节奏",
+    instrumentalProgress: "正在渲染编排片段",
+    statusGenerating: "Generating",
+    statusQueued: "Queued",
+    statusReady: "Ready",
+    statusLabels: {
+      Generating: "生成中",
+      Queued: "排队中",
+      Ready: "已就绪",
+    },
+  },
+} as const;
+
+function getInitialTracksForLocale(locale: "en" | "zh-CN") {
+  const trackNameMap =
+    locale === "zh-CN"
+      ? {
+          drums: { name: "鼓组", role: "律动" },
+          bass: { name: "贝斯", role: "低频" },
+          guitar: { name: "吉他", role: "质感" },
+          vocal: { name: "人声", role: "主线" },
+        }
+      : null;
+  const clipLabelMap =
+    locale === "zh-CN"
+      ? {
+          "drums-a": "前奏 Groove",
+          "drums-b": "主段律动",
+          "drums-c": "Fill + 提升",
+          "bass-a": "主歌线条",
+          "bass-b": "Hook 延音",
+          "guitar-a": "闷音伴奏",
+          "guitar-b": "开放副歌",
+          "guitar-c": "抬升和弦",
+          "vocal-a": "导唱",
+          "vocal-b": "Hook 叠唱",
+          "vocal-c": "尾段 Adlib",
+        }
+      : null;
+
+  return initialTracks.map((track) => ({
+    ...track,
+    name: trackNameMap?.[track.id as keyof typeof trackNameMap]?.name ?? track.name,
+    role: trackNameMap?.[track.id as keyof typeof trackNameMap]?.role ?? track.role,
+    clips: track.clips.map((clip) => ({
+      ...clip,
+      label: clipLabelMap?.[clip.id as keyof typeof clipLabelMap] ?? clip.label,
+    })),
+  }));
+}
+
+function getMusicianTargetsForLocale(locale: "en" | "zh-CN") {
+  const labelMap =
+    locale === "zh-CN"
+      ? {
+          "ai-drummer": { label: "AI 鼓手", helper: "律动、fill 和推进感" },
+          "ai-bassist": { label: "AI 贝斯手", helper: "低频脉冲和推动感" },
+          "ai-guitarist": { label: "AI 吉他手", helper: "伴奏、和弦和纹理" },
+          "ai-keyboardist": { label: "AI 键盘手", helper: "键盘、和声铺底和粘合感" },
+          "ai-percussionist": { label: "AI 打击乐手", helper: "打击层次和 groove 细节" },
+          "ai-vocalist": { label: "AI 主唱", helper: "Topline、咬字和 hook" },
+        }
+      : null;
+
+  return musicianTargets.map((target) => ({
+    ...target,
+    label: labelMap?.[target.id as keyof typeof labelMap]?.label ?? target.label,
+    helper: labelMap?.[target.id as keyof typeof labelMap]?.helper ?? target.helper,
+  }));
+}
+
+function getAgentModeOptionsForLocale(locale: "en" | "zh-CN") {
+  const copy = agenticCopyByLocale[locale];
+  return [
+    { id: "musician" as const, label: copy.aiMusician },
+    { id: "producer" as const, label: copy.aiProducer },
+  ];
+}
+
+function getInitialProducerMessagesForLocale(locale: "en" | "zh-CN") {
+  const copy = agenticCopyByLocale[locale];
+  return [
+    {
+      id: "producer-intro",
+      role: "agent" as const,
+      text:
+        locale === "zh-CN"
+          ? "告诉我段落、情绪或下一步动作。我会把它整理成明确的 pass，并路由给合适的 AI 乐手。"
+          : "Tell me the section, mood, or next move. I will turn it into a concrete pass and route it to the right AI musician.",
+      timestamp: copy.ready,
+    },
+  ];
+}
+
+function getInitialAudioQueueForLocale(locale: "en" | "zh-CN") {
+  const copy = agenticCopyByLocale[locale];
+  const targets = getMusicianTargetsForLocale(locale);
+  const vocalist = targets.find((item) => item.id === "ai-vocalist")?.label ?? "AI Vocalist";
+  const bassist = targets.find((item) => item.id === "ai-bassist")?.label ?? "AI Bassist";
+  const drummer = targets.find((item) => item.id === "ai-drummer")?.label ?? "AI Drummer";
+  return [
+    {
+      id: "queue-vocal-hook",
+      title: locale === "zh-CN" ? "Hook 叠唱" : "Hook doubles",
+      owner: vocalist,
+      status: copy.statusGenerating,
+      detail: locale === "zh-CN" ? "Neo Soul · 第 9-16 小节" : "Neo Soul • Bars 9-16",
+      progress: copy.lyricProgress,
+    },
+    {
+      id: "queue-bass-pocket",
+      title: locale === "zh-CN" ? "主歌律动" : "Verse pocket",
+      owner: bassist,
+      status: copy.statusQueued,
+      detail: locale === "zh-CN" ? "Neo Soul · 第 1-8 小节" : "Neo Soul • Bars 1-8",
+      progress: locale === "zh-CN" ? "等待轨道路由交接" : "Waiting for lane handoff",
+    },
+    {
+      id: "queue-drum-variation",
+      title: locale === "zh-CN" ? "提升 Fill" : "Lift fill",
+      owner: drummer,
+      status: copy.statusReady,
+      detail: locale === "zh-CN" ? "House · 第 17-20 小节" : "House • Bars 17-20",
+      progress: locale === "zh-CN" ? "可以开始试听" : "Ready to audition",
+    },
+  ];
+}
+
+function getInitialGenerationHistoryForLocale(locale: "en" | "zh-CN") {
+  const copy = agenticCopyByLocale[locale];
+  const targets = getMusicianTargetsForLocale(locale);
+  const drummer = targets.find((item) => item.id === "ai-drummer")?.label ?? "AI Drummer";
+  const guitarist = targets.find((item) => item.id === "ai-guitarist")?.label ?? "AI Guitarist";
+  return [
+    {
+      id: "history-drum-pocket",
+      title: locale === "zh-CN" ? "主段律动" : "Main pocket",
+      owner: drummer,
+      meta: locale === "zh-CN" ? "Neo Soul · 鼓组" : "Neo Soul • Drums",
+      timestamp: locale === "zh-CN" ? "2 分钟前" : "2 min ago",
+    },
+    {
+      id: "history-guitar-comp",
+      title: locale === "zh-CN" ? "闷音伴奏" : "Muted comp",
+      owner: guitarist,
+      meta: locale === "zh-CN" ? "Indie Pop · 吉他" : "Indie Pop • Guitar",
+      timestamp: locale === "zh-CN" ? "12 分钟前" : "12 min ago",
+    },
+    {
+      id: "history-producer-brief",
+      title: copy.producerBrief,
+      owner: copy.aiProducer,
+      meta: locale === "zh-CN" ? "结构 + 提示单" : "Structure + cue sheet",
+      timestamp: locale === "zh-CN" ? "18 分钟前" : "18 min ago",
+    },
+  ];
+}
+
 export function AgenticProducingPage({
   onBack,
   previewMode = false,
 }: AgenticProducingPageProps) {
-  const [tracks, setTracks] = useState(initialTracks);
-  const [selectedTrackId, setSelectedTrackId] = useState(initialTracks[0].id);
+  const locale = useEntranceLocale();
+  const copy = agenticCopyByLocale[locale];
+  const localizedTargets = getMusicianTargetsForLocale(locale);
+  const [tracks, setTracks] = useState(() => getInitialTracksForLocale(locale));
+  const [selectedTrackId, setSelectedTrackId] = useState(
+    () => getInitialTracksForLocale(locale)[0].id,
+  );
   const [mutedTrackIds, setMutedTrackIds] = useState<string[]>([]);
   const [soloTrackIds, setSoloTrackIds] = useState<string[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -373,16 +667,15 @@ export function AgenticProducingPage({
   const [musicianTargetId, setMusicianTargetId] =
     useState<MusicianTargetId>("ai-drummer");
   const [styleDraft, setStyleDraft] = useState("");
-  const [lyricsDraft, setLyricsDraft] = useState(
-    "Falling through the city lights, give me a slow-burn chorus with space.",
-  );
+  const [lyricsDraft, setLyricsDraft] = useState(() => copy.defaultLyricsDraft);
   const [producerDraft, setProducerDraft] = useState("");
   const [producerWorkspaceOpen, setProducerWorkspaceOpen] = useState(false);
   const [producerMessages, setProducerMessages] =
-    useState<ProducerMessage[]>(initialProducerMessages);
-  const [audioQueue, setAudioQueue] = useState<AudioQueueItem[]>(initialAudioQueue);
+    useState<ProducerMessage[]>(() => getInitialProducerMessagesForLocale(locale));
+  const [audioQueue, setAudioQueue] =
+    useState<AudioQueueItem[]>(() => getInitialAudioQueueForLocale(locale));
   const [generationHistory, setGenerationHistory] =
-    useState<GenerationHistoryItem[]>(initialGenerationHistory);
+    useState<GenerationHistoryItem[]>(() => getInitialGenerationHistoryForLocale(locale));
 
   const timelinePaneRef = useRef<HTMLDivElement | null>(null);
   const timelineBodyRef = useRef<HTMLDivElement | null>(null);
@@ -411,9 +704,33 @@ export function AgenticProducingPage({
     timelineLeadingInset + currentBeat * pixelsPerBeat - scrollLeft;
   const selectedTrack = tracks.find((track) => track.id === selectedTrackId) ?? tracks[0];
   const selectedMusicianTarget =
-    musicianTargets.find((target) => target.id === musicianTargetId) ?? musicianTargets[0];
-  const selectedStyle = styleDraft.trim() || "Freeform";
+    localizedTargets.find((target) => target.id === musicianTargetId) ?? localizedTargets[0];
+  const selectedStyle = styleDraft.trim() || copy.selectedStyleFallback;
   const producerWorkspaceVisible = showAgentOverlay && agentMode === "producer" && producerWorkspaceOpen;
+
+  useEffect(() => {
+    const nextTracks = getInitialTracksForLocale(locale);
+    setTracks(nextTracks);
+    setSelectedTrackId(nextTracks[0]?.id ?? "");
+    setMutedTrackIds([]);
+    setSoloTrackIds([]);
+    setIsPlaying(false);
+    setLoopEnabled(false);
+    setCurrentBeat(6);
+    setScrollLeft(0);
+    setScrollTop(0);
+    setIsDraggingPlayhead(false);
+    setAgentMode("musician");
+    setOpenOverlayMenu(null);
+    setMusicianTargetId("ai-drummer");
+    setStyleDraft("");
+    setLyricsDraft(copy.defaultLyricsDraft);
+    setProducerDraft("");
+    setProducerWorkspaceOpen(false);
+    setProducerMessages(getInitialProducerMessagesForLocale(locale));
+    setAudioQueue(getInitialAudioQueueForLocale(locale));
+    setGenerationHistory(getInitialGenerationHistoryForLocale(locale));
+  }, [copy.defaultLyricsDraft, locale]);
 
   useEffect(() => {
     const handlePointerDown = (event: PointerEvent) => {
@@ -444,8 +761,8 @@ export function AgenticProducingPage({
     const nextIndex = tracks.length + 1;
     const nextTrack: ArrangementTrack = {
       id: `track-${nextIndex}`,
-      name: `Track ${nextIndex}`,
-      role: "Idea lane",
+      name: copy.trackName(nextIndex),
+      role: copy.ideaLane,
       level: "-inf dB",
       clips: [],
     };
@@ -492,23 +809,23 @@ export function AgenticProducingPage({
 
     pushQueueItem({
       id: createUiId("queue"),
-      title: `${selectedMusicianTarget.label} pass`,
+      title: copy.musicianPassTitle(selectedMusicianTarget.label),
       owner: selectedMusicianTarget.label,
-      status: "Generating",
+      status: copy.statusGenerating,
       detail: `${selectedStyle} • ${targetTrack?.name ?? selectedTrack.name}`,
       progress: selectedMusicianTarget.showsLyrics
-        ? "Shaping topline + lyric cadence"
-        : "Rendering arrangement take",
+        ? copy.lyricProgress
+        : copy.instrumentalProgress,
     });
 
     pushHistoryItem({
       id: createUiId("history"),
-      title: `${selectedMusicianTarget.label} pass`,
+      title: copy.musicianPassTitle(selectedMusicianTarget.label),
       owner: selectedMusicianTarget.label,
       meta: selectedMusicianTarget.showsLyrics
-        ? `${selectedStyle} • lyric-guided draft`
-        : `${selectedStyle} • instrumental pass`,
-      timestamp: "Just now",
+        ? copy.lyricDraftMeta(selectedStyle)
+        : copy.instrumentalPassMeta(selectedStyle),
+      timestamp: copy.justNow,
     });
   };
 
@@ -525,31 +842,31 @@ export function AgenticProducingPage({
         id: createUiId("message"),
         role: "user",
         text: nextDraft,
-        timestamp: "Just now",
+        timestamp: copy.justNow,
       },
       {
         id: createUiId("message"),
         role: "agent",
-        text: `Locked. I am shaping this into a ${selectedStyle} direction and sending the next pass to ${selectedMusicianTarget.label}. Queue and recent outputs stay visible on the right.`,
-        timestamp: "Just now",
+        text: copy.producerSubmitReply(selectedStyle, selectedMusicianTarget.label),
+        timestamp: copy.justNow,
       },
     ]);
 
     pushQueueItem({
       id: createUiId("queue"),
-      title: "Producer brief",
-      owner: "AI Producer",
-      status: "Generating",
-      detail: `${selectedStyle} • Session direction`,
-      progress: "Dispatching tasks to AI musicians",
+      title: copy.producerBrief,
+      owner: copy.aiProducer,
+      status: copy.statusGenerating,
+      detail: copy.producerSessionDirection(selectedStyle),
+      progress: copy.producerDispatch,
     });
 
     pushHistoryItem({
       id: createUiId("history"),
-      title: "Producer brief",
-      owner: "AI Producer",
-      meta: `${selectedStyle} • chat-directed`,
-      timestamp: "Just now",
+      title: copy.producerBrief,
+      owner: copy.aiProducer,
+      meta: copy.producerChatDirected(selectedStyle),
+      timestamp: copy.justNow,
     });
 
     setProducerDraft("");
@@ -681,7 +998,7 @@ export function AgenticProducingPage({
               <button
                 type="button"
                 onClick={onBack}
-                aria-label="Close DAW"
+                aria-label={copy.closeDaw}
                 className="tablet-icon-target tablet-pressable inline-flex items-center justify-center"
                 style={{
                   width: 44,
@@ -707,7 +1024,7 @@ export function AgenticProducingPage({
                   letterSpacing: "0.01em",
                 }}
               >
-                New Project 20250408
+                {copy.projectTitle}
               </h2>
             ) : (
               <div />
@@ -716,7 +1033,7 @@ export function AgenticProducingPage({
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                aria-label="Undo"
+                aria-label={copy.undo}
                 className="tablet-icon-target tablet-pressable inline-flex items-center justify-center"
                 style={toolbarIconStyle}
               >
@@ -724,7 +1041,7 @@ export function AgenticProducingPage({
               </button>
               <button
                 type="button"
-                aria-label="Import audio"
+                aria-label={copy.importAudio}
                 className="tablet-icon-target tablet-pressable inline-flex items-center justify-center"
                 style={toolbarIconStyle}
               >
@@ -745,7 +1062,7 @@ export function AgenticProducingPage({
                 }}
               >
                 <Save size={14} strokeWidth={1.9} />
-                Save
+                {copy.save}
               </button>
             </div>
           </div>
@@ -787,14 +1104,14 @@ export function AgenticProducingPage({
                         fontSize: previewMode ? 11 : 12,
                       }}
                     >
-                      {totalBars} bars • {tempo} BPM • {tracks.length} tracks
+                      {totalBars} {copy.barsUnit} • {tempo} BPM • {tracks.length} {copy.tracksUnit}
                     </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={addTrack}
-                    aria-label="Add track"
+                    aria-label={copy.addTrack}
                     className="tablet-touch-target tablet-pressable inline-flex items-center justify-center"
                     style={{
                       width: previewMode ? 28 : 32,
@@ -906,7 +1223,7 @@ export function AgenticProducingPage({
                             <button
                               type="button"
                               onClick={() => toggleMuted(track.id)}
-                              aria-label={`${isMuted ? "Unmute" : "Mute"} ${track.name}`}
+                              aria-label={`${isMuted ? copy.unmute : copy.mute} ${track.name}`}
                               style={{
                                 ...trackTogglePillStyle,
                                 width: 44,
@@ -924,7 +1241,7 @@ export function AgenticProducingPage({
                             <button
                               type="button"
                               onClick={() => toggleSolo(track.id)}
-                              aria-label={`${isSolo ? "Disable solo for" : "Solo"} ${track.name}`}
+                              aria-label={`${isSolo ? copy.disableSolo : copy.solo} ${track.name}`}
                               style={{
                                 ...trackTogglePillStyle,
                                 width: 44,
@@ -1140,8 +1457,10 @@ export function AgenticProducingPage({
                                   opacity: 0.86,
                                 }}
                               >
-                                Bar {Math.floor(clip.startBeat / beatsPerBar) + 1} •{" "}
-                                {Math.ceil(clip.durationBeats / beatsPerBar)} bars
+                                {copy.barLabel(
+                                  Math.floor(clip.startBeat / beatsPerBar) + 1,
+                                  Math.ceil(clip.durationBeats / beatsPerBar),
+                                )}
                               </span>
                             </button>
                           ))}
@@ -1161,7 +1480,7 @@ export function AgenticProducingPage({
                 >
                   <button
                     type="button"
-                    aria-label={`Playhead at ${transportPosition}`}
+                    aria-label={copy.playheadAt(transportPosition)}
                     onPointerDown={handlePlayheadPointerDown}
                     style={{
                       position: "absolute",
@@ -1234,13 +1553,13 @@ export function AgenticProducingPage({
                 </div>
 
                 <div className="flex items-center" style={{ gap: previewMode ? 8 : 10 }}>
-                  <button type="button" style={bottomIconStyle} aria-label="Waveform tools">
+                  <button type="button" style={bottomIconStyle} aria-label={copy.waveformTools}>
                     <AudioWaveform size={20} strokeWidth={1.8} />
                   </button>
-                  <button type="button" style={bottomIconStyle} aria-label="Microphone monitor">
+                  <button type="button" style={bottomIconStyle} aria-label={copy.microphoneMonitor}>
                     <MicOff size={20} strokeWidth={1.8} />
                   </button>
-                  <button type="button" style={bottomIconStyle} aria-label="Mixer controls">
+                  <button type="button" style={bottomIconStyle} aria-label={copy.mixerControls}>
                     <SlidersHorizontal size={20} strokeWidth={1.8} />
                   </button>
                 </div>
@@ -1250,7 +1569,7 @@ export function AgenticProducingPage({
                 <button
                   type="button"
                   onClick={() => seekToBeat(0)}
-                  aria-label="Return to start"
+                  aria-label={copy.returnToStart}
                   style={transportStyle}
                 >
                   <SkipBack size={previewMode ? 20 : 24} strokeWidth={2.1} />
@@ -1263,7 +1582,7 @@ export function AgenticProducingPage({
                     }
                     setIsPlaying((prev) => !prev);
                   }}
-                  aria-label={isPlaying ? "Pause playback" : "Start playback"}
+                  aria-label={isPlaying ? copy.pausePlayback : copy.startPlayback}
                   style={{
                     ...transportStyle,
                     width: previewMode ? 52 : 58,
@@ -1281,7 +1600,7 @@ export function AgenticProducingPage({
                 </button>
                 <button
                   type="button"
-                  aria-label="Record"
+                  aria-label={copy.record}
                   style={{ ...transportStyle, color: "var(--agentic-danger)" }}
                 >
                   <Circle size={previewMode ? 18 : 22} fill="currentColor" strokeWidth={2} />
@@ -1301,7 +1620,7 @@ export function AgenticProducingPage({
                   }}
                 >
                   <Repeat size={16} strokeWidth={2} />
-                  Loop
+                  {copy.loop}
                 </button>
                 <button type="button" style={bottomPillStyle}>
                   {selectedTrack.name}
@@ -1340,7 +1659,7 @@ export function AgenticProducingPage({
                   {agentMode === "musician" ? (
                     <MusicianComposerBar
                       openMenu={openOverlayMenu}
-                      targets={musicianTargets}
+                      targets={localizedTargets}
                       selectedTarget={selectedMusicianTarget}
                       styleDraft={styleDraft}
                       lyricsDraft={lyricsDraft}
@@ -1419,6 +1738,8 @@ function MusicianComposerBar({
   onGenerate,
   onSelectMode,
 }: MusicianComposerBarProps) {
+  const locale = useEntranceLocale();
+  const copy = agenticCopyByLocale[locale];
   return (
     <div className="flex-1" style={overlayBarStyle}>
       <div className="flex items-center" style={{ gap: 14 }}>
@@ -1437,7 +1758,7 @@ function MusicianComposerBar({
             style={overlayFieldButtonStyle}
           >
             <span>
-              <span style={overlayFieldLabelStyle}>AI Musician</span>
+              <span style={overlayFieldLabelStyle}>{copy.aiMusician}</span>
               <span style={overlayFieldValueStyle}>{selectedTarget.label}</span>
             </span>
             <ChevronDown size={18} strokeWidth={2} />
@@ -1445,7 +1766,7 @@ function MusicianComposerBar({
 
           {openMenu === "target" ? (
             <div style={overlayMenuStyle}>
-              <div style={overlayMenuTitleStyle}>Choose AI Musician</div>
+              <div style={overlayMenuTitleStyle}>{copy.chooseAiMusician}</div>
               {targets.map((target) => {
                 const isActive = target.id === selectedTarget.id;
                 return (
@@ -1476,12 +1797,12 @@ function MusicianComposerBar({
             }}
           >
             <label style={{ ...overlayLyricsFieldStyle, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-              <span style={overlayFieldLabelStyle}>Style</span>
+              <span style={overlayFieldLabelStyle}>{copy.style}</span>
               <input
                 type="text"
                 value={styleDraft}
                 onChange={(event) => onStyleChange(event.target.value)}
-                placeholder="Enter a style"
+                placeholder={copy.enterStyle}
                 className="min-w-0 bg-transparent outline-none"
                 style={overlayTextFieldInputStyle}
               />
@@ -1490,12 +1811,12 @@ function MusicianComposerBar({
 
           {selectedTarget.showsLyrics ? (
             <label style={{ ...overlayFieldWrapStyle, ...overlayLyricsFieldStyle, flex: "1 1 320px" }}>
-              <span style={overlayFieldLabelStyle}>Lyrics</span>
+              <span style={overlayFieldLabelStyle}>{copy.lyrics}</span>
               <textarea
                 value={lyricsDraft}
                 onChange={(event) => onLyricsChange(event.target.value)}
                 rows={1}
-                placeholder="Shape the topline or paste a hook..."
+                placeholder={copy.lyricsPlaceholder}
                 style={overlayLyricsInputStyle}
               />
             </label>
@@ -1504,7 +1825,7 @@ function MusicianComposerBar({
 
         <div className="flex items-center" style={{ gap: 10, flex: "0 0 auto" }}>
           <button type="button" onClick={onGenerate} style={generateButtonStyle}>
-            Generate
+            {copy.generate}
           </button>
           <ModeToggleButton
             open={openMenu === "mode"}
@@ -1541,6 +1862,8 @@ function ProducerComposerBar({
   onModeToggle,
   onSelectMode,
 }: ProducerComposerBarProps) {
+  const locale = useEntranceLocale();
+  const copy = agenticCopyByLocale[locale];
   return (
     <div className="flex-1" style={overlayBarStyle}>
       <div className="flex items-center" style={{ gap: 12 }}>
@@ -1555,7 +1878,7 @@ function ProducerComposerBar({
                 onDraftSubmit();
               }
             }}
-            placeholder="Start with your AI Music Producer."
+            placeholder={copy.aiProducerPlaceholder}
             className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-[var(--secondary)]"
             style={producerInputStyle}
           />
@@ -1565,13 +1888,13 @@ function ProducerComposerBar({
           type="button"
           onClick={onOpenWorkspace}
           style={producerWorkspaceButtonStyle}
-          aria-label="Open AI Producer workspace"
+          aria-label={copy.openProducerWorkspace}
         >
           <AudioWaveform size={18} strokeWidth={2} />
         </button>
 
         <button type="button" onClick={onDraftSubmit} style={generateButtonStyle}>
-          {workspaceOpen ? "Send" : "Start"}
+          {workspaceOpen ? copy.send : copy.start}
         </button>
 
         <ModeToggleButton
@@ -1598,11 +1921,14 @@ function ModeToggleButton({
   onToggle,
   onSelectMode,
 }: ModeToggleButtonProps) {
+  const locale = useEntranceLocale();
+  const copy = agenticCopyByLocale[locale];
+  const agentModeOptions = getAgentModeOptionsForLocale(locale);
   const currentModeLabel =
-    agentModeOptions.find((mode) => mode.id === currentMode)?.label ?? "AI Musician";
+    agentModeOptions.find((mode) => mode.id === currentMode)?.label ?? copy.aiMusician;
   const nextMode = currentMode === "musician" ? "producer" : "musician";
   const nextModeLabel =
-    agentModeOptions.find((mode) => mode.id === nextMode)?.label ?? "AI Producer";
+    agentModeOptions.find((mode) => mode.id === nextMode)?.label ?? copy.aiProducer;
 
   return (
     <div style={{ position: "relative", flex: "0 0 auto" }}>
@@ -1610,7 +1936,7 @@ function ModeToggleButton({
         type="button"
         onClick={onToggle}
         style={modeToggleButtonStyle}
-        aria-label={`Current mode ${currentModeLabel}. Open switcher.`}
+        aria-label={copy.currentModeAria(currentModeLabel)}
       >
         {currentModeLabel}
       </button>
@@ -1648,15 +1974,17 @@ function ProducerWorkspacePanel({
   generationHistory,
   onClose,
 }: ProducerWorkspacePanelProps) {
+  const locale = useEntranceLocale();
+  const copy = agenticCopyByLocale[locale];
   return (
     <div style={producerPanelStyle}>
       <div className="flex items-center justify-between" style={producerPanelHeaderStyle}>
         <div>
-          <div style={producerPanelEyebrowStyle}>AI Producer</div>
-          <div style={producerPanelTitleStyle}>Shape the next move for this session.</div>
+          <div style={producerPanelEyebrowStyle}>{copy.aiProducer}</div>
+          <div style={producerPanelTitleStyle}>{copy.producerTitle}</div>
         </div>
 
-        <button type="button" onClick={onClose} style={producerPanelCloseStyle} aria-label="Close AI Producer workspace">
+        <button type="button" onClick={onClose} style={producerPanelCloseStyle} aria-label={copy.closeProducerWorkspace}>
           <X size={18} strokeWidth={2} />
         </button>
       </div>
@@ -1667,8 +1995,8 @@ function ProducerWorkspacePanel({
       >
         <div style={producerChatCardStyle}>
           <div style={producerSectionHeaderStyle}>
-            <div style={producerSectionEyebrowStyle}>Conversation</div>
-            <div style={producerSectionMetaStyle}>Direction, notes, and next actions</div>
+            <div style={producerSectionEyebrowStyle}>{copy.conversation}</div>
+            <div style={producerSectionMetaStyle}>{copy.conversationMeta}</div>
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto" style={producerMessagesWrapStyle}>
@@ -1703,8 +2031,8 @@ function ProducerWorkspacePanel({
         >
           <div style={producerRailCardStyle}>
             <div style={producerSectionHeaderStyle}>
-              <div style={producerSectionEyebrowStyle}>Render Queue</div>
-              <div style={producerSectionMetaStyle}>Active and queued generations</div>
+              <div style={producerSectionEyebrowStyle}>{copy.renderQueue}</div>
+              <div style={producerSectionMetaStyle}>{copy.renderQueueMeta}</div>
             </div>
 
             <div className="flex flex-col overflow-y-auto" style={{ gap: 10 }}>
@@ -1717,7 +2045,9 @@ function ProducerWorkspacePanel({
                         {item.owner} • {item.detail}
                       </div>
                     </div>
-                    <span style={queueStatusBadgeStyle(item.status)}>{item.status}</span>
+                    <span style={queueStatusBadgeStyle(item.status)}>
+                      {copy.statusLabels[item.status]}
+                    </span>
                   </div>
                   <div style={producerListItemSubtleStyle}>{item.progress}</div>
                 </div>
@@ -1727,8 +2057,8 @@ function ProducerWorkspacePanel({
 
           <div style={producerRailCardStyle}>
             <div style={producerSectionHeaderStyle}>
-              <div style={producerSectionEyebrowStyle}>Recent Passes</div>
-              <div style={producerSectionMetaStyle}>Latest outputs and handoffs</div>
+              <div style={producerSectionEyebrowStyle}>{copy.recentPasses}</div>
+              <div style={producerSectionMetaStyle}>{copy.recentPassesMeta}</div>
             </div>
 
             <div className="flex flex-col overflow-y-auto" style={{ gap: 10 }}>

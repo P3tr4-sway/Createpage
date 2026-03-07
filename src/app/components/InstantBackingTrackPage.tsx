@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, SlidersHorizontal } from "lucide-react";
+import { useEntranceLocale } from "../../modules/entrance/EntranceLocaleContext";
 
 interface InstantBackingTrackPageProps {
   onBack: () => void;
@@ -192,10 +193,55 @@ const tracks: BackingTrackItem[] = [
   },
 ];
 
+const backingTrackCopyByLocale = {
+  en: {
+    back: "Back",
+    title: "Instant Backing Track",
+    filter: "Filter",
+    showLess: "Show Less",
+    showMore: (count: number) => `Show More (${count} more)`,
+    filterLabels: {
+      Saved: "Saved",
+      Hot: "Hot",
+      New: "New",
+      Pop: "Pop",
+      Blues: "Blues",
+      "Samurai Jam Tracks": "Samurai Jam Tracks",
+      Funk: "Funk",
+      Rock: "Rock",
+      Country: "Country",
+      "R&B": "R&B",
+      "Neo-Soul": "Neo-Soul",
+    },
+  },
+  "zh-CN": {
+    back: "返回",
+    title: "即时伴奏",
+    filter: "筛选",
+    showLess: "收起",
+    showMore: (count: number) => `显示更多（还有 ${count} 项）`,
+    filterLabels: {
+      Saved: "已收藏",
+      Hot: "热门",
+      New: "最新",
+      Pop: "流行",
+      Blues: "布鲁斯",
+      "Samurai Jam Tracks": "武士 Jam 曲库",
+      Funk: "放克",
+      Rock: "摇滚",
+      Country: "乡村",
+      "R&B": "R&B",
+      "Neo-Soul": "Neo-Soul",
+    },
+  },
+} as const;
+
 export function InstantBackingTrackPage({
   onBack,
   initialFilter = "Hot",
 }: InstantBackingTrackPageProps) {
+  const locale = useEntranceLocale();
+  const copy = backingTrackCopyByLocale[locale];
   const [activeFilter, setActiveFilter] = useState("Hot");
   const [showAll, setShowAll] = useState(false);
   const INITIAL_VISIBLE_COUNT = 12;
@@ -238,7 +284,7 @@ export function InstantBackingTrackPage({
           }}
         >
           <ArrowLeft size={16} strokeWidth={1.8} />
-          Back
+          {copy.back}
         </button>
 
         <h2
@@ -248,7 +294,7 @@ export function InstantBackingTrackPage({
             fontWeight: "var(--font-weight-bold)",
           }}
         >
-          Instant Backing Track
+          {copy.title}
         </h2>
 
         <div style={{ width: 60 }} />
@@ -277,7 +323,7 @@ export function InstantBackingTrackPage({
                 lineHeight: 1.1,
               }}
             >
-              {filter}
+              {copy.filterLabels[filter as keyof typeof copy.filterLabels]}
             </button>
           );
         })}
@@ -297,7 +343,7 @@ export function InstantBackingTrackPage({
           }}
         >
           <SlidersHorizontal size={16} strokeWidth={1.8} />
-          Filter
+          {copy.filter}
         </button>
       </div>
 
@@ -379,7 +425,7 @@ export function InstantBackingTrackPage({
               letterSpacing: "0.04em",
             }}
           >
-            {showAll ? "Show Less" : `Show More (${hiddenCount} more)`}
+            {showAll ? copy.showLess : copy.showMore(hiddenCount)}
           </button>
         </div>
       )}
