@@ -307,7 +307,7 @@ export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
 
             <div style={{ padding: "0 28px" }}>
               <div
-                className="flex items-center gap-3 rounded-[18px] border px-4 py-3"
+                className="flex items-center gap-3 rounded-[var(--radius-control)] border px-4 py-3"
                 style={{
                   backgroundColor: "var(--input-background)",
                   borderColor: "var(--border)",
@@ -357,7 +357,7 @@ export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
                     fontWeight: "var(--font-weight-medium)",
                     fontFamily: FONT,
                     padding: "0 14px",
-                    borderRadius: 999,
+                    borderRadius: "var(--radius-pill)",
                     border: `1px solid ${
                       activeFilter === f
                         ? "var(--chip-active-border)"
@@ -388,7 +388,7 @@ export function ProjectsSheet({ open, onOpenChange }: ProjectsSheetProps) {
                   <button
                     key={project.id}
                     type="button"
-                    className="tablet-touch-target tablet-pressable tablet-hover-soft flex w-full items-center gap-4 rounded-[18px] text-left"
+                    className="tablet-touch-target tablet-pressable tablet-hover-soft flex w-full items-center gap-4 rounded-[var(--radius-control)] text-left"
                     style={{
                       padding: "12px 14px",
                       fontFamily: FONT,

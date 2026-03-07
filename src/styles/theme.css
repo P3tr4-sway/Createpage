@@ -72,10 +72,18 @@
   --chart-5: rgba(198, 198, 202, 1.00);
   /* The default border radius for elements such as buttons, tooltip, and other containers. */
   --radius: 12px;
+  /* The default radius for standard buttons, inputs, and selects. */
+  --radius-control: 18px;
   /* The border radius for card-like containers. */
   --radius-card: 20px;
+  /* The radius for large interactive cards and floating menus. */
+  --radius-container: 24px;
+  /* The radius for image thumbnails and compact media tiles. */
+  --radius-media: 14px;
   /* The border radius for tooltips and popovers. */
   --radius-tooltip: 20px;
+  /* The radius for pill controls and composer bars. */
+  --radius-pill: 9999px;
   /* The background color for sidebars, navigation menus, and other persistent elements. */
   --sidebar: rgba(243, 243, 240, 1);
   /* The default color for text or elements that appear on top of sidebars, navigation menus, and other persistent elements. */

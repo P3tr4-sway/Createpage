@@ -388,7 +388,7 @@ export function EntranceWorkspace() {
             <button
               type="button"
               onClick={() => setActiveSubView("home")}
-              className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-full"
+              className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-[var(--radius-control)]"
               style={secondaryButtonStyle}
             >
               <ArrowLeft size={15} strokeWidth={1.9} />

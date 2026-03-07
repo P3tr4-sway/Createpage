@@ -162,7 +162,10 @@ export function EntranceWorkspaceHero({
             className="relative flex w-full"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex w-full items-center rounded-full" style={heroChatFieldStyle}>
+            <div
+              className="flex w-full items-center rounded-[var(--radius-pill)]"
+              style={heroChatFieldStyle}
+            >
               <input
                 ref={inputRef}
                 type="text"
@@ -180,7 +183,7 @@ export function EntranceWorkspaceHero({
               <button
                 type="button"
                 onClick={(event) => event.stopPropagation()}
-                className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-full"
+                className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-[var(--radius-pill)]"
                 style={heroChatSendStyle}
               >
                 {promptStartLabel}
@@ -299,6 +302,7 @@ const heroSloganTitleStyle: CSSProperties = {
 const heroChatFieldStyle: CSSProperties = {
   minHeight: 80,
   padding: "0 12px 0 20px",
+  borderRadius: "var(--radius-pill)",
   border: "1px solid var(--border)",
   backgroundColor: "var(--card)",
   boxShadow: "0 10px 28px rgba(15,23,42,0.08)",
@@ -318,6 +322,7 @@ const heroChatInputStyle: CSSProperties = {
 const heroChatSendStyle: CSSProperties = {
   height: 56,
   padding: "0 24px",
+  borderRadius: "var(--radius-pill)",
   border: "1px solid var(--border)",
   backgroundColor: "var(--foreground)",
   color: "var(--background)",

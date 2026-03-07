@@ -619,7 +619,7 @@ const producerWorkspacePopoverStyle: CSSProperties = {
 
 const overlayBarStyle: CSSProperties = {
   minHeight: 80,
-  borderRadius: 9999,
+  borderRadius: "var(--radius-pill)",
   border: "1px solid var(--border)",
   backgroundColor: "var(--card)",
   boxShadow: "0 10px 28px rgba(15,23,42,0.08)",
@@ -634,7 +634,7 @@ const overlayFieldButtonStyle: CSSProperties = {
   width: "100%",
   minHeight: 56,
   padding: "0 18px",
-  borderRadius: 9999,
+  borderRadius: "var(--radius-pill)",
   border: "none",
   backgroundColor: "var(--soft-surface)",
   color: "var(--foreground)",
@@ -663,7 +663,7 @@ const overlayFieldValueStyle: CSSProperties = {
 const overlayLyricsFieldStyle: CSSProperties = {
   minHeight: 56,
   padding: "10px 18px",
-  borderRadius: 9999,
+  borderRadius: "var(--radius-pill)",
   border: "none",
   backgroundColor: "var(--soft-surface)",
   display: "block",
@@ -726,7 +726,7 @@ const generateButtonStyle: CSSProperties = {
   fontSize: 16,
   fontWeight: 700,
   letterSpacing: "0",
-  borderRadius: 9999,
+  borderRadius: "var(--radius-pill)",
   cursor: "pointer",
 };
 
@@ -736,7 +736,7 @@ const producerWorkspaceButtonStyle: CSSProperties = {
   border: "1px solid var(--border)",
   backgroundColor: "var(--soft-surface)",
   color: "var(--foreground)",
-  borderRadius: 18,
+  borderRadius: "var(--radius-control)",
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
@@ -754,7 +754,7 @@ const modeToggleButtonStyle: CSSProperties = {
   fontSize: 16,
   fontWeight: 700,
   letterSpacing: "0",
-  borderRadius: 9999,
+  borderRadius: "var(--radius-pill)",
   cursor: "pointer",
 };
 
@@ -764,7 +764,7 @@ const overlayMenuStyle: CSSProperties = {
   bottom: "calc(100% + 12px)",
   width: "100%",
   minWidth: 220,
-  borderRadius: 24,
+  borderRadius: "var(--radius-container)",
   border: "1px solid var(--border)",
   backgroundColor: "var(--float-surface)",
   boxShadow: "var(--float-shadow)",
@@ -785,7 +785,7 @@ const overlayMenuItemStyle: CSSProperties = {
   minHeight: 48,
   padding: "0 14px",
   border: "none",
-  borderRadius: 16,
+  borderRadius: "var(--radius-control)",
   fontSize: 15,
   fontWeight: 600,
   cursor: "pointer",
@@ -835,7 +835,7 @@ const producerPanelTitleStyle: CSSProperties = {
 const producerPanelCloseStyle: CSSProperties = {
   width: 44,
   height: 44,
-  borderRadius: 9999,
+  borderRadius: "var(--radius-control)",
   border: "1px solid var(--border)",
   backgroundColor: "var(--float-surface)",
   color: "var(--secondary)",

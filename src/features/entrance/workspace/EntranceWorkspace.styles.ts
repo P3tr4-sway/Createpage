@@ -21,7 +21,7 @@ export const railHeadingStyle: CSSProperties = {
 export const iconButtonStyle: CSSProperties = {
   width: 44,
   height: 44,
-  borderRadius: 999,
+  borderRadius: "var(--radius-control)",
   border: "none",
   backgroundColor: "transparent",
   color: "var(--foreground)",
@@ -37,7 +37,7 @@ export const languageSelectStyle: CSSProperties = {
   width: "100%",
   height: 44,
   padding: "0 34px 0 14px",
-  borderRadius: 999,
+  borderRadius: "var(--radius-control)",
   border: "1px solid color-mix(in srgb, var(--border) 78%, transparent)",
   backgroundColor: "color-mix(in srgb, var(--card) 78%, transparent)",
   color: "var(--foreground)",

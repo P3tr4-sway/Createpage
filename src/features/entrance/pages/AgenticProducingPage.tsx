@@ -162,7 +162,7 @@ export function AgenticProducingPage({
                 style={{
                   width: 44,
                   height: 44,
-                  borderRadius: 10,
+                  borderRadius: "var(--radius-control)",
                   color: "var(--agentic-foreground)",
                   backgroundColor: "transparent",
                   border: "none",
@@ -212,7 +212,7 @@ export function AgenticProducingPage({
                 style={{
                   height: 42,
                   padding: "0 14px",
-                  borderRadius: 9999,
+                  borderRadius: "var(--radius-pill)",
                   border: "1px solid var(--agentic-border)",
                   color: "var(--background)",
                   backgroundColor: "var(--foreground)",
@@ -275,7 +275,7 @@ export function AgenticProducingPage({
                     style={{
                       width: previewMode ? 28 : 32,
                       height: previewMode ? 28 : 32,
-                      borderRadius: 10,
+                      borderRadius: "var(--radius-control)",
                       border: "none",
                       backgroundColor: "transparent",
                       color: "var(--agentic-contrast)",
@@ -837,14 +837,14 @@ export function AgenticProducingPage({
 const toolbarIconStyle: CSSProperties = {
   width: 44,
   height: 44,
-  borderRadius: 12,
+  borderRadius: "var(--radius-control)",
   border: "1px solid var(--agentic-border)",
   backgroundColor: "var(--agentic-elevated)",
   color: "var(--agentic-control-text)",
 };
 
 const trackTogglePillStyle: CSSProperties = {
-  borderRadius: 10,
+  borderRadius: "var(--radius-control)",
   border: "1px solid rgba(255,255,255,0.1)",
   fontSize: 13,
   fontWeight: 700,
@@ -857,7 +857,7 @@ const trackTogglePillStyle: CSSProperties = {
 const bottomIconStyle: CSSProperties = {
   width: 44,
   height: 44,
-  borderRadius: 12,
+  borderRadius: "var(--radius-control)",
   border: "1px solid var(--agentic-border)",
   backgroundColor: "var(--agentic-elevated)",
   color: "var(--agentic-control-text)",
@@ -870,7 +870,7 @@ const bottomIconStyle: CSSProperties = {
 const transportStyle: CSSProperties = {
   width: 50,
   height: 50,
-  borderRadius: 14,
+  borderRadius: "var(--radius-control)",
   border: "1px solid var(--agentic-border)",
   backgroundColor: "var(--agentic-elevated)",
   color: "var(--agentic-foreground)",
@@ -884,7 +884,7 @@ const bottomPillStyle: CSSProperties = {
   minWidth: 44,
   height: 44,
   padding: "0 13px",
-  borderRadius: 9999,
+  borderRadius: "var(--radius-pill)",
   border: "1px solid var(--agentic-border)",
   backgroundColor: "var(--agentic-elevated)",
   color: "var(--agentic-control-text)",

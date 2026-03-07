@@ -28,7 +28,7 @@ export function EntranceWorkspaceTutorialPanel({
   onOpenTutorial,
 }: EntranceWorkspaceTutorialPanelProps) {
   return (
-    <div className="rounded-[30px]" style={panelStyle}>
+    <div className="rounded-[var(--radius-container)]" style={panelStyle}>
       <div className="mb-3 flex items-center justify-between">
         <p style={miniSectionTitleStyle}>{title}</p>
         <button
@@ -47,7 +47,7 @@ export function EntranceWorkspaceTutorialPanel({
             key={course.id}
             type="button"
             onClick={() => onOpenTutorial(course)}
-            className="tablet-pressable relative overflow-hidden rounded-[22px] text-left"
+            className="tablet-pressable relative overflow-hidden rounded-[var(--radius-container)] text-left"
             style={{
               minHeight: 168,
               border: `1px solid ${railBorder}`,

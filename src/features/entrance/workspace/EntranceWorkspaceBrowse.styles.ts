@@ -3,6 +3,7 @@ import { type CSSProperties } from "react";
 export const secondaryButtonStyle: CSSProperties = {
   height: 46,
   padding: "0 18px",
+  borderRadius: "var(--radius-control)",
   border: "1px solid var(--border)",
   backgroundColor: "var(--surface-glass)",
   color: "var(--foreground)",
@@ -28,6 +29,7 @@ export const sectionDescriptionStyle: CSSProperties = {
 
 export const panelStyle: CSSProperties = {
   padding: 18,
+  borderRadius: "var(--radius-container)",
   border: "1px solid var(--border)",
   backgroundColor: "var(--surface-glass-strong)",
   boxShadow: "var(--elevation-sm)",
@@ -65,6 +67,7 @@ export const inlineLinkButtonStyle: CSSProperties = {
 export const quickActionCardStyle: CSSProperties = {
   minHeight: 104,
   padding: 14,
+  borderRadius: "var(--radius-container)",
   border: "1px solid var(--border)",
   backgroundColor: "var(--surface-glass-strong)",
   boxShadow: "0 8px 20px rgba(15,23,42,0.04)",

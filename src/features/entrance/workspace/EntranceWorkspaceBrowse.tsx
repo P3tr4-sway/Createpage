@@ -64,11 +64,11 @@ function QuickActionCard({ action, onClick }: QuickActionCardProps) {
     <button
       type="button"
       onClick={onClick}
-      className="tablet-touch-target tablet-pressable tablet-hover-lift flex h-full items-center gap-3 rounded-[22px] text-left"
+      className="tablet-touch-target tablet-pressable tablet-hover-lift flex h-full items-center gap-3 rounded-[var(--radius-container)] text-left"
       style={quickActionCardStyle}
     >
       <div
-        className="relative overflow-hidden rounded-[14px]"
+        className="relative overflow-hidden rounded-[var(--radius-media)]"
         style={{ width: 68, height: 68, flexShrink: 0 }}
       >
         <ImageWithFallback
@@ -163,7 +163,7 @@ export function QuickActionsPage({
         <button
           type="button"
           onClick={onBack}
-          className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-full"
+          className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-[var(--radius-control)]"
           style={secondaryButtonStyle}
         >
           <ArrowLeft size={15} strokeWidth={1.9} />
@@ -197,7 +197,7 @@ export function TopListColumn({
 
   return (
     <div
-      className="rounded-[30px]"
+      className="rounded-[var(--radius-container)]"
       style={{ ...panelStyle, display: "flex", flexDirection: "column" }}
     >
       <div className="mb-3 flex items-center justify-between">
@@ -230,7 +230,7 @@ export function TopListColumn({
             key={item.id}
             type="button"
             onClick={() => onItemClick(item)}
-            className="tablet-touch-target tablet-pressable flex items-center gap-3 rounded-[20px] text-left"
+            className="tablet-touch-target tablet-pressable flex items-center gap-3 rounded-[var(--radius-control)] text-left"
             style={{
               padding: "10px 10px 10px 12px",
               border: "none",
@@ -238,7 +238,7 @@ export function TopListColumn({
             }}
           >
             <div
-              className="relative overflow-hidden rounded-[14px]"
+              className="relative overflow-hidden rounded-[var(--radius-media)]"
               style={{ width: 52, height: 52, flexShrink: 0 }}
             >
               <ImageWithFallback
@@ -280,7 +280,7 @@ export function TopBrowsePage({
         <button
           type="button"
           onClick={onBack}
-          className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-full"
+          className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-[var(--radius-control)]"
           style={secondaryButtonStyle}
         >
           <ArrowLeft size={15} strokeWidth={1.9} />
@@ -296,7 +296,7 @@ export function TopBrowsePage({
             key={item.id}
             type="button"
             onClick={() => onItemClick(item)}
-            className="tablet-pressable relative overflow-hidden rounded-[28px] text-left"
+            className="tablet-pressable relative overflow-hidden rounded-[var(--radius-container)] text-left"
             style={{
               minHeight: 220,
               border: "1px solid var(--border)",

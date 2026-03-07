@@ -278,7 +278,7 @@ export function InstantBackingTrackPage({
             fontSize: "var(--text-sm)",
             fontWeight: "var(--font-weight-medium)",
             padding: "0 14px",
-            borderRadius: 10,
+            borderRadius: "var(--radius-control)",
             border: "1px solid var(--border)",
             backgroundColor: "var(--soft-surface)",
           }}
@@ -314,7 +314,7 @@ export function InstantBackingTrackPage({
               className="tablet-touch-target tablet-pressable whitespace-nowrap"
               style={{
                 padding: "0 18px",
-                borderRadius: 12,
+                borderRadius: "var(--radius-pill)",
                 border: isActive ? "1px solid var(--chip-active-border)" : "1px solid var(--border)",
                 backgroundColor: isActive ? "var(--chip-active-bg)" : "var(--chip-bg)",
                 color: isActive ? "var(--chip-active-text)" : "var(--chip-text)",
@@ -333,7 +333,7 @@ export function InstantBackingTrackPage({
           className="tablet-touch-target tablet-pressable ml-auto inline-flex items-center gap-2 whitespace-nowrap"
           style={{
             padding: "0 16px",
-            borderRadius: 12,
+            borderRadius: "var(--radius-control)",
             border: "1px solid var(--border)",
             backgroundColor: "var(--chip-bg)",
             color: "var(--chip-text)",
@@ -420,7 +420,7 @@ export function InstantBackingTrackPage({
               fontWeight: "var(--font-weight-medium)",
               fontFamily: "var(--app-font-family)",
               padding: "0 24px",
-              borderRadius: "var(--radius-full, 9999px)",
+              borderRadius: "var(--radius-pill)",
               border: "1px solid var(--border)",
               letterSpacing: "0.04em",
             }}

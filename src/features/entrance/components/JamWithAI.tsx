@@ -159,7 +159,7 @@ export function JamWithAI() {
 
       <div className="mb-3 flex gap-3">
         <div
-          className="flex-1 flex items-center gap-3 px-4 py-3 rounded-lg border transition-colors"
+          className="flex-1 flex items-center gap-3 px-4 py-3 rounded-[var(--radius-control)] border transition-colors"
           style={{
             minHeight: "var(--touch-target-comfortable)",
             backgroundColor: "var(--input-background)",
@@ -195,7 +195,7 @@ export function JamWithAI() {
             fontFamily: "var(--app-font-family)",
             minWidth: 96,
             padding: "0 18px",
-            borderRadius: "var(--radius-tooltip)",
+            borderRadius: "var(--radius-control)",
             border: "none",
             whiteSpace: "nowrap",
             letterSpacing: "0.04em",
@@ -214,7 +214,7 @@ export function JamWithAI() {
             key={suggestion}
             type="button"
             onClick={() => handleSuggestionClick(suggestion)}
-            className="tablet-touch-target tablet-pressable rounded-full border px-4"
+            className="tablet-touch-target tablet-pressable rounded-[var(--radius-pill)] border px-4"
             style={{
               borderColor: "var(--border)",
               color: "var(--secondary)",
