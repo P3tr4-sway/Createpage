@@ -1,16 +1,11 @@
 import {
   ArrowLeft,
-  Bookmark,
   Bot,
   ChevronRight,
-  LibraryBig,
   Moon,
-  Music,
   Repeat,
-  Search,
   Sparkles,
   Sun,
-  Waves,
   type LucideIcon,
 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -89,11 +84,6 @@ type SidebarProject = {
   meta: string;
   status: string;
   onClick: () => void;
-};
-
-type SidebarProjectGroup = {
-  label: string;
-  items: SidebarProject[];
 };
 
 const topSongs: BrowseItem[] = [
@@ -424,26 +414,26 @@ export function EntranceWorkspace() {
 
   const shellTone = useMemo(
     () => ({
-      appBg: isDark ? "#111315" : "#f3f4f6",
+      appBg: isDark ? "#171717" : "#f7f7f5",
       homeBg: isDark
-        ? "radial-gradient(circle at 18% 0%, rgba(99,102,241,0.18), transparent 30%), radial-gradient(circle at 88% 12%, rgba(45,212,191,0.14), transparent 26%), linear-gradient(180deg, #111315 0%, #151920 34%, #111315 100%)"
-        : "radial-gradient(circle at 16% 0%, rgba(99,102,241,0.08), transparent 28%), radial-gradient(circle at 86% 12%, rgba(45,212,191,0.08), transparent 24%), linear-gradient(180deg, #f7f8fb 0%, #edf2f8 34%, #f3f4f6 100%)",
-      railBg: isDark ? "#16181c" : "#f7f7f8",
-      railSurface: isDark ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.78)",
-      railSurfaceStrong: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.92)",
-      railBorder: isDark ? "rgba(255,255,255,0.08)" : "rgba(15,23,42,0.08)",
-      mainHeaderBg: isDark ? "#171a1f" : "#f8f8f9",
+        ? "radial-gradient(circle at 22% 0%, rgba(255,255,255,0.04), transparent 24%), linear-gradient(180deg, #171717 0%, #121212 34%, #171717 100%)"
+        : "radial-gradient(circle at 18% 0%, rgba(255,255,255,0.62), transparent 24%), linear-gradient(180deg, #fbfbfa 0%, #f2f2ef 34%, #f7f7f5 100%)",
+      railBg: isDark ? "#1b1b1b" : "#f8f8f6",
+      railSurface: isDark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.72)",
+      railSurfaceStrong: isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.9)",
+      railBorder: isDark ? "rgba(255,255,255,0.08)" : "rgba(23,23,23,0.08)",
+      mainHeaderBg: isDark ? "#1c1c1c" : "#fafaf8",
       heroScrim: isDark
         ? "linear-gradient(180deg, rgba(6,8,12,0.18) 0%, rgba(6,8,12,0.36) 48%, rgba(6,8,12,0.6) 100%)"
         : "linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.28) 48%, rgba(248,250,252,0.68) 100%)",
       heroBridge: isDark
-        ? "linear-gradient(180deg, rgba(17,19,21,0) 0%, rgba(17,19,21,0.18) 36%, rgba(17,19,21,0.82) 100%)"
-        : "linear-gradient(180deg, rgba(243,244,246,0) 0%, rgba(243,244,246,0.42) 36%, rgba(243,244,246,0.95) 100%)",
-      heroFrameBg: isDark ? "rgba(5,8,12,0.96)" : "rgba(255,255,255,0.92)",
-      heroHintBg: isDark ? "rgba(10,14,20,0.74)" : "rgba(255,255,255,0.8)",
-      heroHintBorder: isDark ? "rgba(255,255,255,0.12)" : "rgba(15,23,42,0.08)",
-      chipBg: isDark ? "rgba(255,255,255,0.06)" : "rgba(15,23,42,0.04)",
-      mutedText: isDark ? "rgba(255,255,255,0.58)" : "rgba(71,85,105,0.86)",
+        ? "linear-gradient(180deg, rgba(23,23,23,0) 0%, rgba(23,23,23,0.18) 36%, rgba(23,23,23,0.82) 100%)"
+        : "linear-gradient(180deg, rgba(247,247,245,0) 0%, rgba(247,247,245,0.42) 36%, rgba(247,247,245,0.95) 100%)",
+      heroFrameBg: isDark ? "rgba(12,12,12,0.96)" : "rgba(255,255,255,0.92)",
+      heroHintBg: isDark ? "rgba(17,17,17,0.76)" : "rgba(255,255,255,0.8)",
+      heroHintBorder: isDark ? "rgba(255,255,255,0.12)" : "rgba(23,23,23,0.08)",
+      chipBg: isDark ? "rgba(255,255,255,0.06)" : "rgba(23,23,23,0.04)",
+      mutedText: isDark ? "rgba(255,255,255,0.58)" : "rgba(82,82,82,0.86)",
     }),
     [isDark],
   );
@@ -519,15 +509,15 @@ export function EntranceWorkspace() {
   const createActions = useMemo<SidebarAction[]>(
     () => [
       {
-        label: "Song",
-        meta: "Full sketch",
+        label: "Start a song",
+        meta: "Build a full idea fast.",
         icon: Bot,
         accent: "rgba(99, 102, 241, 0.18)",
         onClick: () => setFullscreenView("agentic-producing"),
       },
       {
-        label: "Loop",
-        meta: "Fast groove",
+        label: "Make a loop",
+        meta: "Lock a groove in seconds.",
         icon: Repeat,
         accent: "rgba(20, 184, 166, 0.18)",
         onClick: () => {
@@ -536,134 +526,50 @@ export function EntranceWorkspace() {
         },
       },
       {
-        label: "Jam",
-        meta: "Start loose",
+        label: "Catch a riff",
+        meta: "Save a playable idea before it goes.",
         icon: Sparkles,
         accent: "rgba(244, 114, 182, 0.18)",
+        onClick: () => openGuitar(guitarClips[0]),
+      },
+      {
+        label: "Jam a vibe",
+        meta: "Start loose and explore a feeling.",
+        icon: Sparkles,
+        accent: "rgba(250, 204, 21, 0.2)",
         onClick: () => handleScrollTo("launch"),
       },
     ],
-    [handleScrollTo],
+    [handleScrollTo, openGuitar],
   );
 
-  const workspaceActions = useMemo<SidebarAction[]>(
+  const continueProject = useMemo<SidebarProject>(
+    () => ({
+      id: "daw-1",
+      title: "Late Night Arrangement",
+      meta: "Edited 2h ago",
+      status: "Song draft",
+      onClick: () => setFullscreenView("agentic-producing"),
+    }),
+    [],
+  );
+
+  const sidebarUtilityActions = useMemo(
     () => [
       {
-        label: "Search",
-        meta: "All drafts",
-        icon: Search,
-        accent: "rgba(250, 204, 21, 0.2)",
+        label: "Projects",
         onClick: () => setProjectsOpen(true),
       },
       {
         label: "Templates",
-        meta: "Starter kits",
-        icon: LibraryBig,
-        accent: "rgba(59, 130, 246, 0.18)",
         onClick: () => setActiveSubView("top-templates"),
       },
       {
         label: "Explore",
-        meta: "Best picks",
-        icon: Music,
-        accent: "rgba(249, 115, 22, 0.18)",
         onClick: () => handleScrollTo("community"),
       },
     ],
     [handleScrollTo],
-  );
-
-  const inProgressGroups = useMemo<SidebarProjectGroup[]>(
-    () => [
-      {
-        label: "DAW",
-        items: [
-          {
-            id: "daw-1",
-            title: "Late Night Arrangement",
-            meta: "Edited 2h ago",
-            status: "Editing",
-            onClick: () => setFullscreenView("agentic-producing"),
-          },
-          {
-            id: "daw-2",
-            title: "Neo Soul Draft v4",
-            meta: "Verse and chorus blocked",
-            status: "Structuring",
-            onClick: () => setFullscreenView("agentic-producing"),
-          },
-          {
-            id: "daw-3",
-            title: "Vocal Mix Cleanup",
-            meta: "Mix notes waiting",
-            status: "Mixing",
-            onClick: () => setFullscreenView("agentic-producing"),
-          },
-        ],
-      },
-      {
-        label: "Looper",
-        items: [
-          {
-            id: "loop-1",
-            title: "Rock Loop 128",
-            meta: "Driving riff set",
-            status: "Looping",
-            onClick: () => {
-              setLooperInitialFilter("Rock");
-              setActiveSubView("looper");
-            },
-          },
-          {
-            id: "loop-2",
-            title: "Blues Pocket Jam",
-            meta: "Swing feel locked",
-            status: "Refining",
-            onClick: () => {
-              setLooperInitialFilter("Hot");
-              setActiveSubView("looper");
-            },
-          },
-          {
-            id: "loop-3",
-            title: "Funk Muting Study",
-            meta: "Pocket ideas saved",
-            status: "Looping",
-            onClick: () => {
-              setLooperInitialFilter("R&B");
-              setActiveSubView("looper");
-            },
-          },
-        ],
-      },
-      {
-        label: "Jams",
-        items: [
-          {
-            id: "jam-1",
-            title: "Ambient Jam in E",
-            meta: "Wide pads and delay",
-            status: "Jamming",
-            onClick: () => handleScrollTo("launch"),
-          },
-          {
-            id: "jam-2",
-            title: "Hip-Hop Bounce Test",
-            meta: "Beat prompt saved",
-            status: "Prompting",
-            onClick: () => openTemplate(hipHopStarterTemplate),
-          },
-          {
-            id: "jam-3",
-            title: "Guitar Call Response",
-            meta: "Lead phrases selected",
-            status: "Tracking",
-            onClick: () => openGuitar(guitarClips[0]),
-          },
-        ],
-      },
-    ],
-    [handleScrollTo, openGuitar, openTemplate],
   );
 
   const quickActions = useMemo<QuickAction[]>(
@@ -767,10 +673,10 @@ export function EntranceWorkspace() {
             flexBasis: sidebarWidth,
             padding: `22px ${sidebarInlinePadding}px 14px`,
             background: isDark
-              ? "radial-gradient(circle at top left, rgba(129,140,248,0.12), transparent 34%), radial-gradient(circle at 78% 18%, rgba(45,212,191,0.12), transparent 28%), linear-gradient(180deg, #14161c 0%, #101217 100%)"
-              : "radial-gradient(circle at top left, rgba(129,140,248,0.08), transparent 34%), radial-gradient(circle at 78% 18%, rgba(45,212,191,0.08), transparent 28%), linear-gradient(180deg, #f7f8fb 0%, #eef2f7 100%)",
+              ? "radial-gradient(circle at top left, rgba(255,255,255,0.04), transparent 28%), linear-gradient(180deg, #1a1a1a 0%, #131313 100%)"
+              : "radial-gradient(circle at top left, rgba(255,255,255,0.7), transparent 30%), linear-gradient(180deg, #fbfbfa 0%, #f1f1ee 100%)",
             borderRight: `1px solid ${shellTone.railBorder}`,
-            boxShadow: isDark ? "24px 0 80px rgba(0,0,0,0.28)" : "24px 0 64px rgba(15,23,42,0.08)",
+            boxShadow: isDark ? "24px 0 80px rgba(0,0,0,0.24)" : "24px 0 64px rgba(0,0,0,0.05)",
             zIndex: 2,
         }}
       >
@@ -794,17 +700,22 @@ export function EntranceWorkspace() {
           className="min-h-0 flex-1 overflow-y-auto"
           style={{ paddingRight: 2, paddingBottom: 8 }}
         >
-          <div className="flex flex-col gap-6">
-            <RailCard title="Create" tone={shellTone} style={createRailCardStyle}>
-              <div className="mb-4">
-                <p style={railIntroStyle}>
-                  Make something fun, fast.
-                </p>
-              </div>
+          <div className="flex flex-col" style={{ minHeight: "100%" }}>
+            <section style={sidebarHeroSectionStyle}>
+              <p style={eyebrowStyle}>Create</p>
+              <h2 style={sidebarHeroTitleStyle}>Start from what you want to make.</h2>
+              <p style={sidebarHeroCopyStyle}>
+                No DAW thinking first. Pick the idea in your head and jump straight into that flow.
+              </p>
+            </section>
 
+            <section style={sidebarSectionStyle}>
+              <div className="mb-3">
+                <p style={sidebarSectionLabelStyle}>Start</p>
+              </div>
               <div className="flex flex-col gap-2.5">
                 {createActions.map((action) => (
-                  <TouchActionRow
+                  <SidebarStartAction
                     key={action.label}
                     label={action.label}
                     meta={action.meta}
@@ -814,68 +725,36 @@ export function EntranceWorkspace() {
                   />
                 ))}
               </div>
+            </section>
 
-              <div className="mt-4 flex flex-wrap gap-2">
-                <MiniActionChip
-                  label="Guitar Riff"
-                  accent="rgba(250, 204, 21, 0.22)"
-                  onClick={() => openGuitar(guitarClips[0])}
-                />
-                <MiniActionChip
-                  label="Beat Sketch"
-                  accent="rgba(249, 115, 22, 0.18)"
-                  onClick={() => openTemplate(hipHopStarterTemplate)}
-                />
-                <MiniActionChip
-                  label="Starter Template"
-                  accent="rgba(59, 130, 246, 0.16)"
-                  onClick={() => setActiveSubView("top-templates")}
-                />
-              </div>
-            </RailCard>
-
-            <RailCard title="Workspace" tone={shellTone}>
-              <div className="flex flex-col gap-2.5">
-                {workspaceActions.map((action) => (
-                  <TouchActionRow
-                    key={action.label}
-                    label={action.label}
-                    meta={action.meta}
-                    icon={action.icon}
-                    accent={action.accent}
-                    onClick={action.onClick}
-                  />
-                ))}
-              </div>
-            </RailCard>
-
-            <RailCard
-              title="In Progress"
-              tone={shellTone}
-              style={inProgressRailCardStyle}
-            >
+            <section style={sidebarSectionStyle}>
               <div className="mb-3 flex items-center justify-between">
-                <p style={railIntroStyle}>Pick up the good stuff.</p>
+                <p style={sidebarSectionLabelStyle}>My Project</p>
                 <button
                   type="button"
                   onClick={() => setProjectsOpen(true)}
                   className="tablet-touch-target tablet-pressable"
                   style={inlineLinkButtonStyle}
                 >
-                  See all
+                  View all
                 </button>
               </div>
 
-              <div className="flex flex-col gap-4">
-                {inProgressGroups.map((group) => (
-                  <SidebarProjectCluster
-                    key={group.label}
-                    label={group.label}
-                    items={group.items}
+              <SidebarContinueCard project={continueProject} />
+            </section>
+
+            <div className="mt-auto" style={sidebarFooterStyle}>
+              <p style={sidebarSectionLabelStyle}>Tools</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {sidebarUtilityActions.map((action) => (
+                  <SidebarUtilityButton
+                    key={action.label}
+                    label={action.label}
+                    onClick={action.onClick}
                   />
                 ))}
               </div>
-            </RailCard>
+            </div>
           </div>
         </div>
       </aside>
@@ -1425,43 +1304,7 @@ function LoopLaunchPanel({
   );
 }
 
-function RailCard({
-  title,
-  icon: Icon,
-  tone,
-  children,
-  style,
-}: {
-  title: string;
-  icon?: LucideIcon;
-  tone: { railSurface: string; railBorder: string };
-  children: ReactNode;
-  style?: CSSProperties;
-}) {
-  return (
-    <section
-      className="rounded-[28px]"
-      style={{
-        padding: "16px 15px 15px",
-        backgroundColor: tone.railSurface,
-        border: `1px solid ${tone.railBorder}`,
-        ...style,
-      }}
-    >
-      <div className={`mb-3 flex items-center ${Icon ? "gap-3" : ""}`}>
-        {Icon ? (
-          <div className="flex h-10 w-10 items-center justify-center" style={plainSidebarIconWrapStyle}>
-            <Icon size={16} strokeWidth={1.8} />
-          </div>
-        ) : null}
-        <p style={railCardTitleStyle}>{title}</p>
-      </div>
-      {children}
-    </section>
-  );
-}
-
-function TouchActionRow({
+function SidebarStartAction({
   label,
   meta,
   icon: Icon,
@@ -1479,90 +1322,63 @@ function TouchActionRow({
       type="button"
       onClick={onClick}
       className="tablet-touch-target tablet-pressable flex items-center justify-between text-left"
-      style={touchRowStyle}
+      style={sidebarStartActionStyle}
     >
       <span className="flex min-w-0 items-center gap-3">
         <span
-          className="flex h-11 w-11 shrink-0 items-center justify-center"
+          className="flex h-10 w-10 shrink-0 items-center justify-center"
           style={{ ...sidebarActionIconStyle, backgroundColor: accent }}
         >
-          <Icon size={16} strokeWidth={1.9} />
+          <Icon size={15} strokeWidth={1.9} />
         </span>
         <span className="min-w-0">
-          <span style={touchLabelStyle}>{label}</span>
-          {meta ? <span style={touchMetaStyle}>{meta}</span> : null}
+          <span style={sidebarStartLabelStyle}>{label}</span>
+          {meta ? <span style={sidebarStartMetaStyle}>{meta}</span> : null}
+        </span>
+      </span>
+    </button>
+  );
+}
+
+function SidebarContinueCard({ project }: { project: SidebarProject }) {
+  return (
+    <button
+      type="button"
+      onClick={project.onClick}
+      className="tablet-touch-target tablet-pressable flex w-full items-center justify-between text-left"
+      style={sidebarContinueCardStyle}
+    >
+      <span className="min-w-0">
+        <span style={sidebarContinueTitleStyle}>{project.title}</span>
+        <span style={sidebarContinueMetaStyle}>
+          {project.meta} · {project.status}
         </span>
       </span>
       <ChevronRight
-        size={14}
+        size={15}
         strokeWidth={1.9}
-        style={{ color: "var(--secondary)" }}
+        style={{ color: "var(--secondary)", flexShrink: 0 }}
       />
     </button>
   );
 }
 
-function MiniActionChip({
+function SidebarUtilityButton({
   label,
-  accent,
   onClick,
 }: {
   label: string;
-  accent: string;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-full"
-      style={{ ...miniActionChipStyle, backgroundColor: accent }}
+      className="tablet-touch-target tablet-pressable"
+      style={sidebarUtilityButtonStyle}
     >
       {label}
     </button>
-  );
-}
-
-function SidebarProjectCluster({
-  label,
-  items,
-}: {
-  label: string;
-  items: SidebarProject[];
-}) {
-  return (
-    <section>
-      <div className="mb-2 flex items-center justify-between">
-        <p style={sidebarClusterLabelStyle}>{label}</p>
-        <span style={sidebarClusterCountStyle}>{items.length}</span>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        {items.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={item.onClick}
-            className="tablet-touch-target tablet-pressable flex items-center gap-3 rounded-[18px] text-left"
-            style={sidebarProjectRowStyle}
-          >
-            <span className="min-w-0 flex-1">
-              <span className="truncate" style={sidebarProjectTitleStyle}>
-                {item.title}
-              </span>
-              <span style={sidebarProjectMetaStyle}>
-                {item.meta} · {item.status}
-              </span>
-            </span>
-            <ChevronRight
-              size={14}
-              strokeWidth={1.9}
-              style={{ color: "var(--secondary)", flexShrink: 0 }}
-            />
-          </button>
-        ))}
-      </div>
-    </section>
   );
 }
 
@@ -1873,10 +1689,6 @@ function TopBrowsePage({
   );
 }
 
-const plainSidebarIconWrapStyle: CSSProperties = {
-  color: "var(--foreground)",
-};
-
 const eyebrowStyle: CSSProperties = {
   margin: 0,
   color: "var(--secondary)",
@@ -1905,51 +1717,60 @@ const iconButtonStyle: CSSProperties = {
   cursor: "pointer",
 };
 
-const railCardTitleStyle: CSSProperties = {
+const sidebarHeroSectionStyle: CSSProperties = {
+  padding: "8px 0 34px",
+};
+
+const sidebarHeroTitleStyle: CSSProperties = {
+  margin: "14px 0 0",
+  color: "var(--foreground)",
+  fontSize: 34,
+  fontWeight: 700,
+  lineHeight: 1,
+  letterSpacing: "-0.05em",
+  maxWidth: 280,
+};
+
+const sidebarHeroCopyStyle: CSSProperties = {
+  margin: "14px 0 0",
+  maxWidth: 300,
+  color: "var(--secondary)",
+  fontSize: 14,
+  fontWeight: 500,
+  lineHeight: 1.5,
+};
+
+const sidebarSectionStyle: CSSProperties = {
+  paddingTop: 22,
+  borderTop: "1px solid color-mix(in srgb, var(--border) 76%, transparent)",
+};
+
+const sidebarSectionLabelStyle: CSSProperties = {
   margin: 0,
   color: "var(--foreground)",
-  fontSize: 17,
-  fontWeight: 700,
-  letterSpacing: "-0.02em",
-};
-
-const railIntroStyle: CSSProperties = {
-  margin: 0,
-  color: "var(--secondary)",
   fontSize: 12,
-  fontWeight: 600,
-  lineHeight: 1.35,
+  fontWeight: 700,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
 };
 
-const createRailCardStyle: CSSProperties = {
-  background:
-    "linear-gradient(160deg, color-mix(in srgb, var(--surface-glass-strong) 84%, rgba(129,140,248,0.18) 16%) 0%, color-mix(in srgb, var(--surface-glass) 88%, rgba(45,212,191,0.12) 12%) 100%)",
-};
-
-const inProgressRailCardStyle: CSSProperties = {
-  paddingTop: 18,
-  background:
-    "linear-gradient(180deg, color-mix(in srgb, var(--surface-glass) 88%, rgba(255,255,255,0.06) 12%) 0%, var(--surface-glass-strong) 100%)",
-};
-
-const touchRowStyle: CSSProperties = {
+const sidebarStartActionStyle: CSSProperties = {
   width: "100%",
-  minHeight: 68,
+  minHeight: 64,
   padding: "0 14px",
-  borderRadius: 22,
-  border: "1px solid color-mix(in srgb, var(--border) 80%, transparent)",
-  backgroundColor: "color-mix(in srgb, var(--card) 78%, transparent)",
+  borderRadius: 20,
+  border: "1px solid color-mix(in srgb, var(--border) 74%, transparent)",
+  backgroundColor: "color-mix(in srgb, var(--card) 58%, transparent)",
   color: "var(--foreground)",
   fontSize: 14,
   fontWeight: 600,
   display: "flex",
   alignItems: "center",
-  justifyContent: "space-between",
   cursor: "pointer",
-  boxShadow: "0 10px 24px rgba(15,23,42,0.05)",
+  boxShadow: "none",
 };
 
-const touchLabelStyle: CSSProperties = {
+const sidebarStartLabelStyle: CSSProperties = {
   display: "block",
   color: "inherit",
   fontSize: 16,
@@ -1957,84 +1778,66 @@ const touchLabelStyle: CSSProperties = {
   lineHeight: 1.2,
 };
 
-const touchMetaStyle: CSSProperties = {
+const sidebarStartMetaStyle: CSSProperties = {
   display: "block",
   marginTop: 3,
   color: "var(--secondary)",
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: "0.08em",
-  textTransform: "uppercase",
-  lineHeight: 1.2,
-};
-
-const miniActionChipStyle: CSSProperties = {
-  height: 40,
-  padding: "0 14px",
-  border: "1px solid color-mix(in srgb, var(--border) 70%, transparent)",
-  color: "var(--foreground)",
   fontSize: 12,
-  fontWeight: 700,
-  boxShadow: "0 8px 18px rgba(15,23,42,0.05)",
+  fontWeight: 500,
+  lineHeight: 1.35,
 };
 
 const sidebarActionIconStyle: CSSProperties = {
   color: "var(--foreground)",
-  borderRadius: 16,
-  border: "1px solid color-mix(in srgb, var(--border) 55%, transparent)",
-  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.24)",
-};
-
-const sidebarClusterLabelStyle: CSSProperties = {
-  margin: 0,
-  color: "var(--foreground)",
-  fontSize: 12,
-  fontWeight: 700,
-  letterSpacing: "0.1em",
-  textTransform: "uppercase",
-};
-
-const sidebarClusterCountStyle: CSSProperties = {
-  minWidth: 22,
-  height: 22,
-  padding: "0 7px",
-  borderRadius: 999,
-  border: "1px solid var(--border)",
-  color: "var(--secondary)",
-  fontSize: 11,
-  fontWeight: 700,
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-};
-
-const sidebarProjectRowStyle: CSSProperties = {
-  width: "100%",
-  minHeight: 60,
-  padding: "12px 14px",
-  borderRadius: 20,
-  border: "1px solid color-mix(in srgb, var(--border) 75%, transparent)",
-  backgroundColor: "color-mix(in srgb, var(--card) 74%, transparent)",
+  borderRadius: 14,
+  border: "1px solid color-mix(in srgb, var(--border) 50%, transparent)",
   boxShadow: "none",
 };
 
-const sidebarProjectTitleStyle: CSSProperties = {
+const sidebarContinueCardStyle: CSSProperties = {
+  width: "100%",
+  minHeight: 84,
+  padding: "16px 18px",
+  borderRadius: 20,
+  border: "1px solid color-mix(in srgb, var(--border) 72%, transparent)",
+  background:
+    "linear-gradient(180deg, color-mix(in srgb, var(--surface-glass-strong) 92%, rgba(255,255,255,0.08) 8%) 0%, color-mix(in srgb, var(--surface-glass) 96%, transparent) 100%)",
+  boxShadow: "0 10px 28px rgba(0,0,0,0.05)",
+};
+
+const sidebarContinueTitleStyle: CSSProperties = {
   display: "block",
   color: "var(--foreground)",
-  fontSize: 14,
+  fontSize: 17,
   fontWeight: 700,
   lineHeight: 1.2,
 };
 
-const sidebarProjectMetaStyle: CSSProperties = {
+const sidebarContinueMetaStyle: CSSProperties = {
   display: "block",
-  marginTop: 3,
+  marginTop: 6,
   color: "var(--secondary)",
-  fontSize: 11,
+  fontSize: 12,
+  fontWeight: 500,
+  lineHeight: 1.35,
+};
+
+const sidebarFooterStyle: CSSProperties = {
+  marginTop: 28,
+  paddingTop: 22,
+  borderTop: "1px solid color-mix(in srgb, var(--border) 76%, transparent)",
+};
+
+const sidebarUtilityButtonStyle: CSSProperties = {
+  height: 36,
+  padding: "0 14px",
+  borderRadius: 999,
+  border: "1px solid color-mix(in srgb, var(--border) 72%, transparent)",
+  backgroundColor: "transparent",
+  color: "var(--secondary)",
+  fontSize: 12,
   fontWeight: 700,
-  letterSpacing: "0.06em",
-  textTransform: "uppercase",
-  lineHeight: 1.25,
+  cursor: "pointer",
 };
 
 const topTitleStyle: CSSProperties = {

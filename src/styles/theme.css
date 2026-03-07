@@ -13,29 +13,29 @@
   --text-sm: 16px;
   --text-xs: 14px;
   /* The default background color for the application. */
-  --background: rgba(247, 248, 250, 1);
+  --background: rgba(247, 247, 245, 1);
   /* The default color for elements or text that appears on top of the background. */
   --foreground: rgba(23, 23, 23, 1);
   /* The background color for cards, modals, and other containers. */
   --card: rgba(255, 255, 255, 1);
   /* The default color for text or elements that appear on top of cards, modals and other background containers. */
-  --card-foreground: rgba(17, 24, 39, 1);
+  --card-foreground: rgba(23, 23, 23, 1);
   /* The background color for dropdowns and tooltips. */
   --popover: rgba(255, 255, 255, 1);
   /* The default color for text or elements that appear on top of dropdowns and tooltips. */
-  --popover-foreground: rgba(31, 41, 55, 1);
+  --popover-foreground: rgba(23, 23, 23, 1);
   /* The primary color used for buttons, links, and other interactive elements. */
   --primary: rgba(23, 23, 23, 1);
   /* The default color for text or elements that appear on top of primary colored elements. */
   --primary-foreground: rgba(255, 255, 255, 1.00);
   /* The secondary color used for secondary(but NOT-DESTRUCTIVE) buttons and interactive elements. */
-  --secondary: rgba(82, 82, 91, 1);
+  --secondary: rgba(82, 82, 82, 1);
   /* The default color for text or elements that appear on top of secondary colored elements. */
   --secondary-foreground: rgba(17, 24, 39, 1);
   /* The muted color used for less prominent elements, such as disabled buttons or disabled text. */
-  --muted: rgba(15, 23, 42, 0.06);
+  --muted: rgba(23, 23, 23, 0.05);
   /* The default color for text or elements that appear on top of muted colored elements. */
-  --muted-foreground: rgba(100, 116, 139, 1);
+  --muted-foreground: rgba(115, 115, 115, 1);
   /* The accent color used for highlights, links, and other interactive elements. */
   --accent: rgba(23, 23, 23, 1);
   /* The default color for text or elements that appear on top of accent colored elements. */
@@ -45,7 +45,7 @@
   /* The default color for text or elements that appear on top of destructive colored elements. */
   --destructive-foreground: rgba(255, 255, 255, 1.00);
   /* The default border color for elements such as inputs, buttons, and other containers. */
-  --border: rgba(15, 23, 42, 0.14);
+  --border: rgba(23, 23, 23, 0.12);
   /* The default background color for input fields once the text has been filled. Should be either transparent or match the input-background. */
   --input: rgba(255, 255, 255, 1);
   /* The default background color for input fields, text areas, and other input elements. */
@@ -77,9 +77,9 @@
   /* The border radius for tooltips and popovers. */
   --radius-tooltip: 20px;
   /* The background color for sidebars, navigation menus, and other persistent elements. */
-  --sidebar: rgba(242, 243, 245, 1);
+  --sidebar: rgba(243, 243, 240, 1);
   /* The default color for text or elements that appear on top of sidebars, navigation menus, and other persistent elements. */
-  --sidebar-foreground: rgba(17, 24, 39, 1);
+  --sidebar-foreground: rgba(23, 23, 23, 1);
   /* The primary color used for buttons, links, and other interactive elements in sidebars and navigation menus. */
   --sidebar-primary: rgba(23, 23, 23, 1);
   /* The default color for text or elements that appear on top of primary colored elements in sidebars and navigation menus. */
@@ -87,37 +87,37 @@
   /* The accent color used for highlights, links, and other interactive elements in sidebars and navigation menus. */
   --sidebar-accent: rgba(255, 255, 255, 0.95);
   /* The default color for text or elements that appear on top of accent colored elements in sidebars and navigation menus. */
-  --sidebar-accent-foreground: rgba(17, 24, 39, 1);
+  --sidebar-accent-foreground: rgba(23, 23, 23, 1);
   /* The default border color for elements in sidebars and navigation menus. */
-  --sidebar-border: rgba(17, 24, 39, 0.14);
+  --sidebar-border: rgba(23, 23, 23, 0.12);
   /* The default color for focus rings, outlines, and other focus indicators in sidebars and navigation menus. */
   --sidebar-ring: rgba(23, 23, 23, 0.28);
-  --sidebar-surface-top: rgba(250, 250, 251, 1);
+  --sidebar-surface-top: rgba(251, 251, 249, 1);
   --sidebar-surface-card: rgba(255, 255, 255, 0.78);
   --sidebar-surface-card-strong: rgba(255, 255, 255, 0.92);
-  --sidebar-soft-border: rgba(17, 24, 39, 0.12);
-  --sidebar-ring-track: rgba(17, 24, 39, 0.16);
-  --sidebar-ring-halo: rgba(17, 24, 39, 0.06);
+  --sidebar-soft-border: rgba(23, 23, 23, 0.1);
+  --sidebar-ring-track: rgba(23, 23, 23, 0.14);
+  --sidebar-ring-halo: rgba(23, 23, 23, 0.05);
   --sidebar-accent-teal: rgba(53, 188, 176, 1);
   --sidebar-accent-coral: rgba(244, 109, 109, 1);
   --sidebar-accent-lilac: rgba(159, 140, 240, 1);
   /* Shared semantic tokens */
-  --surface-glass: rgba(255, 255, 255, 0.86);
-  --surface-glass-strong: rgba(255, 255, 255, 0.95);
-  --chip-bg: rgba(15, 23, 42, 0.05);
-  --chip-border: rgba(15, 23, 42, 0.14);
-  --chip-active-bg: rgba(17, 24, 39, 0.94);
-  --chip-active-border: rgba(17, 24, 39, 0.28);
+  --surface-glass: rgba(255, 255, 255, 0.84);
+  --surface-glass-strong: rgba(255, 255, 255, 0.94);
+  --chip-bg: rgba(23, 23, 23, 0.04);
+  --chip-border: rgba(23, 23, 23, 0.12);
+  --chip-active-bg: rgba(23, 23, 23, 0.94);
+  --chip-active-border: rgba(23, 23, 23, 0.24);
   --chip-active-text: rgba(255, 255, 255, 1);
-  --chip-text: rgba(17, 24, 39, 0.88);
-  --soft-surface: rgba(15, 23, 42, 0.03);
-  --soft-surface-strong: rgba(15, 23, 42, 0.07);
-  --overlay-scrim: rgba(15, 23, 42, 0.3);
+  --chip-text: rgba(23, 23, 23, 0.88);
+  --soft-surface: rgba(23, 23, 23, 0.025);
+  --soft-surface-strong: rgba(23, 23, 23, 0.06);
+  --overlay-scrim: rgba(23, 23, 23, 0.28);
   --float-surface: rgba(255, 255, 255, 0.98);
   --float-surface-muted: rgba(255, 255, 255, 0.92);
-  --float-surface-soft: rgba(15, 23, 42, 0.03);
-  --float-shadow: 0 22px 72px rgba(15, 23, 42, 0.22);
-  --icon-subtle-bg: rgba(15, 23, 42, 0.03);
+  --float-surface-soft: rgba(23, 23, 23, 0.025);
+  --float-shadow: 0 22px 72px rgba(0, 0, 0, 0.18);
+  --icon-subtle-bg: rgba(23, 23, 23, 0.025);
   --solid-button-bg: rgba(17, 24, 39, 1);
   --solid-button-fg: rgba(255, 255, 255, 1);
   --solid-button-border: rgba(17, 24, 39, 0.2);

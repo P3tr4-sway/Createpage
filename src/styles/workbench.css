@@ -1,17 +1,17 @@
 :root {
-  --workbench-bg-1: #f3f4f6;
-  --workbench-bg-2: #e5e7eb;
-  --workbench-border: #11182722;
-  --workbench-glow-1: #ffffff88;
-  --workbench-glow-2: #ffffff44;
+  --workbench-bg-1: #f7f7f5;
+  --workbench-bg-2: #ededea;
+  --workbench-border: #1717171a;
+  --workbench-glow-1: rgba(255, 255, 255, 0.78);
+  --workbench-glow-2: rgba(0, 0, 0, 0.03);
 }
 
 .dark {
-  --workbench-bg-1: #0f1013;
-  --workbench-bg-2: #15161a;
-  --workbench-border: #ffffff1f;
-  --workbench-glow-1: #ffffff12;
-  --workbench-glow-2: #ffffff08;
+  --workbench-bg-1: #171717;
+  --workbench-bg-2: #101010;
+  --workbench-border: rgba(255, 255, 255, 0.12);
+  --workbench-glow-1: rgba(255, 255, 255, 0.04);
+  --workbench-glow-2: rgba(255, 255, 255, 0.02);
 }
 
 html,
@@ -34,9 +34,9 @@ body {
   padding: 24px;
   box-sizing: border-box;
   background:
-    radial-gradient(circle at 10% 20%, var(--workbench-glow-1) 0%, transparent 42%),
-    radial-gradient(circle at 85% 85%, var(--workbench-glow-2) 0%, transparent 35%),
-    linear-gradient(140deg, var(--workbench-bg-1), var(--workbench-bg-2));
+    radial-gradient(circle at 12% 16%, var(--workbench-glow-1) 0%, transparent 34%),
+    radial-gradient(circle at 84% 82%, var(--workbench-glow-2) 0%, transparent 28%),
+    linear-gradient(180deg, var(--workbench-bg-1), var(--workbench-bg-2));
 }
 
 .design-frame-shell {
