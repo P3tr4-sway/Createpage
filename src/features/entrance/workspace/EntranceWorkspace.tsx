@@ -2,7 +2,6 @@ import {
   ArrowLeft,
   Bot,
   ChevronDown,
-  ChevronRight,
   Moon,
   Repeat,
   Sparkles,
@@ -20,7 +19,6 @@ import {
   type UIEvent,
   useCallback,
 } from "react";
-import { AnimatePresence, motion } from "motion/react";
 import { EntranceLocaleProvider, type Locale } from "@/features/entrance/EntranceLocaleContext";
 import { AgenticProducingPage } from "@/features/entrance/pages/AgenticProducingPage";
 import { InstantBackingTrackPage } from "@/features/entrance/pages/InstantBackingTrackPage";
@@ -55,20 +53,23 @@ import {
   SidebarProjectListItem,
   SidebarStartAction,
 } from "@/features/entrance/workspace/EntranceWorkspacePanels";
-import { useDragScroll } from "@/shared/hooks/useDragScroll";
-import { ScaledPreviewCanvas } from "@/shared/ui/ScaledPreviewCanvas";
-import { ImageWithFallback } from "@/shared/ui/ImageWithFallback";
+import {
+  QuickAccessCarousel,
+  QuickActionsPage,
+  TopBrowsePage,
+  TopListColumn,
+  type QuickAction,
+} from "@/features/entrance/workspace/EntranceWorkspaceBrowse";
+import { EntranceWorkspaceHero } from "@/features/entrance/workspace/EntranceWorkspaceHero";
+import { EntranceWorkspaceTutorialPanel } from "@/features/entrance/workspace/EntranceWorkspaceTutorialPanel";
+import {
+  inlineLinkButtonStyle,
+  secondaryButtonStyle,
+  sectionDescriptionStyle,
+  sectionTitleStyle,
+} from "@/features/entrance/workspace/EntranceWorkspaceBrowse.styles";
 
 type ActionId = "looper";
-
-type QuickAction = {
-  id: string;
-  title: string;
-  meta: string;
-  tag: string;
-  imageUrl: string;
-  onClick: () => void;
-};
 
 type SidebarAction = {
   label: string;
@@ -681,196 +682,45 @@ export function EntranceWorkspace() {
             className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
             style={{ scrollBehavior: "smooth", background: shellTone.homeBg }}
           >
-            <section
-              ref={studioRef}
-                style={{
-                  ...sectionStyle,
-                  position: "relative",
-                  zIndex: 3,
-                  minHeight: homeHeroHeight,
-                  marginLeft: -mainContentInlinePadding,
-                  marginRight: -mainContentInlinePadding,
-                }}
-              >
-              <div
-                role="button"
-                tabIndex={0}
-                data-touch-target="true"
-                onClick={() => setFullscreenView("agentic-producing")}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    setFullscreenView("agentic-producing");
-                  }
-                }}
-                aria-label={copy.openFullWorkspaceAriaLabel}
-                className="tablet-pressable relative block w-full overflow-visible text-left"
-                style={{
-                  height: homeHeroHeight,
-                  backgroundColor: shellTone.heroFrameBg,
-                  borderBottom: `1px solid ${shellTone.railBorder}`,
-                  cursor: "pointer",
-                }}
-              >
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    overflow: "hidden",
-                  }}
-                >
-                  <ScaledPreviewCanvas
-                    designWidth={homePreviewCanvasWidth}
-                    zoom={homePreviewZoom}
-                    focusX={homePreviewFocusX}
-                  >
-                    <AgenticProducingPage previewMode />
-                  </ScaledPreviewCanvas>
-                </div>
-                <div
-                  className="absolute inset-0"
-                  style={{ background: shellTone.heroScrim }}
-                />
-                <div
-                  aria-hidden="true"
-                  className="absolute rounded-[22px]"
-                  style={{
-                    top: 28,
-                    right: 28,
-                    padding: "10px 14px 11px",
-                    background: shellTone.heroHintBg,
-                    border: `1px solid ${shellTone.heroHintBorder}`,
-                    backdropFilter: "blur(18px)",
-                    boxShadow: "0 18px 38px rgba(15,23,42,0.14)",
-                  }}
-                >
-                  <span style={heroPreviewHintEyebrowStyle}>{copy.heroPreviewEyebrow}</span>
-                  <span style={heroPreviewHintLabelStyle}>{copy.heroPreviewLabel}</span>
-                </div>
-                <div
-                  aria-hidden="true"
-                  className="absolute"
-                  style={heroSloganOverlayStyle}
-                >
-                  <h2 style={heroSloganTitleStyle}>{copy.sidebarHeroTitle}</h2>
-                </div>
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-x-0 bottom-0"
-                  style={{
-                    height: 180,
-                    background: shellTone.heroBridge,
-                    pointerEvents: "none",
-                  }}
-                />
-                <div
-                  className="absolute flex items-center gap-5"
-                  style={{
-                    ...heroBottomDockStyle,
-                    left: "50%",
-                    bottom: 0,
-                    width: "62%",
-                    maxWidth: 860,
-                    transform: "translate(-50%, 50%)",
-                    zIndex: 4,
-                  }}
-                >
-                  <div
-                    ref={heroPromptFieldRef}
-                    className="relative flex w-full"
-                    onClick={(event) => event.stopPropagation()}
-                  >
-                    <div className="flex w-full items-center rounded-full" style={heroChatFieldStyle}>
-                      <input
-                        ref={heroPromptInputRef}
-                        type="text"
-                        value={heroPromptValue}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          setHeroPromptOpen(true);
-                        }}
-                        onFocus={() => setHeroPromptOpen(true)}
-                        onChange={(event) => {
-                          setHeroPromptValue(event.target.value);
-                          if (!heroPromptOpen) {
-                            setHeroPromptOpen(true);
-                          }
-                        }}
-                        placeholder={copy.heroPromptPlaceholder}
-                        className="tablet-touch-target min-w-0 flex-1 bg-transparent text-left outline-none placeholder:text-[var(--secondary)]"
-                        style={heroChatInputStyle}
-                      />
-                      <button
-                        type="button"
-                        onClick={(event) => event.stopPropagation()}
-                        className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-full"
-                        style={heroChatSendStyle}
-                      >
-                        {copy.heroPromptStart}
-                      </button>
-                    </div>
-                    <AnimatePresence>
-                      {heroPromptOpen ? (
-                        <motion.div
-                          className="absolute"
-                          style={heroPromptPanelStyle}
-                          onClick={(event) => event.stopPropagation()}
-                          initial={{ opacity: 0, y: 16 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          transition={{ duration: 0.22, ease: "easeOut" }}
-                        >
-                          <div style={heroPromptListStyle}>
-                            <div
-                              className="relative flex max-h-[320px] flex-col overflow-y-auto"
-                              style={heroPromptListContentStyle}
-                            >
-                              {visibleHeroPromptSuggestions.length ? (
-                                <>
-                                  {filteredHeroPromptSuggestions.length > 3 ? (
-                                    <div aria-hidden="true" style={heroPromptOverflowHintStyle}>
-                                      {copy.heroPromptShowMore}
-                                    </div>
-                                  ) : null}
-                                  {visibleHeroPromptSuggestions.map((suggestion, index) => (
-                                  <motion.button
-                                    key={suggestion.prompt}
-                                    type="button"
-                                    className="w-full text-left"
-                                    style={heroPromptSuggestionStyle}
-                                    onClick={() => handleHeroPromptSuggestionSelect(suggestion.prompt)}
-                                    initial={{ opacity: 0, y: 12 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 8 }}
-                                    transition={{
-                                      duration: 0.18,
-                                      delay: index * 0.025,
-                                      ease: "easeOut",
-                                    }}
-                                  >
-                                    <div style={heroPromptSuggestionContentStyle}>
-                                      <span aria-hidden="true" style={heroPromptSuggestionBulletStyle}>
-                                        •
-                                      </span>
-                                      <p style={heroPromptSuggestionPromptStyle}>{suggestion.prompt}</p>
-                                    </div>
-                                  </motion.button>
-                                  ))}
-                                </>
-                              ) : (
-                                <div style={heroPromptEmptyStyle}>
-                                  <p style={heroPromptEmptyTextStyle}>{copy.heroPromptEmpty}</p>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </motion.div>
-                      ) : null}
-                    </AnimatePresence>
-                  </div>
-                </div>
-              </div>
-            </section>
+            <EntranceWorkspaceHero
+              sectionRef={studioRef}
+              height={homeHeroHeight}
+              contentInset={mainContentInlinePadding}
+              previewCanvasWidth={homePreviewCanvasWidth}
+              previewZoom={homePreviewZoom}
+              previewFocusX={homePreviewFocusX}
+              tone={{
+                heroFrameBg: shellTone.heroFrameBg,
+                railBorder: shellTone.railBorder,
+                heroScrim: shellTone.heroScrim,
+                heroHintBg: shellTone.heroHintBg,
+                heroHintBorder: shellTone.heroHintBorder,
+                heroBridge: shellTone.heroBridge,
+              }}
+              openFullWorkspaceAriaLabel={copy.openFullWorkspaceAriaLabel}
+              previewEyebrow={copy.heroPreviewEyebrow}
+              previewLabel={copy.heroPreviewLabel}
+              sloganTitle={copy.sidebarHeroTitle}
+              promptPlaceholder={copy.heroPromptPlaceholder}
+              promptStartLabel={copy.heroPromptStart}
+              promptShowMoreLabel={copy.heroPromptShowMore}
+              promptEmptyLabel={copy.heroPromptEmpty}
+              promptValue={heroPromptValue}
+              promptOpen={heroPromptOpen}
+              filteredSuggestions={filteredHeroPromptSuggestions}
+              visibleSuggestions={visibleHeroPromptSuggestions}
+              fieldRef={heroPromptFieldRef}
+              inputRef={heroPromptInputRef}
+              onOpenWorkspace={() => setFullscreenView("agentic-producing")}
+              onPromptOpen={() => setHeroPromptOpen(true)}
+              onPromptChange={(value) => {
+                setHeroPromptValue(value);
+                if (!heroPromptOpen) {
+                  setHeroPromptOpen(true);
+                }
+              }}
+              onPromptSelect={handleHeroPromptSuggestionSelect}
+            />
 
               <div
                 style={{
@@ -906,15 +756,13 @@ export function EntranceWorkspace() {
                     </div>
                   </div>
 
-                  <div style={templateStripStyle}>
-                    <QuickAccessCarousel
-                      actions={quickActions}
-                      onSeeAll={() => setActiveSubView("quick-actions")}
-                      heading={copy.quickActionsHeading}
-                      hint={copy.quickActionsHint}
-                      seeAllLabel={copy.seeAll}
-                    />
-                  </div>
+                  <QuickAccessCarousel
+                    actions={quickActions}
+                    onSeeAll={() => setActiveSubView("quick-actions")}
+                    heading={copy.quickActionsHeading}
+                    hint={copy.quickActionsHint}
+                    seeAllLabel={copy.seeAll}
+                  />
                 </div>
               </section>
 
@@ -941,53 +789,15 @@ export function EntranceWorkspace() {
                     onOpenDetail={() => setActiveSubView("top-templates")}
                     seeAllLabel={copy.seeAll}
                   />
-                  <div className="rounded-[30px]" style={panelStyle}>
-                    <div className="mb-3 flex items-center justify-between">
-                      <p style={miniSectionTitleStyle}>{copy.tutorialTitle}</p>
-                      <button
-                        type="button"
-                        onClick={() => setActiveSubView("tutorials")}
-                        className="tablet-touch-target tablet-pressable"
-                        style={inlineLinkButtonStyle}
-                      >
-                        {copy.seeAll}
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      {tutorialCourses.slice(0, 4).map((course) => (
-                        <button
-                          key={course.id}
-                          type="button"
-                          onClick={() => openTutorial(course)}
-                          className="tablet-pressable relative overflow-hidden rounded-[22px] text-left"
-                          style={{
-                            minHeight: 168,
-                            border: `1px solid ${shellTone.railBorder}`,
-                            backgroundColor: "var(--card)",
-                          }}
-                        >
-                          <ImageWithFallback
-                            src={course.imageUrl}
-                            alt={course.title}
-                            className="absolute inset-0 h-full w-full object-cover"
-                          />
-                          <div
-                            className="absolute inset-0"
-                            style={{
-                              backgroundColor: "rgba(0,0,0,0.36)",
-                            }}
-                          />
-                          <div className="absolute bottom-0 left-0 right-0" style={{ padding: 14 }}>
-                            <p style={imageCardTitleStyle}>{course.title}</p>
-                            <p style={imageCardMetaStyle}>
-                              {course.lessons.length} {copy.tutorialPartUnit} · {course.duration}
-                            </p>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  <EntranceWorkspaceTutorialPanel
+                    title={copy.tutorialTitle}
+                    seeAllLabel={copy.seeAll}
+                    partUnit={copy.tutorialPartUnit}
+                    railBorder={shellTone.railBorder}
+                    courses={tutorialCourses}
+                    onSeeAll={() => setActiveSubView("tutorials")}
+                    onOpenTutorial={openTutorial}
+                  />
                 </div>
               </section>
             </div>
@@ -1080,288 +890,6 @@ export function EntranceWorkspace() {
   );
 }
 
-function QuickActionCard({
-  action,
-  onClick,
-}: {
-  action: QuickAction;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="tablet-touch-target tablet-pressable tablet-hover-lift flex h-full items-center gap-3 rounded-[22px] text-left"
-      style={quickActionCardStyle}
-    >
-      <div
-        className="relative overflow-hidden rounded-[14px]"
-        style={{ width: 68, height: 68, flexShrink: 0 }}
-      >
-        <ImageWithFallback
-          src={action.imageUrl}
-          alt={action.title}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p style={quickActionTagStyle}>{action.tag}</p>
-        <p className="truncate" style={listTitleStyle}>
-          {action.title}
-        </p>
-        <p style={quickActionMetaStyle}>
-          {action.meta}
-        </p>
-      </div>
-      <ChevronRight size={16} strokeWidth={1.8} style={{ color: "var(--secondary)", flexShrink: 0 }} />
-    </button>
-  );
-}
-
-function QuickAccessCarousel({
-  actions,
-  onSeeAll,
-  heading,
-  hint,
-  seeAllLabel,
-}: {
-  actions: QuickAction[];
-  onSeeAll: () => void;
-  heading: string;
-  hint: string;
-  seeAllLabel: string;
-}) {
-  const { containerRef, isDragging, dragBind } = useDragScroll("x");
-
-  return (
-    <div style={templateStripStyle}>
-      <div className="mb-3 flex items-center justify-between">
-        <div>
-          <p style={miniSectionTitleStyle}>{heading}</p>
-          <p style={templateStripHintStyle}>{hint}</p>
-        </div>
-        <button
-          type="button"
-          onClick={onSeeAll}
-          className="tablet-touch-target tablet-pressable"
-          style={inlineLinkButtonStyle}
-        >
-          {seeAllLabel}
-        </button>
-      </div>
-
-      <div
-        ref={containerRef}
-        {...dragBind}
-        className="overflow-x-auto pb-2"
-        style={{
-          WebkitOverflowScrolling: "touch",
-          overscrollBehaviorX: "contain",
-          scrollbarWidth: "none",
-          touchAction: "none",
-          cursor: isDragging ? "grabbing" : "grab",
-        }}
-      >
-        <div className="flex gap-3 pr-6" style={{ width: "max-content" }}>
-          {actions.map((action) => (
-            <div
-              key={action.id}
-              style={{
-                width: 372,
-                minWidth: 372,
-                maxWidth: 372,
-              }}
-            >
-              <QuickActionCard action={action} onClick={action.onClick} />
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function QuickActionsPage({
-  actions,
-  onBack,
-  title,
-  description,
-  backLabel,
-}: {
-  actions: QuickAction[];
-  onBack: () => void;
-  title: string;
-  description: string;
-  backLabel: string;
-}) {
-  return (
-    <section>
-      <div className="mb-6 flex items-center justify-between">
-        <button
-          type="button"
-          onClick={onBack}
-          className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-full"
-          style={secondaryButtonStyle}
-        >
-          <ArrowLeft size={15} strokeWidth={1.9} />
-          {backLabel}
-        </button>
-        <h3 style={sectionTitleStyle}>{title}</h3>
-        <div style={{ width: 72 }} />
-      </div>
-
-      <div className="mb-6">
-        <p style={sectionDescriptionStyle}>{description}</p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        {actions.map((action) => (
-          <QuickActionCard key={action.id} action={action} onClick={action.onClick} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function TopListColumn({
-  title,
-  items,
-  onItemClick,
-  onOpenDetail,
-  seeAllLabel,
-}: {
-  title: string;
-  items: BrowseItem[];
-  onItemClick: (item: BrowseItem) => void;
-  onOpenDetail: () => void;
-  seeAllLabel: string;
-}) {
-  const { containerRef, isDragging, dragBind } = useDragScroll("y");
-
-  return (
-    <div className="rounded-[30px]" style={{ ...panelStyle, display: "flex", flexDirection: "column" }}>
-      <div className="mb-3 flex items-center justify-between">
-        <p style={miniSectionTitleStyle}>{title}</p>
-        <button type="button" onClick={onOpenDetail} className="tablet-touch-target tablet-pressable" style={inlineLinkButtonStyle}>
-          {seeAllLabel}
-        </button>
-      </div>
-
-      <div
-        ref={containerRef}
-        {...dragBind}
-        className="flex flex-col gap-2 overflow-y-auto pr-1"
-        style={{
-          maxHeight: 432,
-          minHeight: 432,
-          WebkitOverflowScrolling: "touch",
-          overscrollBehaviorY: "contain",
-          touchAction: "none",
-          cursor: isDragging ? "grabbing" : "grab",
-        }}
-      >
-        {items.map((item) => (
-          <button
-            key={item.title}
-            type="button"
-            onClick={() => onItemClick(item)}
-            className="tablet-touch-target tablet-pressable flex items-center gap-3 rounded-[20px] text-left"
-            style={{
-              padding: "10px 10px 10px 12px",
-              border: "none",
-              backgroundColor: "var(--card)",
-            }}
-          >
-            <div
-              className="relative overflow-hidden rounded-[14px]"
-              style={{ width: 52, height: 52, flexShrink: 0 }}
-            >
-              <ImageWithFallback
-                src={item.imageUrl}
-                alt={item.title}
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate" style={listTitleStyle}>
-                {item.title}
-              </p>
-              <p className="truncate" style={listMetaStyle}>
-                {item.author}
-              </p>
-            </div>
-            <ChevronRight size={16} strokeWidth={1.8} style={{ color: "var(--secondary)" }} />
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function TopBrowsePage({
-  title,
-  items,
-  onBack,
-  onItemClick,
-  backLabel,
-}: {
-  title: string;
-  items: BrowseItem[];
-  onBack: () => void;
-  onItemClick: (item: BrowseItem) => void;
-  backLabel: string;
-}) {
-  return (
-    <section>
-      <div className="mb-6 flex items-center justify-between">
-        <button
-          type="button"
-          onClick={onBack}
-          className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-full"
-          style={secondaryButtonStyle}
-        >
-          <ArrowLeft size={15} strokeWidth={1.9} />
-          {backLabel}
-        </button>
-        <h3 style={sectionTitleStyle}>{title}</h3>
-        <div style={{ width: 72 }} />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        {items.map((item) => (
-          <button
-            key={`${item.title}-${item.author}`}
-            type="button"
-            onClick={() => onItemClick(item)}
-            className="tablet-pressable relative overflow-hidden rounded-[28px] text-left"
-            style={{
-              minHeight: 220,
-              border: "1px solid var(--border)",
-              backgroundColor: "var(--card)",
-            }}
-          >
-            <ImageWithFallback
-              src={item.imageUrl}
-              alt={item.title}
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundColor: "rgba(0,0,0,0.38)",
-              }}
-            />
-            <div className="absolute bottom-0 left-0 right-0" style={{ padding: 18 }}>
-              <p style={imageCardTitleStyle}>{item.title}</p>
-              <p style={imageCardMetaStyle}>{item.author}</p>
-            </div>
-          </button>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 const eyebrowStyle: CSSProperties = {
   margin: 0,
   color: "var(--secondary)",
@@ -1448,274 +976,6 @@ const topTitleStyle: CSSProperties = {
   letterSpacing: "-0.02em",
 };
 
-const secondaryButtonStyle: CSSProperties = {
-  height: 46,
-  padding: "0 18px",
-  border: "1px solid var(--border)",
-  backgroundColor: "var(--surface-glass)",
-  color: "var(--foreground)",
-  fontSize: 15,
-  fontWeight: 600,
-  cursor: "pointer",
-};
-
 const sectionStyle: CSSProperties = {
   paddingBottom: 28,
-};
-
-const sectionTitleStyle: CSSProperties = {
-  margin: "6px 0 0",
-  color: "var(--foreground)",
-  fontSize: 38,
-  fontWeight: 700,
-  letterSpacing: "-0.03em",
-};
-
-const sectionDescriptionStyle: CSSProperties = {
-  margin: "8px 0 0",
-  color: "var(--secondary)",
-  fontSize: 15,
-  fontWeight: 500,
-};
-
-const heroBottomDockStyle: CSSProperties = {
-  padding: "0 0 0 0",
-  minHeight: 88,
-};
-
-const heroPreviewHintEyebrowStyle: CSSProperties = {
-  display: "block",
-  color: "var(--secondary)",
-  fontSize: 10,
-  fontWeight: 700,
-  letterSpacing: "0.12em",
-  textTransform: "uppercase",
-  lineHeight: 1.2,
-};
-
-const heroPreviewHintLabelStyle: CSSProperties = {
-  display: "block",
-  marginTop: 4,
-  color: "var(--foreground)",
-  fontSize: 14,
-  fontWeight: 700,
-  lineHeight: 1.2,
-};
-
-const heroSloganOverlayStyle: CSSProperties = {
-  top: "33.333vh",
-  left: "50%",
-  width: "auto",
-  maxWidth: "none",
-  transform: "translateX(-50%)",
-  zIndex: 4,
-  pointerEvents: "none",
-};
-
-const heroSloganTitleStyle: CSSProperties = {
-  margin: 0,
-  color: "#171717",
-  fontSize: 38,
-  fontWeight: 700,
-  lineHeight: 0.95,
-  letterSpacing: "-0.03em",
-  textAlign: "center",
-  whiteSpace: "nowrap",
-};
-
-const heroChatFieldStyle: CSSProperties = {
-  minHeight: 80,
-  padding: "0 12px 0 20px",
-  border: "1px solid var(--border)",
-  backgroundColor: "var(--card)",
-  boxShadow: "0 10px 28px rgba(15,23,42,0.08)",
-};
-
-const heroChatInputStyle: CSSProperties = {
-  flex: 1,
-  minWidth: 0,
-  border: "none",
-  padding: 0,
-  background: "transparent",
-  color: "var(--foreground)",
-  fontSize: 18,
-  fontWeight: 500,
-};
-
-const heroChatSendStyle: CSSProperties = {
-  height: 56,
-  padding: "0 24px",
-  border: "1px solid var(--border)",
-  backgroundColor: "var(--foreground)",
-  color: "var(--background)",
-  fontSize: 16,
-  fontWeight: 700,
-  cursor: "pointer",
-};
-
-const heroPromptPanelStyle: CSSProperties = {
-  left: 0,
-  right: 0,
-  bottom: "calc(100% + 14px)",
-  zIndex: 8,
-  padding: "0 2px 12px",
-};
-
-const heroPromptListStyle: CSSProperties = {
-  position: "relative",
-};
-
-const heroPromptListContentStyle: CSSProperties = {
-  gap: 6,
-};
-
-const heroPromptOverflowHintStyle: CSSProperties = {
-  padding: "0 0 4px 17px",
-  color: "var(--secondary)",
-  fontSize: 12,
-  fontWeight: 600,
-  letterSpacing: "0.04em",
-  lineHeight: 1.2,
-  textTransform: "uppercase",
-  opacity: 0.74,
-};
-
-const heroPromptSuggestionStyle: CSSProperties = {
-  padding: 0,
-  border: "none",
-  background: "transparent",
-  cursor: "pointer",
-};
-
-const heroPromptSuggestionContentStyle: CSSProperties = {
-  display: "flex",
-  alignItems: "flex-start",
-  gap: 10,
-  padding: "6px 0",
-};
-
-const heroPromptSuggestionBulletStyle: CSSProperties = {
-  display: "inline-flex",
-  minWidth: 10,
-  color: "var(--secondary)",
-  fontSize: 17,
-  fontWeight: 600,
-  lineHeight: 1.2,
-  transform: "translateY(1px)",
-};
-
-const heroPromptSuggestionPromptStyle: CSSProperties = {
-  margin: 0,
-  color: "var(--secondary)",
-  fontSize: 15,
-  fontWeight: 500,
-  lineHeight: 1.45,
-  textShadow: "0 1px 10px rgba(15,23,42,0.12)",
-};
-
-const heroPromptEmptyStyle: CSSProperties = {
-  padding: "6px 0",
-};
-
-const heroPromptEmptyTextStyle: CSSProperties = {
-  margin: 0,
-  padding: "6px 0",
-  color: "var(--secondary)",
-  fontSize: 14,
-  fontWeight: 500,
-  lineHeight: 1.5,
-};
-
-const panelStyle: CSSProperties = {
-  padding: 18,
-  border: "1px solid var(--border)",
-  backgroundColor: "var(--surface-glass-strong)",
-  boxShadow: "var(--elevation-sm)",
-};
-
-const templateStripStyle: CSSProperties = {
-  padding: "2px 0 0",
-};
-
-const templateStripHintStyle: CSSProperties = {
-  margin: "6px 0 0",
-  color: "var(--secondary)",
-  fontSize: 13,
-  fontWeight: 500,
-};
-
-const miniSectionTitleStyle: CSSProperties = {
-  margin: 0,
-  color: "var(--foreground)",
-  fontSize: 17,
-  fontWeight: 700,
-};
-
-const inlineLinkButtonStyle: CSSProperties = {
-  border: "none",
-  minHeight: 44,
-  padding: "0 6px",
-  background: "transparent",
-  color: "var(--secondary)",
-  fontSize: 13,
-  fontWeight: 600,
-  cursor: "pointer",
-};
-
-const quickActionCardStyle: CSSProperties = {
-  minHeight: 104,
-  padding: 14,
-  border: "1px solid var(--border)",
-  backgroundColor: "var(--surface-glass-strong)",
-  boxShadow: "0 8px 20px rgba(15,23,42,0.04)",
-};
-
-const quickActionTagStyle: CSSProperties = {
-  margin: "0 0 6px",
-  color: "var(--secondary)",
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: "0.12em",
-  textTransform: "uppercase",
-};
-
-const listTitleStyle: CSSProperties = {
-  margin: 0,
-  color: "var(--foreground)",
-  fontSize: 15,
-  fontWeight: 600,
-};
-
-const listMetaStyle: CSSProperties = {
-  margin: "4px 0 0",
-  color: "var(--secondary)",
-  fontSize: 13,
-  fontWeight: 500,
-};
-
-const quickActionMetaStyle: CSSProperties = {
-  margin: "6px 0 0",
-  color: "var(--secondary)",
-  fontSize: 13,
-  fontWeight: 500,
-  lineHeight: 1.35,
-  display: "-webkit-box",
-  WebkitLineClamp: 2,
-  WebkitBoxOrient: "vertical",
-  overflow: "hidden",
-};
-
-const imageCardTitleStyle: CSSProperties = {
-  margin: 0,
-  color: "var(--on-image-primary)",
-  fontSize: 15,
-  fontWeight: 700,
-  lineHeight: 1.3,
-};
-
-const imageCardMetaStyle: CSSProperties = {
-  margin: "4px 0 0",
-  color: "var(--on-image-secondary)",
-  fontSize: 13,
-  fontWeight: 500,
 };
