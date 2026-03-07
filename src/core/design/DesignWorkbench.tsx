@@ -26,14 +26,15 @@ export function DesignWorkbench({
     return () => window.removeEventListener("resize", updateScale);
   }, [width, height]);
 
-  const frameStyle: CSSProperties = {
+  const frameStyle: CSSProperties &
+    Record<"--workbench-scale" | "--workbench-inverse-scale", number> = {
     width,
     height,
     position: "relative",
     isolation: "isolate",
     transform: `scale(${scale})`,
-    ["--workbench-scale" as "--workbench-scale"]: scale,
-    ["--workbench-inverse-scale" as "--workbench-inverse-scale"]: inverseScale,
+    "--workbench-scale": scale,
+    "--workbench-inverse-scale": inverseScale,
   };
 
   return (

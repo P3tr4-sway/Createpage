@@ -22,151 +22,27 @@ import {
   AudioWaveform,
 } from "lucide-react";
 import { useEntranceLocale } from "../../modules/entrance/EntranceLocaleContext";
+import { agenticCopyByLocale } from "../../features/entrance/i18n/agentic.copy";
+import {
+  getAgentModeOptionsForLocale,
+  getMusicianTargetsForLocale,
+} from "../../features/entrance/model/agentic.mock";
+import type {
+  AudioQueueItem,
+  AgentMode,
+  GenerationHistoryItem,
+  MusicianTarget,
+  MusicianTargetId,
+  OverlayMenu,
+  ProducerMessage,
+  QueueStatus,
+} from "../../features/entrance/model/agentic.types";
+import { useAgenticSessionState } from "../../features/entrance/state/useAgenticSessionState";
 
 interface AgenticProducingPageProps {
   onBack?: () => void;
   previewMode?: boolean;
 }
-
-type ArrangementClip = {
-  id: string;
-  label: string;
-  startBeat: number;
-  durationBeats: number;
-  fill: string;
-  accent: string;
-};
-
-type ArrangementTrack = {
-  id: string;
-  name: string;
-  role: string;
-  level: string;
-  clips: ArrangementClip[];
-};
-
-const initialTracks: ArrangementTrack[] = [
-  {
-    id: "drums",
-    name: "Drums",
-    role: "Pocket",
-    level: "-4.5 dB",
-    clips: [
-      {
-        id: "drums-a",
-        label: "Intro groove",
-        startBeat: 0,
-        durationBeats: 12,
-        fill: "linear-gradient(135deg, rgba(69, 132, 255, 0.94), rgba(40, 87, 214, 0.94))",
-        accent: "#DCE7FF",
-      },
-      {
-        id: "drums-b",
-        label: "Main pocket",
-        startBeat: 16,
-        durationBeats: 28,
-        fill: "linear-gradient(135deg, rgba(46, 109, 239, 0.96), rgba(30, 74, 189, 0.96))",
-        accent: "#F7FBFF",
-      },
-      {
-        id: "drums-c",
-        label: "Fill + lift",
-        startBeat: 52,
-        durationBeats: 8,
-        fill: "linear-gradient(135deg, rgba(98, 146, 255, 0.96), rgba(46, 109, 239, 0.94))",
-        accent: "#F7FBFF",
-      },
-    ],
-  },
-  {
-    id: "bass",
-    name: "Bass",
-    role: "Low end",
-    level: "-6.0 dB",
-    clips: [
-      {
-        id: "bass-a",
-        label: "Verse line",
-        startBeat: 4,
-        durationBeats: 20,
-        fill: "linear-gradient(135deg, rgba(41, 185, 133, 0.94), rgba(24, 128, 92, 0.94))",
-        accent: "#E7FFF6",
-      },
-      {
-        id: "bass-b",
-        label: "Hook sustain",
-        startBeat: 28,
-        durationBeats: 24,
-        fill: "linear-gradient(135deg, rgba(58, 204, 148, 0.94), rgba(30, 145, 106, 0.96))",
-        accent: "#F2FFF9",
-      },
-    ],
-  },
-  {
-    id: "guitar",
-    name: "Guitar",
-    role: "Texture",
-    level: "-8.2 dB",
-    clips: [
-      {
-        id: "guitar-a",
-        label: "Muted comp",
-        startBeat: 8,
-        durationBeats: 12,
-        fill: "linear-gradient(135deg, rgba(249, 161, 71, 0.96), rgba(233, 119, 14, 0.94))",
-        accent: "#FFF4E6",
-      },
-      {
-        id: "guitar-b",
-        label: "Open chorus",
-        startBeat: 24,
-        durationBeats: 20,
-        fill: "linear-gradient(135deg, rgba(251, 186, 88, 0.96), rgba(242, 136, 26, 0.96))",
-        accent: "#FFF6EA",
-      },
-      {
-        id: "guitar-c",
-        label: "Lift voicing",
-        startBeat: 48,
-        durationBeats: 12,
-        fill: "linear-gradient(135deg, rgba(255, 194, 107, 0.96), rgba(244, 146, 37, 0.96))",
-        accent: "#FFF9EF",
-      },
-    ],
-  },
-  {
-    id: "vocal",
-    name: "Vocal",
-    role: "Lead",
-    level: "-3.0 dB",
-    clips: [
-      {
-        id: "vocal-a",
-        label: "Guide vocal",
-        startBeat: 12,
-        durationBeats: 16,
-        fill: "linear-gradient(135deg, rgba(216, 106, 156, 0.96), rgba(176, 65, 115, 0.94))",
-        accent: "#FFF0F6",
-      },
-      {
-        id: "vocal-b",
-        label: "Hook doubles",
-        startBeat: 32,
-        durationBeats: 16,
-        fill: "linear-gradient(135deg, rgba(230, 128, 174, 0.96), rgba(190, 79, 127, 0.95))",
-        accent: "#FFF3F8",
-      },
-      {
-        id: "vocal-c",
-        label: "Outro adlibs",
-        startBeat: 56,
-        durationBeats: 8,
-        fill: "linear-gradient(135deg, rgba(237, 145, 188, 0.96), rgba(198, 87, 137, 0.96))",
-        accent: "#FFF6FA",
-      },
-    ],
-  },
-];
 
 function clampBeat(beat: number, totalBeats: number) {
   const maxBeat = Math.max(totalBeats - 0.001, 0);
@@ -189,460 +65,6 @@ function formatTransportPosition(
 function createUiId(prefix: string) {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 }
-
-type AgentMode = "musician" | "producer";
-
-type MusicianTargetId =
-  | "ai-drummer"
-  | "ai-bassist"
-  | "ai-guitarist"
-  | "ai-keyboardist"
-  | "ai-percussionist"
-  | "ai-vocalist";
-
-type MusicianTarget = {
-  id: MusicianTargetId;
-  label: string;
-  helper: string;
-  showsLyrics: boolean;
-  trackMatch: string;
-};
-
-type OverlayMenu = "target" | "mode" | null;
-
-type ProducerMessage = {
-  id: string;
-  role: "user" | "agent";
-  text: string;
-  timestamp: string;
-};
-
-type QueueStatus = "Generating" | "Queued" | "Ready";
-
-type AudioQueueItem = {
-  id: string;
-  title: string;
-  owner: string;
-  status: QueueStatus;
-  detail: string;
-  progress: string;
-};
-
-type GenerationHistoryItem = {
-  id: string;
-  title: string;
-  owner: string;
-  meta: string;
-  timestamp: string;
-};
-
-const musicianTargets: MusicianTarget[] = [
-  {
-    id: "ai-drummer",
-    label: "AI Drummer",
-    helper: "Pocket, fills, and momentum",
-    showsLyrics: false,
-    trackMatch: "drums",
-  },
-  {
-    id: "ai-bassist",
-    label: "AI Bassist",
-    helper: "Low-end pulse and movement",
-    showsLyrics: false,
-    trackMatch: "bass",
-  },
-  {
-    id: "ai-guitarist",
-    label: "AI Guitarist",
-    helper: "Comping, voicings, and texture",
-    showsLyrics: false,
-    trackMatch: "guitar",
-  },
-  {
-    id: "ai-keyboardist",
-    label: "AI Keyboardist",
-    helper: "Keys, harmony pads, and glue",
-    showsLyrics: false,
-    trackMatch: "keys",
-  },
-  {
-    id: "ai-percussionist",
-    label: "AI Percussionist",
-    helper: "Perc layers and groove detail",
-    showsLyrics: false,
-    trackMatch: "perc",
-  },
-  {
-    id: "ai-vocalist",
-    label: "AI Vocalist",
-    helper: "Topline, phrasing, and hooks",
-    showsLyrics: true,
-    trackMatch: "vocal",
-  },
-];
-
-const agentModeOptions: Array<{
-  id: AgentMode;
-  label: string;
-}> = [
-  {
-    id: "musician",
-    label: "AI Musician",
-  },
-  {
-    id: "producer",
-    label: "AI Producer",
-  },
-];
-
-const initialProducerMessages: ProducerMessage[] = [
-  {
-    id: "producer-intro",
-    role: "agent",
-    text: "Tell me the section, mood, or next move. I will turn it into a concrete pass and route it to the right AI musician.",
-    timestamp: "Ready",
-  },
-];
-
-const initialAudioQueue: AudioQueueItem[] = [
-  {
-    id: "queue-vocal-hook",
-    title: "Hook doubles",
-    owner: "AI Vocalist",
-    status: "Generating",
-    detail: "Neo Soul • Bars 9-16",
-    progress: "Rendering topline timing",
-  },
-  {
-    id: "queue-bass-pocket",
-    title: "Verse pocket",
-    owner: "AI Bassist",
-    status: "Queued",
-    detail: "Neo Soul • Bars 1-8",
-    progress: "Waiting for lane handoff",
-  },
-  {
-    id: "queue-drum-variation",
-    title: "Lift fill",
-    owner: "AI Drummer",
-    status: "Ready",
-    detail: "House • Bars 17-20",
-    progress: "Ready to audition",
-  },
-];
-
-const initialGenerationHistory: GenerationHistoryItem[] = [
-  {
-    id: "history-drum-pocket",
-    title: "Main pocket",
-    owner: "AI Drummer",
-    meta: "Neo Soul • Drums",
-    timestamp: "2 min ago",
-  },
-  {
-    id: "history-guitar-comp",
-    title: "Muted comp",
-    owner: "AI Guitarist",
-    meta: "Indie Pop • Guitar",
-    timestamp: "12 min ago",
-  },
-  {
-    id: "history-producer-brief",
-    title: "Session brief",
-    owner: "AI Producer",
-    meta: "Structure + cue sheet",
-    timestamp: "18 min ago",
-  },
-];
-
-const agenticCopyByLocale = {
-  en: {
-    defaultLyricsDraft: "Falling through the city lights, give me a slow-burn chorus with space.",
-    selectedStyleFallback: "Freeform",
-    justNow: "Just now",
-    ready: "Ready",
-    closeDaw: "Close DAW",
-    projectTitle: "New Project 20250408",
-    undo: "Undo",
-    importAudio: "Import audio",
-    save: "Save",
-    addTrack: "Add track",
-    trackName: (index: number) => `Track ${index}`,
-    ideaLane: "Idea lane",
-    barsUnit: "bars",
-    tracksUnit: "tracks",
-    mute: "Mute",
-    unmute: "Unmute",
-    solo: "Solo",
-    disableSolo: "Disable solo for",
-    barLabel: (bar: number, count: number) => `Bar ${bar} • ${count} bars`,
-    playheadAt: (position: string) => `Playhead at ${position}`,
-    waveformTools: "Waveform tools",
-    microphoneMonitor: "Microphone monitor",
-    mixerControls: "Mixer controls",
-    returnToStart: "Return to start",
-    pausePlayback: "Pause playback",
-    startPlayback: "Start playback",
-    record: "Record",
-    loop: "Loop",
-    aiMusician: "AI Musician",
-    chooseAiMusician: "Choose AI Musician",
-    style: "Style",
-    enterStyle: "Enter a style",
-    lyrics: "Lyrics",
-    lyricsPlaceholder: "Shape the topline or paste a hook...",
-    generate: "Generate",
-    currentModeAria: (mode: string) => `Current mode ${mode}. Open switcher.`,
-    aiProducerPlaceholder: "Start with your AI Music Producer.",
-    openProducerWorkspace: "Open AI Producer workspace",
-    send: "Send",
-    start: "Start",
-    aiProducer: "AI Producer",
-    producerTitle: "Shape the next move for this session.",
-    closeProducerWorkspace: "Close AI Producer workspace",
-    conversation: "Conversation",
-    conversationMeta: "Direction, notes, and next actions",
-    renderQueue: "Render Queue",
-    renderQueueMeta: "Active and queued generations",
-    recentPasses: "Recent Passes",
-    recentPassesMeta: "Latest outputs and handoffs",
-    producerSubmitReply: (style: string, target: string) =>
-      `Locked. I am shaping this into a ${style} direction and sending the next pass to ${target}. Queue and recent outputs stay visible on the right.`,
-    producerBrief: "Producer brief",
-    producerSessionDirection: (style: string) => `${style} • Session direction`,
-    producerDispatch: "Dispatching tasks to AI musicians",
-    producerChatDirected: (style: string) => `${style} • chat-directed`,
-    musicianPassTitle: (label: string) => `${label} pass`,
-    lyricDraftMeta: (style: string) => `${style} • lyric-guided draft`,
-    instrumentalPassMeta: (style: string) => `${style} • instrumental pass`,
-    lyricProgress: "Shaping topline + lyric cadence",
-    instrumentalProgress: "Rendering arrangement take",
-    statusGenerating: "Generating",
-    statusQueued: "Queued",
-    statusReady: "Ready",
-    statusLabels: {
-      Generating: "Generating",
-      Queued: "Queued",
-      Ready: "Ready",
-    },
-  },
-  "zh-CN": {
-    defaultLyricsDraft: "灯火从城市上空滑过，给我一个带空间感、慢慢升温的副歌。",
-    selectedStyleFallback: "自由风格",
-    justNow: "刚刚",
-    ready: "就绪",
-    closeDaw: "关闭 DAW",
-    projectTitle: "新建项目 20250408",
-    undo: "撤销",
-    importAudio: "导入音频",
-    save: "保存",
-    addTrack: "添加轨道",
-    trackName: (index: number) => `轨道 ${index}`,
-    ideaLane: "灵感轨道",
-    barsUnit: "小节",
-    tracksUnit: "轨道",
-    mute: "静音",
-    unmute: "取消静音",
-    solo: "独奏",
-    disableSolo: "取消独奏",
-    barLabel: (bar: number, count: number) => `第 ${bar} 小节 · ${count} 小节`,
-    playheadAt: (position: string) => `播放头位置 ${position}`,
-    waveformTools: "波形工具",
-    microphoneMonitor: "麦克风监听",
-    mixerControls: "混音控制",
-    returnToStart: "回到开头",
-    pausePlayback: "暂停播放",
-    startPlayback: "开始播放",
-    record: "录音",
-    loop: "循环",
-    aiMusician: "AI 乐手",
-    chooseAiMusician: "选择 AI 乐手",
-    style: "风格",
-    enterStyle: "输入风格",
-    lyrics: "歌词",
-    lyricsPlaceholder: "整理 topline，或直接粘贴一个 hook……",
-    generate: "生成",
-    currentModeAria: (mode: string) => `当前模式为 ${mode}。打开切换器。`,
-    aiProducerPlaceholder: "从你的 AI 音乐制作人开始。",
-    openProducerWorkspace: "打开 AI 制作人工作区",
-    send: "发送",
-    start: "开始",
-    aiProducer: "AI 制作人",
-    producerTitle: "为这个 session 决定下一步。",
-    closeProducerWorkspace: "关闭 AI 制作人工作区",
-    conversation: "对话",
-    conversationMeta: "方向、备注和下一步动作",
-    renderQueue: "渲染队列",
-    renderQueueMeta: "正在进行和排队中的生成任务",
-    recentPasses: "最近生成",
-    recentPassesMeta: "最新输出与交接结果",
-    producerSubmitReply: (style: string, target: string) =>
-      `已锁定。我会把它整理成 ${style} 方向，并把下一轮 pass 发给 ${target}。右侧会继续显示队列和最近输出。`,
-    producerBrief: "制作人简报",
-    producerSessionDirection: (style: string) => `${style} · Session 方向`,
-    producerDispatch: "正在把任务分发给 AI 乐手",
-    producerChatDirected: (style: string) => `${style} · 聊天驱动`,
-    musicianPassTitle: (label: string) => `${label} Pass`,
-    lyricDraftMeta: (style: string) => `${style} · 歌词引导草稿`,
-    instrumentalPassMeta: (style: string) => `${style} · 器乐 Pass`,
-    lyricProgress: "正在整理 topline 与歌词节奏",
-    instrumentalProgress: "正在渲染编排片段",
-    statusGenerating: "Generating",
-    statusQueued: "Queued",
-    statusReady: "Ready",
-    statusLabels: {
-      Generating: "生成中",
-      Queued: "排队中",
-      Ready: "已就绪",
-    },
-  },
-} as const;
-
-function getInitialTracksForLocale(locale: "en" | "zh-CN") {
-  const trackNameMap =
-    locale === "zh-CN"
-      ? {
-          drums: { name: "鼓组", role: "律动" },
-          bass: { name: "贝斯", role: "低频" },
-          guitar: { name: "吉他", role: "质感" },
-          vocal: { name: "人声", role: "主线" },
-        }
-      : null;
-  const clipLabelMap =
-    locale === "zh-CN"
-      ? {
-          "drums-a": "前奏 Groove",
-          "drums-b": "主段律动",
-          "drums-c": "Fill + 提升",
-          "bass-a": "主歌线条",
-          "bass-b": "Hook 延音",
-          "guitar-a": "闷音伴奏",
-          "guitar-b": "开放副歌",
-          "guitar-c": "抬升和弦",
-          "vocal-a": "导唱",
-          "vocal-b": "Hook 叠唱",
-          "vocal-c": "尾段 Adlib",
-        }
-      : null;
-
-  return initialTracks.map((track) => ({
-    ...track,
-    name: trackNameMap?.[track.id as keyof typeof trackNameMap]?.name ?? track.name,
-    role: trackNameMap?.[track.id as keyof typeof trackNameMap]?.role ?? track.role,
-    clips: track.clips.map((clip) => ({
-      ...clip,
-      label: clipLabelMap?.[clip.id as keyof typeof clipLabelMap] ?? clip.label,
-    })),
-  }));
-}
-
-function getMusicianTargetsForLocale(locale: "en" | "zh-CN") {
-  const labelMap =
-    locale === "zh-CN"
-      ? {
-          "ai-drummer": { label: "AI 鼓手", helper: "律动、fill 和推进感" },
-          "ai-bassist": { label: "AI 贝斯手", helper: "低频脉冲和推动感" },
-          "ai-guitarist": { label: "AI 吉他手", helper: "伴奏、和弦和纹理" },
-          "ai-keyboardist": { label: "AI 键盘手", helper: "键盘、和声铺底和粘合感" },
-          "ai-percussionist": { label: "AI 打击乐手", helper: "打击层次和 groove 细节" },
-          "ai-vocalist": { label: "AI 主唱", helper: "Topline、咬字和 hook" },
-        }
-      : null;
-
-  return musicianTargets.map((target) => ({
-    ...target,
-    label: labelMap?.[target.id as keyof typeof labelMap]?.label ?? target.label,
-    helper: labelMap?.[target.id as keyof typeof labelMap]?.helper ?? target.helper,
-  }));
-}
-
-function getAgentModeOptionsForLocale(locale: "en" | "zh-CN") {
-  const copy = agenticCopyByLocale[locale];
-  return [
-    { id: "musician" as const, label: copy.aiMusician },
-    { id: "producer" as const, label: copy.aiProducer },
-  ];
-}
-
-function getInitialProducerMessagesForLocale(locale: "en" | "zh-CN") {
-  const copy = agenticCopyByLocale[locale];
-  return [
-    {
-      id: "producer-intro",
-      role: "agent" as const,
-      text:
-        locale === "zh-CN"
-          ? "告诉我段落、情绪或下一步动作。我会把它整理成明确的 pass，并路由给合适的 AI 乐手。"
-          : "Tell me the section, mood, or next move. I will turn it into a concrete pass and route it to the right AI musician.",
-      timestamp: copy.ready,
-    },
-  ];
-}
-
-function getInitialAudioQueueForLocale(locale: "en" | "zh-CN") {
-  const copy = agenticCopyByLocale[locale];
-  const targets = getMusicianTargetsForLocale(locale);
-  const vocalist = targets.find((item) => item.id === "ai-vocalist")?.label ?? "AI Vocalist";
-  const bassist = targets.find((item) => item.id === "ai-bassist")?.label ?? "AI Bassist";
-  const drummer = targets.find((item) => item.id === "ai-drummer")?.label ?? "AI Drummer";
-  return [
-    {
-      id: "queue-vocal-hook",
-      title: locale === "zh-CN" ? "Hook 叠唱" : "Hook doubles",
-      owner: vocalist,
-      status: copy.statusGenerating,
-      detail: locale === "zh-CN" ? "Neo Soul · 第 9-16 小节" : "Neo Soul • Bars 9-16",
-      progress: copy.lyricProgress,
-    },
-    {
-      id: "queue-bass-pocket",
-      title: locale === "zh-CN" ? "主歌律动" : "Verse pocket",
-      owner: bassist,
-      status: copy.statusQueued,
-      detail: locale === "zh-CN" ? "Neo Soul · 第 1-8 小节" : "Neo Soul • Bars 1-8",
-      progress: locale === "zh-CN" ? "等待轨道路由交接" : "Waiting for lane handoff",
-    },
-    {
-      id: "queue-drum-variation",
-      title: locale === "zh-CN" ? "提升 Fill" : "Lift fill",
-      owner: drummer,
-      status: copy.statusReady,
-      detail: locale === "zh-CN" ? "House · 第 17-20 小节" : "House • Bars 17-20",
-      progress: locale === "zh-CN" ? "可以开始试听" : "Ready to audition",
-    },
-  ];
-}
-
-function getInitialGenerationHistoryForLocale(locale: "en" | "zh-CN") {
-  const copy = agenticCopyByLocale[locale];
-  const targets = getMusicianTargetsForLocale(locale);
-  const drummer = targets.find((item) => item.id === "ai-drummer")?.label ?? "AI Drummer";
-  const guitarist = targets.find((item) => item.id === "ai-guitarist")?.label ?? "AI Guitarist";
-  return [
-    {
-      id: "history-drum-pocket",
-      title: locale === "zh-CN" ? "主段律动" : "Main pocket",
-      owner: drummer,
-      meta: locale === "zh-CN" ? "Neo Soul · 鼓组" : "Neo Soul • Drums",
-      timestamp: locale === "zh-CN" ? "2 分钟前" : "2 min ago",
-    },
-    {
-      id: "history-guitar-comp",
-      title: locale === "zh-CN" ? "闷音伴奏" : "Muted comp",
-      owner: guitarist,
-      meta: locale === "zh-CN" ? "Indie Pop · 吉他" : "Indie Pop • Guitar",
-      timestamp: locale === "zh-CN" ? "12 分钟前" : "12 min ago",
-    },
-    {
-      id: "history-producer-brief",
-      title: copy.producerBrief,
-      owner: copy.aiProducer,
-      meta: locale === "zh-CN" ? "结构 + 提示单" : "Structure + cue sheet",
-      timestamp: locale === "zh-CN" ? "18 分钟前" : "18 min ago",
-    },
-  ];
-}
-
 export function AgenticProducingPage({
   onBack,
   previewMode = false,
@@ -652,32 +74,53 @@ export function AgenticProducingPage({
   const localizedTargets = getMusicianTargetsForLocale(locale);
   const previewInitialBeat = 6;
   const previewPlayheadTargetRatio = 2 / 3;
-  const [tracks, setTracks] = useState(() => getInitialTracksForLocale(locale));
-  const [selectedTrackId, setSelectedTrackId] = useState(
-    () => getInitialTracksForLocale(locale)[0].id,
-  );
-  const [mutedTrackIds, setMutedTrackIds] = useState<string[]>([]);
-  const [soloTrackIds, setSoloTrackIds] = useState<string[]>([]);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [loopEnabled, setLoopEnabled] = useState(false);
-  const [currentBeat, setCurrentBeat] = useState(6);
-  const [scrollLeft, setScrollLeft] = useState(0);
-  const [scrollTop, setScrollTop] = useState(0);
-  const [isDraggingPlayhead, setIsDraggingPlayhead] = useState(false);
-  const [agentMode, setAgentMode] = useState<AgentMode>("musician");
-  const [openOverlayMenu, setOpenOverlayMenu] = useState<OverlayMenu>(null);
-  const [musicianTargetId, setMusicianTargetId] =
-    useState<MusicianTargetId>("ai-drummer");
-  const [styleDraft, setStyleDraft] = useState("");
-  const [lyricsDraft, setLyricsDraft] = useState(() => copy.defaultLyricsDraft);
-  const [producerDraft, setProducerDraft] = useState("");
-  const [producerWorkspaceOpen, setProducerWorkspaceOpen] = useState(false);
-  const [producerMessages, setProducerMessages] =
-    useState<ProducerMessage[]>(() => getInitialProducerMessagesForLocale(locale));
-  const [audioQueue, setAudioQueue] =
-    useState<AudioQueueItem[]>(() => getInitialAudioQueueForLocale(locale));
-  const [generationHistory, setGenerationHistory] =
-    useState<GenerationHistoryItem[]>(() => getInitialGenerationHistoryForLocale(locale));
+  const {
+    tracks,
+    selectedTrackId,
+    setSelectedTrackId,
+    mutedTrackIds,
+    soloTrackIds,
+    isPlaying,
+    setIsPlaying,
+    loopEnabled,
+    setLoopEnabled,
+    currentBeat,
+    setCurrentBeat,
+    scrollLeft,
+    setScrollLeft,
+    scrollTop,
+    setScrollTop,
+    isDraggingPlayhead,
+    setIsDraggingPlayhead,
+    agentMode,
+    openOverlayMenu,
+    setOpenOverlayMenu,
+    musicianTargetId,
+    setMusicianTargetId,
+    styleDraft,
+    setStyleDraft,
+    lyricsDraft,
+    setLyricsDraft,
+    producerDraft,
+    setProducerDraft,
+    producerWorkspaceOpen,
+    setProducerWorkspaceOpen,
+    producerMessages,
+    setProducerMessages,
+    audioQueue,
+    generationHistory,
+    pushQueueItem,
+    pushHistoryItem,
+    selectAgentMode,
+    addTrack,
+    toggleMuted,
+    toggleSolo,
+  } = useAgenticSessionState({
+    locale,
+    defaultLyricsDraft: copy.defaultLyricsDraft,
+    trackName: copy.trackName,
+    ideaLane: copy.ideaLane,
+  });
   const [previewViewportWidth, setPreviewViewportWidth] = useState(() =>
     previewMode ? 1280 : 0,
   );
@@ -725,30 +168,6 @@ export function AgenticProducingPage({
   const producerWorkspaceVisible = showAgentOverlay && agentMode === "producer" && producerWorkspaceOpen;
 
   useEffect(() => {
-    const nextTracks = getInitialTracksForLocale(locale);
-    setTracks(nextTracks);
-    setSelectedTrackId(nextTracks[0]?.id ?? "");
-    setMutedTrackIds([]);
-    setSoloTrackIds([]);
-    setIsPlaying(false);
-    setLoopEnabled(false);
-    setCurrentBeat(6);
-    setScrollLeft(0);
-    setScrollTop(0);
-    setIsDraggingPlayhead(false);
-    setAgentMode("musician");
-    setOpenOverlayMenu(null);
-    setMusicianTargetId("ai-drummer");
-    setStyleDraft("");
-    setLyricsDraft(copy.defaultLyricsDraft);
-    setProducerDraft("");
-    setProducerWorkspaceOpen(false);
-    setProducerMessages(getInitialProducerMessagesForLocale(locale));
-    setAudioQueue(getInitialAudioQueueForLocale(locale));
-    setGenerationHistory(getInitialGenerationHistoryForLocale(locale));
-  }, [copy.defaultLyricsDraft, locale]);
-
-  useEffect(() => {
     if (!previewMode) return;
 
     const previewRoot = previewRootRef.current;
@@ -780,58 +199,6 @@ export function AgenticProducingPage({
     window.addEventListener("pointerdown", handlePointerDown);
     return () => window.removeEventListener("pointerdown", handlePointerDown);
   }, []);
-
-  const pushQueueItem = (item: AudioQueueItem) => {
-    setAudioQueue((prev) => [item, ...prev].slice(0, 6));
-  };
-
-  const pushHistoryItem = (item: GenerationHistoryItem) => {
-    setGenerationHistory((prev) => [item, ...prev].slice(0, 8));
-  };
-
-  const selectAgentMode = (nextMode: AgentMode) => {
-    setAgentMode(nextMode);
-    setOpenOverlayMenu(null);
-  };
-
-  const addTrack = () => {
-    const nextIndex = tracks.length + 1;
-    const nextTrack: ArrangementTrack = {
-      id: `track-${nextIndex}`,
-      name: copy.trackName(nextIndex),
-      role: copy.ideaLane,
-      level: "-inf dB",
-      clips: [],
-    };
-    setTracks((prev) => [...prev, nextTrack]);
-    setSelectedTrackId(nextTrack.id);
-  };
-
-  const deleteTrack = (trackId: string) => {
-    setTracks((prev) => {
-      if (prev.length <= 1) return prev;
-      const deletedIndex = prev.findIndex((track) => track.id === trackId);
-      const nextTracks = prev.filter((track) => track.id !== trackId);
-      const fallbackTrack =
-        nextTracks[Math.min(deletedIndex, nextTracks.length - 1)] ?? nextTracks[0];
-      setSelectedTrackId((current) => (current === trackId ? fallbackTrack.id : current));
-      return nextTracks;
-    });
-    setMutedTrackIds((prev) => prev.filter((id) => id !== trackId));
-    setSoloTrackIds((prev) => prev.filter((id) => id !== trackId));
-  };
-
-  const toggleMuted = (trackId: string) => {
-    setMutedTrackIds((prev) =>
-      prev.includes(trackId) ? prev.filter((id) => id !== trackId) : [...prev, trackId],
-    );
-  };
-
-  const toggleSolo = (trackId: string) => {
-    setSoloTrackIds((prev) =>
-      prev.includes(trackId) ? prev.filter((id) => id !== trackId) : [...prev, trackId],
-    );
-  };
 
   const handleMusicianGenerate = () => {
     setOpenOverlayMenu(null);

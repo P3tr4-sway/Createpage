@@ -1,0 +1,66 @@
+import type { Locale } from "../../../modules/entrance/EntranceLocaleContext";
+
+export type ArrangementClip = {
+  id: string;
+  label: string;
+  startBeat: number;
+  durationBeats: number;
+  fill: string;
+  accent: string;
+};
+
+export type ArrangementTrack = {
+  id: string;
+  name: string;
+  role: string;
+  level: string;
+  clips: ArrangementClip[];
+};
+
+export type AgentMode = "musician" | "producer";
+
+export type MusicianTargetId =
+  | "ai-drummer"
+  | "ai-bassist"
+  | "ai-guitarist"
+  | "ai-keyboardist"
+  | "ai-percussionist"
+  | "ai-vocalist";
+
+export type MusicianTarget = {
+  id: MusicianTargetId;
+  label: string;
+  helper: string;
+  showsLyrics: boolean;
+  trackMatch: string;
+};
+
+export type OverlayMenu = "target" | "mode" | null;
+
+export type ProducerMessage = {
+  id: string;
+  role: "user" | "agent";
+  text: string;
+  timestamp: string;
+};
+
+export type QueueStatus = "Generating" | "Queued" | "Ready";
+
+export type AudioQueueItem = {
+  id: string;
+  title: string;
+  owner: string;
+  status: QueueStatus;
+  detail: string;
+  progress: string;
+};
+
+export type GenerationHistoryItem = {
+  id: string;
+  title: string;
+  owner: string;
+  meta: string;
+  timestamp: string;
+};
+
+export type AgenticCopy = (typeof import("../i18n/agentic.copy").agenticCopyByLocale)[Locale];

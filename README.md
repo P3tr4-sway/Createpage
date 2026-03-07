@@ -18,6 +18,7 @@ npm run dev
 
 详细流程见：
 - `docs/ARCHITECTURE.md`
+- `docs/ARCHITECTURE_V2.md`
 - `docs/WORKFLOW_HTML_FIGMA_ANDROID.md`
 - `docs/UI_ALIGNMENT_CHECKLIST.md`
 

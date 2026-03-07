@@ -1,10 +1,10 @@
-import { DesignWorkbench } from "../core/design/DesignWorkbench";
-import { EntranceWorkspace } from "../modules/entrance/EntranceWorkspace";
+import { EntranceWorkspace } from "../features/entrance";
+import { DesignWorkbenchShell } from "./shell/DesignWorkbenchShell";
 
 export default function App() {
   return (
-    <DesignWorkbench width={1920} height={1080}>
+    <DesignWorkbenchShell>
       <EntranceWorkspace />
-    </DesignWorkbench>
+    </DesignWorkbenchShell>
   );
 }
