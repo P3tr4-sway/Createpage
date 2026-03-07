@@ -1166,6 +1166,9 @@ export function EntranceWorkspace() {
   const homePreviewCanvasWidth = 1280;
   const homePreviewZoom = 1.14;
   const homePreviewFocusX = 0.42;
+  const mainHeaderHeight = 72;
+  const showMainHeader = activeSubView !== "home";
+  const homeHeroHeight = `clamp(${520 + mainHeaderHeight}px, calc(100vh - ${248 - mainHeaderHeight}px), ${620 + mainHeaderHeight}px)`;
   const sidebarWidth = 399;
   const sidebarInlinePadding = 24;
   const mainContentInlinePadding = 32;
@@ -1204,7 +1207,7 @@ export function EntranceWorkspace() {
       >
         <div className="flex items-center justify-between" style={{ marginBottom: 18 }}>
           <div>
-            <h1 style={railHeadingStyle}>LavaDAW</h1>
+            <h1 style={railHeadingStyle}>Create</h1>
           </div>
 
           <div className="flex items-center gap-2">
@@ -1294,22 +1297,22 @@ export function EntranceWorkspace() {
       </aside>
 
       <main className="flex min-w-0 flex-1 flex-col">
-        <div
-          className="flex items-center justify-between"
+        {showMainHeader ? (
+          <div
+            className="flex items-center justify-between"
             style={{
-              height: 72,
-              minHeight: 72,
+              height: mainHeaderHeight,
+              minHeight: mainHeaderHeight,
               padding: `0 ${mainContentInlinePadding}px`,
               backgroundColor: shellTone.mainHeaderBg,
               borderBottom: `1px solid ${shellTone.railBorder}`,
               backdropFilter: "blur(22px)",
             }}
-        >
-          <div>
-            <h2 style={topTitleStyle}>{contentTitle}</h2>
-          </div>
+          >
+            <div>
+              <h2 style={topTitleStyle}>{contentTitle}</h2>
+            </div>
 
-          {activeSubView !== "home" ? (
             <button
               type="button"
               onClick={() => setActiveSubView("home")}
@@ -1319,10 +1322,8 @@ export function EntranceWorkspace() {
               <ArrowLeft size={15} strokeWidth={1.9} />
               {copy.back}
             </button>
-          ) : (
-            <div />
-          )}
-        </div>
+          </div>
+        ) : null}
 
         {activeSubView === "home" ? (
           <div
@@ -1337,7 +1338,7 @@ export function EntranceWorkspace() {
                   ...sectionStyle,
                   position: "relative",
                   zIndex: 3,
-                  minHeight: "clamp(520px, calc(100vh - 248px), 620px)",
+                  minHeight: homeHeroHeight,
                   marginLeft: -mainContentInlinePadding,
                   marginRight: -mainContentInlinePadding,
                 }}
@@ -1356,9 +1357,8 @@ export function EntranceWorkspace() {
                 aria-label={copy.openFullWorkspaceAriaLabel}
                 className="tablet-pressable relative block w-full overflow-visible text-left"
                 style={{
-                  height: "clamp(520px, calc(100vh - 248px), 620px)",
+                  height: homeHeroHeight,
                   backgroundColor: shellTone.heroFrameBg,
-                  borderTop: `1px solid ${shellTone.railBorder}`,
                   borderBottom: `1px solid ${shellTone.railBorder}`,
                   cursor: "pointer",
                 }}
