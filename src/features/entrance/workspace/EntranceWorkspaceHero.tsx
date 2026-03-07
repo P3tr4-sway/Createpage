@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { type CSSProperties, type RefObject } from "react";
 import { AgenticProducingPage } from "@/features/entrance/pages/AgenticProducingPage";
 import type { HeroPromptSuggestion } from "@/features/entrance/model/entrance.types";
+import { workspaceSectionStyle } from "@/features/entrance/workspace/EntranceWorkspace.styles";
 import { ScaledPreviewCanvas } from "@/shared/ui/ScaledPreviewCanvas";
 
 interface EntranceWorkspaceHeroTone {
@@ -72,7 +73,7 @@ export function EntranceWorkspaceHero({
     <section
       ref={sectionRef}
       style={{
-        ...sectionStyle,
+        ...workspaceSectionStyle,
         position: "relative",
         zIndex: 3,
         minHeight: height,
@@ -249,10 +250,6 @@ export function EntranceWorkspaceHero({
     </section>
   );
 }
-
-const sectionStyle: CSSProperties = {
-  paddingBottom: 28,
-};
 
 const heroBottomDockStyle: CSSProperties = {
   padding: "0 0 0 0",

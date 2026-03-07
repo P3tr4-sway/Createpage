@@ -1,5 +1,6 @@
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import type { BrowseItem } from "@/features/entrance/model/entrance.types";
+import type { QuickAction } from "@/features/entrance/workspace/EntranceWorkspace.types";
 import { useDragScroll } from "@/shared/hooks/useDragScroll";
 import { ImageWithFallback } from "@/shared/ui/ImageWithFallback";
 import {
@@ -19,15 +20,7 @@ import {
   templateStripHintStyle,
   templateStripStyle,
 } from "@/features/entrance/workspace/EntranceWorkspaceBrowse.styles";
-
-export type QuickAction = {
-  id: string;
-  title: string;
-  meta: string;
-  tag: string;
-  imageUrl: string;
-  onClick: () => void;
-};
+export type { QuickAction } from "@/features/entrance/workspace/EntranceWorkspace.types";
 
 interface QuickActionCardProps {
   action: QuickAction;

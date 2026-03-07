@@ -1,5 +1,6 @@
 import { type LucideIcon } from "lucide-react";
 import { type CSSProperties } from "react";
+import type { SidebarProject } from "@/features/entrance/workspace/EntranceWorkspace.types";
 
 interface LoopLaunchPanelProps {
   title: string;
@@ -12,13 +13,6 @@ interface SidebarStartActionProps {
   meta?: string;
   icon: LucideIcon;
   accent: string;
-  onClick: () => void;
-}
-
-interface SidebarProject {
-  title: string;
-  meta: string;
-  status: string;
   onClick: () => void;
 }
 
