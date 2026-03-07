@@ -65,17 +65,28 @@ export const sidebarSectionStyle: CSSProperties = {
 export const sidebarSectionLabelStyle: CSSProperties = {
   margin: 0,
   color: "var(--foreground)",
-  fontSize: 12,
+  fontSize: 11,
   fontWeight: 700,
-  letterSpacing: "0.12em",
+  letterSpacing: "0.16em",
   textTransform: "uppercase",
 };
 
 export const sidebarProjectListStyle: CSSProperties = {
   display: "flex",
   flexDirection: "column",
-  gap: 4,
+  gap: 6,
   paddingRight: 2,
+};
+
+export const sidebarViewAllStyle: CSSProperties = {
+  border: "none",
+  minHeight: 32,
+  padding: "0 2px",
+  background: "transparent",
+  color: "var(--secondary)",
+  fontSize: 13,
+  fontWeight: 600,
+  cursor: "pointer",
 };
 
 export const topTitleStyle: CSSProperties = {

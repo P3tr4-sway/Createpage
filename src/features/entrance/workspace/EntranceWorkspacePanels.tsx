@@ -10,9 +10,7 @@ interface LoopLaunchPanelProps {
 
 interface SidebarStartActionProps {
   label: string;
-  meta?: string;
   icon: LucideIcon;
-  accent: string;
   onClick: () => void;
 }
 
@@ -57,29 +55,25 @@ export function LoopLaunchPanel({
 
 export function SidebarStartAction({
   label,
-  meta,
   icon: Icon,
-  accent,
   onClick,
 }: SidebarStartActionProps) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="tablet-touch-target tablet-pressable flex items-center justify-between text-left"
+      className="tablet-touch-target tablet-pressable tablet-hover-soft flex w-full items-center text-left"
       style={sidebarStartActionStyle}
     >
-      <span className="flex min-w-0 items-center gap-3">
-        <span
-          className="flex h-10 w-10 shrink-0 items-center justify-center"
-          style={{ ...sidebarActionIconStyle, backgroundColor: accent }}
-        >
-          <Icon size={15} strokeWidth={1.9} />
-        </span>
-        <span className="min-w-0">
-          <span style={sidebarStartLabelStyle}>{label}</span>
-          {meta ? <span style={sidebarStartMetaStyle}>{meta}</span> : null}
-        </span>
+      <span
+        className="flex shrink-0 items-center justify-center"
+        style={sidebarActionIconStyle}
+        aria-hidden="true"
+      >
+        <Icon size={18} strokeWidth={1.95} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span style={sidebarStartLabelStyle}>{label}</span>
       </span>
     </button>
   );
@@ -92,14 +86,11 @@ export function SidebarProjectListItem({
     <button
       type="button"
       onClick={project.onClick}
-      className="tablet-touch-target tablet-pressable flex w-full items-start text-left"
+      className="tablet-touch-target tablet-pressable tablet-hover-soft flex w-full items-start text-left"
       style={sidebarProjectItemStyle}
     >
       <span className="min-w-0">
         <span style={sidebarProjectTitleStyle}>{project.title}</span>
-        <span style={sidebarProjectMetaStyle}>
-          {project.status} · {project.meta}
-        </span>
       </span>
     </button>
   );
@@ -107,16 +98,17 @@ export function SidebarProjectListItem({
 
 const sidebarStartActionStyle: CSSProperties = {
   width: "100%",
-  minHeight: 64,
-  padding: "0 14px",
-  borderRadius: 20,
-  border: "1px solid color-mix(in srgb, var(--border) 74%, transparent)",
-  backgroundColor: "color-mix(in srgb, var(--card) 58%, transparent)",
+  minHeight: 50,
+  padding: "5px 12px 5px 14px",
+  borderRadius: 16,
+  border: "1px solid transparent",
+  backgroundColor: "transparent",
   color: "var(--foreground)",
-  fontSize: 14,
+  fontSize: 16,
   fontWeight: 600,
   display: "flex",
   alignItems: "center",
+  gap: 13,
   cursor: "pointer",
   boxShadow: "none",
 };
@@ -125,30 +117,26 @@ const sidebarStartLabelStyle: CSSProperties = {
   display: "block",
   color: "inherit",
   fontSize: 16,
-  fontWeight: 700,
-  lineHeight: 1.2,
-};
-
-const sidebarStartMetaStyle: CSSProperties = {
-  display: "block",
-  marginTop: 3,
-  color: "var(--secondary)",
-  fontSize: 12,
-  fontWeight: 500,
-  lineHeight: 1.35,
+  fontWeight: 650,
+  lineHeight: 1.25,
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
 };
 
 const sidebarActionIconStyle: CSSProperties = {
   color: "var(--foreground)",
-  borderRadius: 14,
-  border: "1px solid color-mix(in srgb, var(--border) 50%, transparent)",
+  width: 21,
+  height: 21,
+  borderRadius: 0,
+  border: "none",
   boxShadow: "none",
 };
 
 const sidebarProjectItemStyle: CSSProperties = {
   width: "100%",
-  minHeight: 58,
-  padding: "10px 12px",
+  minHeight: 42,
+  padding: "5px 12px 5px 14px",
   borderRadius: 16,
   border: "1px solid transparent",
   backgroundColor: "transparent",
@@ -160,20 +148,8 @@ const sidebarProjectTitleStyle: CSSProperties = {
   display: "block",
   color: "var(--foreground)",
   fontSize: 15,
-  fontWeight: 650,
-  lineHeight: 1.2,
-  whiteSpace: "nowrap",
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-};
-
-const sidebarProjectMetaStyle: CSSProperties = {
-  display: "block",
-  marginTop: 4,
-  color: "var(--secondary)",
-  fontSize: 12,
-  fontWeight: 500,
-  lineHeight: 1.35,
+  fontWeight: 600,
+  lineHeight: 1.3,
   whiteSpace: "nowrap",
   overflow: "hidden",
   textOverflow: "ellipsis",

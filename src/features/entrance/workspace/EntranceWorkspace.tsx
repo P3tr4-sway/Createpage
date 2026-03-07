@@ -1,7 +1,11 @@
 import {
   ArrowLeft,
   ChevronDown,
+  Disc3,
+  Guitar,
   Moon,
+  Plus,
+  Search,
   Sun,
 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -31,7 +35,6 @@ import {
 } from "@/features/entrance/model/entrance.mock";
 import { useEntranceViewState } from "@/features/entrance/state/useEntranceViewState";
 import {
-  buildCreateActions,
   buildQuickActions,
   buildSidebarProjects,
   buildTutorialBrowseItems,
@@ -46,7 +49,6 @@ import {
 } from "@/features/entrance/workspace/EntranceWorkspacePanels";
 import type {
   SidebarProject,
-  SidebarAction,
 } from "@/features/entrance/workspace/EntranceWorkspace.types";
 import {
   QuickAccessCarousel,
@@ -57,7 +59,6 @@ import {
 import { EntranceWorkspaceHero } from "@/features/entrance/workspace/EntranceWorkspaceHero";
 import { EntranceWorkspaceTutorialPanel } from "@/features/entrance/workspace/EntranceWorkspaceTutorialPanel";
 import {
-  inlineLinkButtonStyle,
   secondaryButtonStyle,
   sectionDescriptionStyle,
   sectionTitleStyle,
@@ -73,6 +74,7 @@ import {
   sidebarProjectListStyle,
   sidebarSectionLabelStyle,
   sidebarSectionStyle,
+  sidebarViewAllStyle,
   topTitleStyle,
   workspaceSectionStyle,
 } from "@/features/entrance/workspace/EntranceWorkspace.styles";
@@ -163,17 +165,34 @@ export function EntranceWorkspace() {
 
   const shellTone = useMemo(() => getEntranceWorkspaceTone(isDark), [isDark]);
 
-  const createActions = useMemo<SidebarAction[]>(
-    () =>
-      buildCreateActions({
-        copy,
-        guitarClips,
-        onOpenWorkspace: openAgenticWorkspace,
-        onOpenLooper: openLooperWorkspace,
-        onOpenGuitar: openGuitar,
-        onScrollTo: handleScrollTo,
-      }),
-    [copy, handleScrollTo, openAgenticWorkspace, openGuitar, openLooperWorkspace],
+  const sidebarStartItems = useMemo(
+    () => [
+      {
+        id: "new-project",
+        label: "New Project",
+        icon: Plus,
+        onClick: openAgenticWorkspace,
+      },
+      {
+        id: "search-project",
+        label: "Search Project",
+        icon: Search,
+        onClick: () => setProjectsOpen(true),
+      },
+      {
+        id: "looper",
+        label: "Looper",
+        icon: Disc3,
+        onClick: () => openLooperWorkspace("Hot"),
+      },
+      {
+        id: "jamy",
+        label: "Jamy",
+        icon: Guitar,
+        onClick: () => handleScrollTo("launch"),
+      },
+    ],
+    [handleScrollTo, openAgenticWorkspace, openLooperWorkspace, setProjectsOpen],
   );
 
   const sidebarProjects = useMemo<SidebarProject[]>(
@@ -330,14 +349,12 @@ export function EntranceWorkspace() {
                   <div className="mb-3">
                     <p style={sidebarSectionLabelStyle}>{copy.start}</p>
                   </div>
-                  <div className="flex flex-col gap-2.5">
-                    {createActions.map((action) => (
+                  <div style={sidebarProjectListStyle}>
+                    {sidebarStartItems.map((action) => (
                       <SidebarStartAction
                         key={action.id}
                         label={action.label}
-                        meta={action.meta}
                         icon={action.icon}
-                        accent={action.accent}
                         onClick={action.onClick}
                       />
                     ))}
@@ -351,7 +368,7 @@ export function EntranceWorkspace() {
                       type="button"
                       onClick={() => setProjectsOpen(true)}
                       className="tablet-touch-target tablet-pressable"
-                      style={inlineLinkButtonStyle}
+                      style={sidebarViewAllStyle}
                     >
                       {copy.viewAll}
                     </button>
