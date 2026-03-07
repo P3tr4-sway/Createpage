@@ -21,6 +21,7 @@ import {
   type RefObject,
   type UIEvent,
 } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { AgenticProducingPage } from "../../app/components/AgenticProducingPage";
 import { ImageWithFallback } from "../../app/components/figma/ImageWithFallback";
 import { InstantBackingTrackPage } from "../../app/components/InstantBackingTrackPage";
@@ -28,7 +29,11 @@ import { JamWithAI } from "../../app/components/JamWithAI";
 import { LooperPage } from "../../app/components/LooperPage";
 import { ProjectsSheet } from "../../app/components/ProjectsSheet";
 import { TemplateSheet } from "../../app/components/TemplateSheet";
-import { TutorialDialog, tutorialCourses, type TutorialCourse } from "../../app/components/TutorialDialog";
+import {
+  TutorialDialog,
+  tutorialCourses,
+  type TutorialCourse,
+} from "../../app/components/TutorialDialog";
 
 type SectionId = "studio" | "launch" | "community";
 type FullscreenView = "agentic-producing" | null;
@@ -97,27 +102,27 @@ const heroPromptSuggestions: HeroPromptSuggestion[] = [
   {
     tag: "Jazz Fusion",
     title: "Late-night jazz fusion",
-    prompt: "Build a jazz fusion track with warm Rhodes chords, elastic bass, and a late-night city feeling.",
+    prompt: "Make a late-night jazz fusion groove.",
   },
   {
     tag: "Neo Soul",
     title: "Loose neo-soul pocket",
-    prompt: "Start a neo-soul idea with laid-back drums, rich bass movement, and an intimate smoky mood.",
+    prompt: "Start a loose neo-soul jam.",
   },
   {
     tag: "Indie Pop",
     title: "Hopeful indie pop chorus",
-    prompt: "Write an indie pop song that feels hopeful and cinematic, with bright guitars and a singalong hook.",
+    prompt: "Write a bright indie pop hook.",
   },
   {
     tag: "Trap",
     title: "Dark minimal trap beat",
-    prompt: "Create a dark trap beat with sparse drums, deep 808s, and a tense futuristic atmosphere.",
+    prompt: "Create a dark minimal trap beat.",
   },
   {
     tag: "Ambient",
     title: "Weightless ambient scene",
-    prompt: "Make an ambient instrumental that feels weightless and reflective, with evolving pads and distant textures.",
+    prompt: "Make a weightless ambient sketch.",
   },
 ];
 
@@ -732,6 +737,11 @@ export function EntranceWorkspace() {
     );
   }, [heroPromptValue]);
 
+  const visibleHeroPromptSuggestions = useMemo(
+    () => filteredHeroPromptSuggestions.slice(0, 3),
+    [filteredHeroPromptSuggestions],
+  );
+
   const handleHeroPromptSuggestionSelect = useCallback((prompt: string) => {
     setHeroPromptValue(prompt);
     setHeroPromptOpen(false);
@@ -1038,44 +1048,67 @@ export function EntranceWorkspace() {
                         Start
                       </button>
                     </div>
-                    {heroPromptOpen ? (
-                      <div
-                        className="absolute"
-                        style={heroPromptPanelStyle}
-                        onClick={(event) => event.stopPropagation()}
-                      >
-                        <div style={heroPromptPanelHeaderStyle}>
-                          <p style={heroPromptPanelEyebrowStyle}>Try asking AI</p>
-                          <p style={heroPromptPanelTitleStyle}>
-                            Pick a starting prompt and edit it from there.
-                          </p>
-                        </div>
-                        <div className="flex max-h-[320px] flex-col gap-2 overflow-y-auto pr-1">
-                          {filteredHeroPromptSuggestions.length ? (
-                            filteredHeroPromptSuggestions.map((suggestion) => (
-                              <button
-                                key={suggestion.prompt}
-                                type="button"
-                                className="w-full text-left transition-colors hover:bg-black/5 dark:hover:bg-white/5"
-                                style={heroPromptSuggestionStyle}
-                                onClick={() => handleHeroPromptSuggestionSelect(suggestion.prompt)}
-                              >
-                                <div className="flex items-center justify-between gap-3">
-                                  <span style={heroPromptSuggestionTagStyle}>{suggestion.tag}</span>
-                                  <span style={heroPromptSuggestionActionStyle}>Use prompt</span>
+                    <AnimatePresence>
+                      {heroPromptOpen ? (
+                        <motion.div
+                          className="absolute"
+                          style={heroPromptPanelStyle}
+                          onClick={(event) => event.stopPropagation()}
+                          initial={{ opacity: 0, y: 16 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                          transition={{ duration: 0.22, ease: "easeOut" }}
+                        >
+                          <div style={heroPromptListStyle}>
+                            <div
+                              className="relative flex max-h-[320px] flex-col overflow-y-auto"
+                              style={heroPromptListContentStyle}
+                            >
+                              {visibleHeroPromptSuggestions.length ? (
+                                <>
+                                  {filteredHeroPromptSuggestions.length > 3 ? (
+                                    <div aria-hidden="true" style={heroPromptOverflowHintStyle}>
+                                      Show more
+                                    </div>
+                                  ) : null}
+                                  {visibleHeroPromptSuggestions.map((suggestion, index) => (
+                                  <motion.button
+                                    key={suggestion.prompt}
+                                    type="button"
+                                    className="w-full text-left"
+                                    style={heroPromptSuggestionStyle}
+                                    onClick={() => handleHeroPromptSuggestionSelect(suggestion.prompt)}
+                                    initial={{ opacity: 0, y: 12 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 8 }}
+                                    transition={{
+                                      duration: 0.18,
+                                      delay: index * 0.025,
+                                      ease: "easeOut",
+                                    }}
+                                  >
+                                    <div style={heroPromptSuggestionContentStyle}>
+                                      <span aria-hidden="true" style={heroPromptSuggestionBulletStyle}>
+                                        •
+                                      </span>
+                                      <p style={heroPromptSuggestionPromptStyle}>{suggestion.prompt}</p>
+                                    </div>
+                                  </motion.button>
+                                  ))}
+                                </>
+                              ) : (
+                                <div style={heroPromptEmptyStyle}>
+                                  <p style={heroPromptEmptyTextStyle}>
+                                    No matching starter prompt yet. Try words like jazz, trap, ambient,
+                                    or neo-soul.
+                                  </p>
                                 </div>
-                                <p style={heroPromptSuggestionTitleStyle}>{suggestion.title}</p>
-                                <p style={heroPromptSuggestionBodyStyle}>{suggestion.prompt}</p>
-                              </button>
-                            ))
-                          ) : (
-                            <div style={heroPromptEmptyStyle}>
-                              No matching starter prompt yet. Try words like jazz, trap, ambient, or neo-soul.
+                              )}
                             </div>
-                          )}
-                        </div>
-                      </div>
-                    ) : null}
+                          </div>
+                        </motion.div>
+                      ) : null}
+                    </AnimatePresence>
                   </div>
                 </div>
               </div>
@@ -1772,7 +1805,7 @@ function TopListColumn({
             className="tablet-touch-target tablet-pressable flex items-center gap-3 rounded-[20px] text-left"
             style={{
               padding: "10px 10px 10px 12px",
-              border: "1px solid var(--border)",
+              border: "none",
               backgroundColor: "var(--card)",
             }}
           >
@@ -2121,81 +2154,72 @@ const heroChatSendStyle: CSSProperties = {
 const heroPromptPanelStyle: CSSProperties = {
   left: 0,
   right: 0,
-  top: "calc(100% + 14px)",
+  bottom: "calc(100% + 14px)",
   zIndex: 8,
-  padding: 14,
-  border: "1px solid var(--border)",
-  borderRadius: 24,
-  backgroundColor: "var(--card)",
-  boxShadow: "0 22px 48px rgba(15,23,42,0.16)",
-  backdropFilter: "blur(18px)",
+  padding: "0 2px 12px",
 };
 
-const heroPromptPanelHeaderStyle: CSSProperties = {
-  marginBottom: 12,
-  padding: "2px 4px 0",
+const heroPromptListStyle: CSSProperties = {
+  position: "relative",
 };
 
-const heroPromptPanelEyebrowStyle: CSSProperties = {
-  margin: 0,
-  color: "var(--secondary)",
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: "0.12em",
-  textTransform: "uppercase",
+const heroPromptListContentStyle: CSSProperties = {
+  gap: 6,
 };
 
-const heroPromptPanelTitleStyle: CSSProperties = {
-  margin: "6px 0 0",
-  color: "var(--foreground)",
-  fontSize: 14,
-  fontWeight: 600,
-  lineHeight: 1.4,
-};
-
-const heroPromptSuggestionStyle: CSSProperties = {
-  padding: "14px 16px",
-  border: "1px solid var(--border)",
-  borderRadius: 20,
-  background: "linear-gradient(180deg, var(--card) 0%, var(--soft-surface) 100%)",
-};
-
-const heroPromptSuggestionTagStyle: CSSProperties = {
-  color: "var(--foreground)",
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: "0.08em",
-  textTransform: "uppercase",
-};
-
-const heroPromptSuggestionActionStyle: CSSProperties = {
+const heroPromptOverflowHintStyle: CSSProperties = {
+  padding: "0 0 4px 17px",
   color: "var(--secondary)",
   fontSize: 12,
   fontWeight: 600,
+  letterSpacing: "0.04em",
+  lineHeight: 1.2,
+  textTransform: "uppercase",
+  opacity: 0.74,
 };
 
-const heroPromptSuggestionTitleStyle: CSSProperties = {
-  margin: "8px 0 0",
-  color: "var(--foreground)",
-  fontSize: 16,
-  fontWeight: 700,
-  lineHeight: 1.3,
+const heroPromptSuggestionStyle: CSSProperties = {
+  padding: 0,
+  border: "none",
+  background: "transparent",
+  cursor: "pointer",
 };
 
-const heroPromptSuggestionBodyStyle: CSSProperties = {
-  margin: "6px 0 0",
+const heroPromptSuggestionContentStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "flex-start",
+  gap: 10,
+  padding: "6px 0",
+};
+
+const heroPromptSuggestionBulletStyle: CSSProperties = {
+  display: "inline-flex",
+  minWidth: 10,
   color: "var(--secondary)",
-  fontSize: 13,
+  fontSize: 17,
+  fontWeight: 600,
+  lineHeight: 1.2,
+  transform: "translateY(1px)",
+};
+
+const heroPromptSuggestionPromptStyle: CSSProperties = {
+  margin: 0,
+  color: "var(--secondary)",
+  fontSize: 15,
   fontWeight: 500,
-  lineHeight: 1.5,
+  lineHeight: 1.45,
+  textShadow: "0 1px 10px rgba(15,23,42,0.12)",
 };
 
 const heroPromptEmptyStyle: CSSProperties = {
-  padding: "18px 16px",
-  border: "1px dashed var(--border)",
-  borderRadius: 18,
+  padding: "6px 0",
+};
+
+const heroPromptEmptyTextStyle: CSSProperties = {
+  margin: 0,
+  padding: "6px 0",
   color: "var(--secondary)",
-  fontSize: 13,
+  fontSize: 14,
   fontWeight: 500,
   lineHeight: 1.5,
 };
