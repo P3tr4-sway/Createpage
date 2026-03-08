@@ -93,13 +93,45 @@ export function useAgenticSessionState({
     setOpenOverlayMenu(null);
   };
 
+  const updateTrackVolume = (trackId: string, volume: number) => {
+    const nextVolume = Math.max(0, Math.min(100, volume));
+    setTracks((prev) =>
+      prev.map((track) =>
+        track.id === trackId
+          ? {
+              ...track,
+              volume: nextVolume,
+            }
+          : track,
+      ),
+    );
+  };
+
+  const updateTrackPan = (trackId: string, pan: number) => {
+    const nextPan = Math.max(-50, Math.min(50, pan));
+    setTracks((prev) =>
+      prev.map((track) =>
+        track.id === trackId
+          ? {
+              ...track,
+              pan: nextPan,
+            }
+          : track,
+      ),
+    );
+  };
+
   const addTrack = () => {
     const nextIndex = tracks.length + 1;
     const nextTrack: ArrangementTrack = {
       id: `track-${nextIndex}`,
       name: trackName(nextIndex),
+      icon: "default",
       role: ideaLane,
       level: "-inf dB",
+      defaultVolume: 72,
+      volume: 72,
+      pan: 0,
       clips: [],
     };
     setTracks((prev) => [...prev, nextTrack]);
@@ -174,6 +206,8 @@ export function useAgenticSessionState({
     pushQueueItem,
     pushHistoryItem,
     selectAgentMode,
+    updateTrackVolume,
+    updateTrackPan,
     addTrack,
     deleteTrack,
     toggleMuted,

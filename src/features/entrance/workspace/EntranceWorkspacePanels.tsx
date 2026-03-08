@@ -86,12 +86,13 @@ export function SidebarProjectListItem({
     <button
       type="button"
       onClick={project.onClick}
-      className="tablet-touch-target tablet-pressable tablet-hover-soft flex w-full items-start text-left"
+      className="tablet-touch-target tablet-pressable tablet-hover-soft flex w-full items-center justify-between gap-3 text-left"
       style={sidebarProjectItemStyle}
     >
-      <span className="min-w-0">
+      <span className="min-w-0 flex-1">
         <span style={sidebarProjectTitleStyle}>{project.title}</span>
       </span>
+      <span style={sidebarProjectTypeStyle}>{project.typeLabel}</span>
     </button>
   );
 }
@@ -153,6 +154,18 @@ const sidebarProjectTitleStyle: CSSProperties = {
   whiteSpace: "nowrap",
   overflow: "hidden",
   textOverflow: "ellipsis",
+};
+
+const sidebarProjectTypeStyle: CSSProperties = {
+  flexShrink: 0,
+  minWidth: 64,
+  color: "var(--secondary)",
+  fontSize: 12,
+  fontWeight: 700,
+  lineHeight: 1.2,
+  letterSpacing: "0.08em",
+  textAlign: "right",
+  textTransform: "uppercase",
 };
 
 const loopLaunchPanelStyle: CSSProperties = {

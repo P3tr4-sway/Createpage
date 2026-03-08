@@ -9,120 +9,20 @@ export const initialTracks: ArrangementTrack[] = [
   {
     id: "drums",
     name: "Drums",
+    icon: "drums",
     role: "Pocket",
     level: "-4.5 dB",
+    defaultVolume: 78,
+    volume: 78,
+    pan: 0,
     clips: [
       {
         id: "drums-a",
-        label: "Intro groove",
+        label: "Full groove",
         startBeat: 0,
-        durationBeats: 12,
+        durationBeats: 96,
         fill: "linear-gradient(135deg, rgba(69, 132, 255, 0.94), rgba(40, 87, 214, 0.94))",
         accent: "#DCE7FF",
-      },
-      {
-        id: "drums-b",
-        label: "Main pocket",
-        startBeat: 16,
-        durationBeats: 28,
-        fill: "linear-gradient(135deg, rgba(46, 109, 239, 0.96), rgba(30, 74, 189, 0.96))",
-        accent: "#F7FBFF",
-      },
-      {
-        id: "drums-c",
-        label: "Fill + lift",
-        startBeat: 52,
-        durationBeats: 8,
-        fill: "linear-gradient(135deg, rgba(98, 146, 255, 0.96), rgba(46, 109, 239, 0.94))",
-        accent: "#F7FBFF",
-      },
-    ],
-  },
-  {
-    id: "bass",
-    name: "Bass",
-    role: "Low end",
-    level: "-6.0 dB",
-    clips: [
-      {
-        id: "bass-a",
-        label: "Verse line",
-        startBeat: 4,
-        durationBeats: 20,
-        fill: "linear-gradient(135deg, rgba(41, 185, 133, 0.94), rgba(24, 128, 92, 0.94))",
-        accent: "#E7FFF6",
-      },
-      {
-        id: "bass-b",
-        label: "Hook sustain",
-        startBeat: 28,
-        durationBeats: 24,
-        fill: "linear-gradient(135deg, rgba(58, 204, 148, 0.94), rgba(30, 145, 106, 0.96))",
-        accent: "#F2FFF9",
-      },
-    ],
-  },
-  {
-    id: "guitar",
-    name: "Guitar",
-    role: "Texture",
-    level: "-8.2 dB",
-    clips: [
-      {
-        id: "guitar-a",
-        label: "Muted comp",
-        startBeat: 8,
-        durationBeats: 12,
-        fill: "linear-gradient(135deg, rgba(249, 161, 71, 0.96), rgba(233, 119, 14, 0.94))",
-        accent: "#FFF4E6",
-      },
-      {
-        id: "guitar-b",
-        label: "Open chorus",
-        startBeat: 24,
-        durationBeats: 20,
-        fill: "linear-gradient(135deg, rgba(251, 186, 88, 0.96), rgba(242, 136, 26, 0.96))",
-        accent: "#FFF6EA",
-      },
-      {
-        id: "guitar-c",
-        label: "Lift voicing",
-        startBeat: 48,
-        durationBeats: 12,
-        fill: "linear-gradient(135deg, rgba(255, 194, 107, 0.96), rgba(244, 146, 37, 0.96))",
-        accent: "#FFF9EF",
-      },
-    ],
-  },
-  {
-    id: "vocal",
-    name: "Vocal",
-    role: "Lead",
-    level: "-3.0 dB",
-    clips: [
-      {
-        id: "vocal-a",
-        label: "Guide vocal",
-        startBeat: 12,
-        durationBeats: 16,
-        fill: "linear-gradient(135deg, rgba(216, 106, 156, 0.96), rgba(176, 65, 115, 0.94))",
-        accent: "#FFF0F6",
-      },
-      {
-        id: "vocal-b",
-        label: "Hook doubles",
-        startBeat: 32,
-        durationBeats: 16,
-        fill: "linear-gradient(135deg, rgba(230, 128, 174, 0.96), rgba(190, 79, 127, 0.95))",
-        accent: "#FFF3F8",
-      },
-      {
-        id: "vocal-c",
-        label: "Outro adlibs",
-        startBeat: 56,
-        durationBeats: 8,
-        fill: "linear-gradient(135deg, rgba(237, 145, 188, 0.96), rgba(198, 87, 137, 0.96))",
-        accent: "#FFF6FA",
       },
     ],
   },
@@ -178,25 +78,12 @@ export function getInitialTracksForLocale(locale: Locale) {
     locale === "zh-CN"
       ? {
           drums: { name: "鼓组", role: "律动" },
-          bass: { name: "贝斯", role: "低频" },
-          guitar: { name: "吉他", role: "质感" },
-          vocal: { name: "人声", role: "主线" },
         }
       : null;
   const clipLabelMap =
     locale === "zh-CN"
       ? {
-          "drums-a": "前奏 Groove",
-          "drums-b": "主段律动",
-          "drums-c": "Fill + 提升",
-          "bass-a": "主歌线条",
-          "bass-b": "Hook 延音",
-          "guitar-a": "闷音伴奏",
-          "guitar-b": "开放副歌",
-          "guitar-c": "抬升和弦",
-          "vocal-a": "导唱",
-          "vocal-b": "Hook 叠唱",
-          "vocal-c": "尾段 Adlib",
+          "drums-a": "完整 Groove",
         }
       : null;
 

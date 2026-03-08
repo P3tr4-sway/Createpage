@@ -175,6 +175,7 @@ export function buildSidebarProjects({
       title: lateNightArrangementCopy.title,
       meta: lateNightArrangementCopy.meta,
       status: lateNightArrangementCopy.status,
+      typeLabel: lateNightArrangementCopy.typeLabel,
       onClick: onOpenWorkspace,
     },
     {
@@ -182,6 +183,7 @@ export function buildSidebarProjects({
       title: neoSoulPocketLoopCopy.title,
       meta: neoSoulPocketLoopCopy.meta,
       status: neoSoulPocketLoopCopy.status,
+      typeLabel: neoSoulPocketLoopCopy.typeLabel,
       onClick: () => onOpenLooper("Hot"),
     },
     {
@@ -189,6 +191,7 @@ export function buildSidebarProjects({
       title: dreamGuitarBedCopy.title,
       meta: dreamGuitarBedCopy.meta,
       status: dreamGuitarBedCopy.status,
+      typeLabel: dreamGuitarBedCopy.typeLabel,
       onClick: () => onOpenGuitar(featuredGuitarClip),
     },
     {
@@ -196,6 +199,7 @@ export function buildSidebarProjects({
       title: houseDrumStarterCopy.title,
       meta: houseDrumStarterCopy.meta,
       status: houseDrumStarterCopy.status,
+      typeLabel: houseDrumStarterCopy.typeLabel,
       onClick: () => onOpenTemplate(houseDrumTemplate),
     },
     {
@@ -203,6 +207,7 @@ export function buildSidebarProjects({
       title: bluesClubBackingKitCopy.title,
       meta: bluesClubBackingKitCopy.meta,
       status: bluesClubBackingKitCopy.status,
+      typeLabel: bluesClubBackingKitCopy.typeLabel,
       onClick: () => onOpenBackingTrack("Blues"),
     },
     {
@@ -210,6 +215,7 @@ export function buildSidebarProjects({
       title: indiePopWriterRoomCopy.title,
       meta: indiePopWriterRoomCopy.meta,
       status: indiePopWriterRoomCopy.status,
+      typeLabel: indiePopWriterRoomCopy.typeLabel,
       onClick: () => onOpenTemplate(indiePopTemplate),
     },
     {
@@ -217,6 +223,7 @@ export function buildSidebarProjects({
       title: ambientSwellsNotesCopy.title,
       meta: ambientSwellsNotesCopy.meta,
       status: ambientSwellsNotesCopy.status,
+      typeLabel: ambientSwellsNotesCopy.typeLabel,
       onClick: () => onOpenGuitar(ambientGuitarClip),
     },
   ];

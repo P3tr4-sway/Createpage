@@ -55,7 +55,7 @@ describe("useAgenticOverlayController", () => {
       result.current.handleMusicianGenerate();
     });
 
-    expect(result.current.selectedTrackId).toBe("vocal");
+    expect(result.current.selectedTrackId).toBe("drums");
     expect(result.current.openOverlayMenu).toBeNull();
     expect(pushQueueItem).toHaveBeenCalledWith(
       expect.objectContaining({

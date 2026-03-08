@@ -60,7 +60,7 @@ export function getAgenticTimelineMetrics({
   const previewPlayheadTargetRatio = 2 / 3;
   const trackPanelWidth = previewMode ? 282 : 356;
   const arrangementHeaderHeight = previewMode ? 44 : 58;
-  const trackRowHeight = previewMode ? 76 : 92;
+  const trackRowHeight = previewMode ? 92 : 116;
   const bottomTransportHeight = previewMode ? 72 : 94;
   const pixelsPerBeat = previewMode ? 26 : 36;
   const beatsPerBar = 4;

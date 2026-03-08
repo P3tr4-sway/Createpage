@@ -12,8 +12,12 @@ export type ArrangementClip = {
 export type ArrangementTrack = {
   id: string;
   name: string;
+  icon: "drums" | "default";
   role: string;
   level: string;
+  defaultVolume: number;
+  volume: number;
+  pan: number;
   clips: ArrangementClip[];
 };
 

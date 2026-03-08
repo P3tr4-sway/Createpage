@@ -36,6 +36,7 @@ export type SidebarProjectCopy = {
   title: string;
   meta: string;
   status: string;
+  typeLabel: string;
 };
 
 export type QuickActionCopy = {
@@ -59,6 +60,7 @@ export type SidebarProject = {
   title: string;
   meta: string;
   status: string;
+  typeLabel: string;
   onClick: () => void;
 };
 

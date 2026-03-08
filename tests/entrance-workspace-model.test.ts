@@ -145,6 +145,9 @@ describe("EntranceWorkspace model selectors", () => {
       expect.objectContaining({ id: "basement-funk-run" }),
     );
     expect(
+      sidebarProjects.find((project) => project.id === "house-drum-starter")?.typeLabel,
+    ).toBe("Jamy");
+    expect(
       quickActions.find((action) => action.id === "make-song")?.imageUrl,
     ).toBe(topSongs.find((item) => item.id === "midnight-echoes")?.imageUrl);
   });

@@ -1,4 +1,4 @@
-import { type CSSProperties } from "react";
+import { type CSSProperties, type PointerEvent as ReactPointerEvent, useRef } from "react";
 import {
   X,
   Undo2,
@@ -13,10 +13,13 @@ import {
   MicOff,
   SlidersHorizontal,
   AudioWaveform,
+  Drum,
 } from "lucide-react";
+import { Slider } from "@/app/components/ui/slider";
 import { AgenticOverlayDock } from "@/features/entrance/components/AgenticOverlayDock";
 import { useEntranceLocale } from "@/features/entrance/EntranceLocaleContext";
 import { agenticCopyByLocale } from "@/features/entrance/i18n/agentic.copy";
+import type { ArrangementTrack } from "@/features/entrance/model/agentic.types";
 import { getMusicianTargetsForLocale } from "@/features/entrance/model/agentic.mock";
 import { useAgenticOverlayController } from "@/features/entrance/pages/agentic/useAgenticOverlayController";
 import { useAgenticTimelineController } from "@/features/entrance/pages/agentic/useAgenticTimelineController";
@@ -71,6 +74,8 @@ export function AgenticProducingPage({
     pushQueueItem,
     pushHistoryItem,
     selectAgentMode,
+    updateTrackVolume,
+    updateTrackPan,
     addTrack,
     toggleMuted,
     toggleSolo,
@@ -291,6 +296,7 @@ export function AgenticProducingPage({
                       const isSelected = track.id === selectedTrackId;
                       const isMuted = mutedTrackIds.includes(track.id);
                       const isSolo = soloTrackIds.includes(track.id);
+                      const trackNumber = tracks.findIndex((item) => item.id === track.id) + 1;
 
                       return (
                         <div
@@ -298,39 +304,59 @@ export function AgenticProducingPage({
                           className="flex items-center"
                           style={{
                             height: metrics.trackRowHeight,
-                            padding: previewMode ? "0 12px" : "0 16px",
+                            padding: previewMode ? "12px 12px" : "14px 16px",
                             borderBottom: "1px solid rgba(255,255,255,0.08)",
-                            backgroundColor: isSelected
-                              ? "rgba(255,255,255,0.06)"
-                              : "transparent",
+                            background:
+                              isSelected
+                                ? "linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.04))"
+                                : "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015))",
+                            boxShadow: isSelected
+                              ? "inset 0 1px 0 rgba(255,255,255,0.08)"
+                              : "none",
                           }}
                         >
-                          <button
-                            type="button"
-                            onClick={() => setSelectedTrackId(track.id)}
-                            className="flex min-w-0 flex-1 items-center gap-3 text-left"
-                            style={{
-                              background: "transparent",
-                              border: "none",
-                              padding: 0,
-                              color: "inherit",
-                            }}
-                          >
-                            <span
+                          <div className="min-w-0 flex-1">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedTrackId(track.id)}
+                              className="flex w-full min-w-0 items-center gap-3 text-left"
                               style={{
-                                width: 10,
-                                alignSelf: "stretch",
-                                borderRadius: 999,
-                                backgroundColor: track.clips[0]?.accent ?? "#94A3B8",
+                                background: "transparent",
+                                border: "none",
+                                padding: 0,
+                                color: "inherit",
                               }}
-                            />
-                            <span className="min-w-0 flex-1">
+                            >
                               <span
                                 style={{
-                                  display: "block",
-                                  color: "var(--agentic-track-title)",
-                                  fontSize: previewMode ? 15 : 18,
-                                  fontWeight: 700,
+                                  width: previewMode ? 18 : 20,
+                                  color: "rgba(255,255,255,0.52)",
+                                  fontSize: previewMode ? 13 : 14,
+                                  fontWeight: 600,
+                                  letterSpacing: "0.08em",
+                                  textAlign: "center",
+                                }}
+                              >
+                                {trackNumber}
+                              </span>
+                              <span
+                                className="inline-flex items-center justify-center"
+                                style={{
+                                  width: previewMode ? 18 : 20,
+                                  height: previewMode ? 18 : 20,
+                                  color: "rgba(255,255,255,0.96)",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                <TrackIcon track={track} previewMode={previewMode} />
+                              </span>
+                              <span
+                                className="min-w-0 flex-1"
+                                style={{
+                                  color: "rgba(255,255,255,0.96)",
+                                  fontSize: previewMode ? 15 : 17,
+                                  fontWeight: 600,
+                                  letterSpacing: "-0.01em",
                                   lineHeight: 1.15,
                                   overflow: "hidden",
                                   textOverflow: "ellipsis",
@@ -339,82 +365,101 @@ export function AgenticProducingPage({
                               >
                                 {track.name}
                               </span>
-                              <span
-                                className="flex items-center"
+                            </button>
+
+                            <div
+                              className="mt-4 flex items-center"
+                              style={{ gap: previewMode ? 8 : 10 }}
+                            >
+                              <button
+                                type="button"
+                                onClick={() => toggleMuted(track.id)}
+                                aria-label={`${isMuted ? copy.unmute : copy.mute} ${track.name}`}
                                 style={{
-                                  gap: 8,
-                                  marginTop: 6,
-                                  fontSize: previewMode ? 11 : 12,
+                                  ...trackTogglePillStyle,
+                                  width: previewMode ? 34 : 38,
+                                  height: previewMode ? 30 : 32,
+                                  backgroundColor: isMuted
+                                    ? "rgba(255,255,255,0.92)"
+                                    : "rgba(0,0,0,0.44)",
+                                  border: "1px solid rgba(255,255,255,0.18)",
+                                  color: isMuted ? "#111111" : "rgba(255,255,255,0.88)",
                                 }}
                               >
-                                <span
-                                  style={{
-                                    color: "rgba(226,232,240,0.9)",
-                                    fontWeight: 600,
-                                  }}
-                                >
-                                  {track.role}
-                                </span>
-                                <span
-                                  style={{
-                                    width: 4,
-                                    height: 4,
-                                    borderRadius: 999,
-                                    backgroundColor: "rgba(148,163,184,0.7)",
-                                  }}
-                                />
-                                <span
-                                  style={{
-                                    color: "rgba(148,163,184,0.95)",
-                                    fontWeight: 500,
-                                  }}
-                                >
-                                  {track.level}
-                                </span>
-                              </span>
-                            </span>
-                          </button>
+                                M
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => toggleSolo(track.id)}
+                                aria-label={`${isSolo ? copy.disableSolo : copy.solo} ${track.name}`}
+                                style={{
+                                  ...trackTogglePillStyle,
+                                  width: previewMode ? 34 : 38,
+                                  height: previewMode ? 30 : 32,
+                                  backgroundColor: isSolo
+                                    ? "rgba(255,255,255,0.92)"
+                                    : "rgba(0,0,0,0.44)",
+                                  border: "1px solid rgba(255,255,255,0.18)",
+                                  color: isSolo ? "#111111" : "rgba(255,255,255,0.88)",
+                                }}
+                              >
+                                S
+                              </button>
 
-                          <div
-                            className="flex items-center"
-                            style={{ gap: previewMode ? 8 : 10, marginLeft: 10 }}
-                          >
-                            <button
-                              type="button"
-                              onClick={() => toggleMuted(track.id)}
-                              aria-label={`${isMuted ? copy.unmute : copy.mute} ${track.name}`}
-                              style={{
-                                ...trackTogglePillStyle,
-                                width: 44,
-                                height: 44,
-                                backgroundColor: isMuted
-                                  ? "rgba(239, 68, 68, 0.22)"
-                                  : "rgba(255,255,255,0.06)",
-                                color: isMuted
-                                  ? "#FCA5A5"
-                                  : "var(--agentic-contrast)",
-                              }}
-                            >
-                              M
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => toggleSolo(track.id)}
-                              aria-label={`${isSolo ? copy.disableSolo : copy.solo} ${track.name}`}
-                              style={{
-                                ...trackTogglePillStyle,
-                                width: 44,
-                                height: 44,
-                                backgroundColor: isSolo
-                                  ? "rgba(250, 204, 21, 0.24)"
-                                  : "rgba(255,255,255,0.06)",
-                                color: isSolo
-                                  ? "#FDE68A"
-                                  : "var(--agentic-contrast)",
-                              }}
-                            >
-                              S
-                            </button>
+                              <div className="min-w-0 flex-1">
+                                <div
+                                  className="flex items-center justify-between"
+                                  style={{
+                                    marginBottom: 6,
+                                    paddingInline: 2,
+                                  }}
+                                >
+                                  <span
+                                    style={{
+                                      color: "rgba(255,255,255,0.64)",
+                                      fontSize: previewMode ? 9 : 10,
+                                      fontWeight: 700,
+                                      letterSpacing: "0.08em",
+                                      textTransform: "uppercase",
+                                    }}
+                                  >
+                                    {copy.volume}
+                                  </span>
+                                  <span
+                                    style={{
+                                      color: "rgba(255,255,255,0.74)",
+                                      fontSize: previewMode ? 10 : 11,
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    {Math.round(track.volume)}
+                                  </span>
+                                </div>
+                                <Slider
+                                  min={0}
+                                  max={100}
+                                  step={1}
+                                  value={[track.volume]}
+                                  aria-label={`${copy.volume} ${track.name}`}
+                                  onDoubleClick={() =>
+                                    updateTrackVolume(track.id, track.defaultVolume)
+                                  }
+                                  onValueChange={(values) =>
+                                    updateTrackVolume(track.id, values[0] ?? track.volume)
+                                  }
+                                  className="w-full [&_[data-slot=slider-track]]:h-6 [&_[data-slot=slider-track]]:rounded-full [&_[data-slot=slider-track]]:bg-[rgba(16,16,16,0.96)] [&_[data-slot=slider-track]]:shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] [&_[data-slot=slider-range]]:bg-[rgba(255,255,255,0.08)] [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border-[rgba(255,255,255,0.22)] [&_[data-slot=slider-thumb]]:bg-[#F4F4F5] [&_[data-slot=slider-thumb]]:shadow-[0_3px_10px_rgba(0,0,0,0.4)]"
+                                />
+                              </div>
+
+                              <PanControl
+                                centeredLabel={copy.centeredPan}
+                                name={track.name}
+                                pan={track.pan}
+                                panLabel={copy.pan}
+                                previewMode={previewMode}
+                                onChange={(nextPan) => updateTrackPan(track.id, nextPan)}
+                              />
+                            </div>
                           </div>
                         </div>
                       );
@@ -834,6 +879,140 @@ export function AgenticProducingPage({
     </section>
   );
 }
+
+function TrackIcon({
+  track,
+  previewMode,
+}: {
+  track: ArrangementTrack;
+  previewMode: boolean;
+}) {
+  if (track.icon === "drums") {
+    return <Drum size={previewMode ? 18 : 20} strokeWidth={2} />;
+  }
+
+  return <AudioWaveform size={previewMode ? 18 : 20} strokeWidth={2} />;
+}
+
+function PanKnob({ pan }: { pan: number }) {
+  const rotation = (pan / 50) * 135;
+
+  return (
+    <span
+      aria-hidden="true"
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100%",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <span
+        style={{
+          position: "absolute",
+          inset: 7,
+          borderRadius: 999,
+          border: "1px solid rgba(255,255,255,0.08)",
+        }}
+      />
+      <span
+        style={{
+          width: 2,
+          height: 10,
+          borderRadius: 999,
+          backgroundColor: "#C8F36B",
+          transform: `translateY(-7px) rotate(${rotation}deg)`,
+          transformOrigin: "center 12px",
+          boxShadow: "0 0 10px rgba(200,243,107,0.24)",
+        }}
+      />
+    </span>
+  );
+}
+
+function PanControl({
+  centeredLabel,
+  name,
+  pan,
+  panLabel,
+  previewMode,
+  onChange,
+}: {
+  centeredLabel: string;
+  name: string;
+  pan: number;
+  panLabel: string;
+  previewMode: boolean;
+  onChange: (pan: number) => void;
+}) {
+  const knobRef = useRef<HTMLButtonElement | null>(null);
+
+  const handlePointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    const startX = event.clientX;
+    const startPan = pan;
+
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const nextPan = clampPan(startPan + deltaX * 0.45);
+      onChange(nextPan);
+    };
+
+    const handlePointerUp = () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+
+    knobRef.current?.focus();
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+  };
+
+  return (
+    <button
+      ref={knobRef}
+      type="button"
+      onPointerDown={handlePointerDown}
+      onDoubleClick={() => onChange(0)}
+      aria-label={`${panLabel} ${name} ${formatPanLabel(pan, centeredLabel)}`}
+      style={{
+        width: previewMode ? 34 : 40,
+        height: previewMode ? 34 : 40,
+        padding: 0,
+        borderRadius: 999,
+        border: "1px solid rgba(255,255,255,0.12)",
+        background:
+          "radial-gradient(circle at 30% 28%, rgba(255,255,255,0.22), rgba(255,255,255,0.08) 38%, rgba(22,22,22,0.92) 39%, rgba(39,39,39,0.95) 100%)",
+        boxShadow:
+          "inset 0 1px 1px rgba(255,255,255,0.08), 0 4px 10px rgba(0,0,0,0.22)",
+        color: "rgba(255,255,255,0.84)",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+        cursor: "ew-resize",
+        touchAction: "none",
+      }}
+    >
+      <PanKnob pan={pan} />
+    </button>
+  );
+}
+
+function formatPanLabel(pan: number, centeredLabel: string) {
+  if (pan === 0) {
+    return centeredLabel;
+  }
+
+  return `${pan < 0 ? "L" : "R"}${Math.abs(pan)}`;
+}
+
+function clampPan(pan: number) {
+  return Math.max(-50, Math.min(50, pan));
+}
+
 const toolbarIconStyle: CSSProperties = {
   width: 44,
   height: 44,
