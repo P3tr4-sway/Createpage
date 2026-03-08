@@ -11,7 +11,7 @@ const promptSuggestionsByLocale = {
 
 const jamCopyByLocale = {
   en: {
-    title: "Jam",
+    title: "Jamy",
     subtitle: "Start with a vibe.",
     placeholder: "Describe a vibe",
     action: "Jam",
