@@ -15,8 +15,9 @@ export function JamyPage({ onBack }: JamyPageProps) {
     <AgenticProducingPage
       onBack={onBack}
       projectTitle="Jamy"
-      showAgentOverlay={false}
-      allowAddTrack={false}
+      experience="jam"
+      showAgentOverlay
+      allowAddTrack
       initialTracks={initialTracks}
     />
   );

@@ -1,6 +1,7 @@
 import {
   AudioWaveform,
   ChevronDown,
+  Sparkles,
   X,
 } from "lucide-react";
 import { type CSSProperties, type RefObject } from "react";
@@ -8,6 +9,7 @@ import { useEntranceLocale } from "@/features/entrance/EntranceLocaleContext";
 import { agenticCopyByLocale } from "@/features/entrance/i18n/agentic.copy";
 import { getAgentModeOptionsForLocale } from "@/features/entrance/model/agentic.mock";
 import type {
+  AgenticExperience,
   AgentMode,
   AudioQueueItem,
   GenerationHistoryItem,
@@ -20,6 +22,7 @@ import type {
 
 interface AgenticOverlayDockProps {
   bottomTransportHeight: number;
+  experience?: AgenticExperience;
   producerWorkspaceVisible: boolean;
   producerMessages: ProducerMessage[];
   audioQueue: AudioQueueItem[];
@@ -34,6 +37,7 @@ interface AgenticOverlayDockProps {
   lyricsDraft: string;
   producerDraft: string;
   producerWorkspaceOpen: boolean;
+  producerSuggestions?: readonly string[];
   onTargetToggle: () => void;
   onModeToggle: () => void;
   onSelectTarget: (targetId: MusicianTargetId) => void;
@@ -42,12 +46,13 @@ interface AgenticOverlayDockProps {
   onGenerate: () => void;
   onSelectMode: (mode: AgentMode) => void;
   onDraftChange: (value: string) => void;
-  onDraftSubmit: () => void;
+  onDraftSubmit: (text?: string) => void;
   onOpenWorkspace: () => void;
 }
 
 export function AgenticOverlayDock({
   bottomTransportHeight,
+  experience = "default",
   producerWorkspaceVisible,
   producerMessages,
   audioQueue,
@@ -62,6 +67,7 @@ export function AgenticOverlayDock({
   lyricsDraft,
   producerDraft,
   producerWorkspaceOpen,
+  producerSuggestions,
   onTargetToggle,
   onModeToggle,
   onSelectTarget,
@@ -74,7 +80,7 @@ export function AgenticOverlayDock({
   onOpenWorkspace,
 }: AgenticOverlayDockProps) {
   return (
-    <div style={overlayDockShellStyle(bottomTransportHeight)}>
+    <div style={overlayDockShellStyle(bottomTransportHeight, experience)}>
       {producerWorkspaceVisible ? (
         <div style={producerWorkspacePopoverStyle}>
           <div style={{ height: "100%", pointerEvents: "auto" }}>
@@ -112,8 +118,10 @@ export function AgenticOverlayDock({
         ) : (
           <ProducerComposerBar
             draft={producerDraft}
+            experience={experience}
             workspaceOpen={producerWorkspaceOpen}
             openMenu={openOverlayMenu}
+            suggestions={producerSuggestions}
             onDraftChange={onDraftChange}
             onDraftSubmit={onDraftSubmit}
             onOpenWorkspace={onOpenWorkspace}
@@ -162,7 +170,7 @@ function MusicianComposerBar({
   const copy = agenticCopyByLocale[locale];
 
   return (
-    <div className="flex-1" style={overlayBarStyle}>
+    <div className="flex-1" style={overlayBarStyle("default")}>
       <div className="flex items-center" style={{ gap: 14 }}>
         <div
           className="flex items-center"
@@ -280,11 +288,13 @@ function MusicianComposerBar({
 
 interface ProducerComposerBarProps {
   draft: string;
+  experience: AgenticExperience;
   workspaceOpen: boolean;
   openMenu: OverlayMenu;
+  suggestions?: readonly string[];
   currentMode: AgentMode;
   onDraftChange: (value: string) => void;
-  onDraftSubmit: () => void;
+  onDraftSubmit: (text?: string) => void;
   onOpenWorkspace: () => void;
   onModeToggle: () => void;
   onSelectMode: (mode: AgentMode) => void;
@@ -292,8 +302,10 @@ interface ProducerComposerBarProps {
 
 function ProducerComposerBar({
   draft,
+  experience,
   workspaceOpen,
   openMenu,
+  suggestions = [],
   currentMode,
   onDraftChange,
   onDraftSubmit,
@@ -303,11 +315,37 @@ function ProducerComposerBar({
 }: ProducerComposerBarProps) {
   const locale = useEntranceLocale();
   const copy = agenticCopyByLocale[locale];
+  const isJamExperience = experience === "jam";
 
   return (
-    <div className="flex-1" style={overlayBarStyle}>
-      <div className="flex items-center" style={{ gap: 12 }}>
-        <div className="flex-1" style={producerInputShellStyle}>
+    <div className="flex-1" style={overlayBarStyle(experience)}>
+      {isJamExperience && suggestions.length > 0 ? (
+        <div className="mb-3 flex flex-wrap" style={{ gap: 8 }}>
+          {suggestions.map((suggestion) => (
+            <button
+              key={suggestion}
+              type="button"
+              onClick={() => onDraftSubmit(suggestion)}
+              style={suggestionChipStyle}
+            >
+              {suggestion}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
+      <div
+        className="flex items-center"
+        style={{ gap: 12, flexWrap: isJamExperience ? "wrap" : "nowrap" }}
+      >
+        {isJamExperience ? (
+          <div style={producerBadgeStyle}>
+            <Sparkles size={15} strokeWidth={2} />
+            {copy.jamAiProducerBadge}
+          </div>
+        ) : null}
+
+        <div className="flex-1" style={producerInputShellStyle(experience)}>
           <input
             type="text"
             value={draft}
@@ -320,29 +358,33 @@ function ProducerComposerBar({
             }}
             placeholder={copy.aiProducerPlaceholder}
             className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-[var(--secondary)]"
-            style={producerInputStyle}
+            style={producerInputStyle(experience)}
           />
         </div>
 
-        <button
-          type="button"
-          onClick={onOpenWorkspace}
-          style={producerWorkspaceButtonStyle}
-          aria-label={copy.openProducerWorkspace}
-        >
-          <AudioWaveform size={18} strokeWidth={2} />
-        </button>
+        {!isJamExperience ? (
+          <button
+            type="button"
+            onClick={onOpenWorkspace}
+            style={producerWorkspaceButtonStyle}
+            aria-label={copy.openProducerWorkspace}
+          >
+            <AudioWaveform size={18} strokeWidth={2} />
+          </button>
+        ) : null}
 
-        <button type="button" onClick={onDraftSubmit} style={generateButtonStyle}>
+        <button type="button" onClick={() => onDraftSubmit()} style={generateButtonStyle}>
           {workspaceOpen ? copy.send : copy.start}
         </button>
 
-        <ModeToggleButton
-          open={openMenu === "mode"}
-          currentMode={currentMode}
-          onToggle={onModeToggle}
-          onSelectMode={onSelectMode}
-        />
+        {!isJamExperience ? (
+          <ModeToggleButton
+            open={openMenu === "mode"}
+            currentMode={currentMode}
+            onToggle={onModeToggle}
+            onSelectMode={onSelectMode}
+          />
+        ) : null}
       </div>
     </div>
   );
@@ -595,12 +637,16 @@ function HistoryRailCard({
 
 const overlayDockShellStyle = (
   bottomTransportHeight: number,
+  experience: AgenticExperience,
 ): CSSProperties => ({
   position: "absolute",
   left: "50%",
-  bottom: bottomTransportHeight + 18,
+  bottom: bottomTransportHeight + (experience === "jam" ? 26 : 18),
   transform: "translateX(-50%)",
-  width: "min(1120px, calc(100% - 56px))",
+  width:
+    experience === "jam"
+      ? "min(980px, calc(100% - 40px))"
+      : "min(1120px, calc(100% - 56px))",
   zIndex: 30,
   pointerEvents: "none",
 });
@@ -617,14 +663,17 @@ const producerWorkspacePopoverStyle: CSSProperties = {
   pointerEvents: "none",
 };
 
-const overlayBarStyle: CSSProperties = {
-  minHeight: 80,
-  borderRadius: "var(--radius-pill)",
+const overlayBarStyle = (experience: AgenticExperience): CSSProperties => ({
+  minHeight: experience === "jam" ? 112 : 80,
+  borderRadius: experience === "jam" ? 28 : "var(--radius-pill)",
   border: "1px solid var(--border)",
   backgroundColor: "var(--card)",
-  boxShadow: "0 10px 28px rgba(15,23,42,0.08)",
-  padding: "12px",
-};
+  boxShadow:
+    experience === "jam"
+      ? "0 18px 42px rgba(15,23,42,0.12)"
+      : "0 10px 28px rgba(15,23,42,0.08)",
+  padding: experience === "jam" ? "14px" : "12px",
+});
 
 const overlayFieldWrapStyle: CSSProperties = {
   minWidth: 0,
@@ -698,23 +747,25 @@ const overlayTextFieldInputStyle: CSSProperties = {
   minHeight: 20,
 };
 
-const producerInputShellStyle: CSSProperties = {
+const producerInputShellStyle = (experience: AgenticExperience): CSSProperties => ({
   minHeight: 56,
   display: "flex",
   alignItems: "center",
-  padding: "0 12px 0 10px",
-};
+  padding: experience === "jam" ? "0 14px" : "0 12px 0 10px",
+  borderRadius: experience === "jam" ? 22 : 0,
+  backgroundColor: experience === "jam" ? "var(--soft-surface)" : "transparent",
+});
 
-const producerInputStyle: CSSProperties = {
+const producerInputStyle = (experience: AgenticExperience): CSSProperties => ({
   flex: 1,
   minWidth: 0,
   border: "none",
   padding: 0,
   background: "transparent",
   color: "var(--foreground)",
-  fontSize: 18,
+  fontSize: experience === "jam" ? 17 : 18,
   fontWeight: 500,
-};
+});
 
 const generateButtonStyle: CSSProperties = {
   height: 56,
@@ -756,6 +807,35 @@ const modeToggleButtonStyle: CSSProperties = {
   letterSpacing: "0",
   borderRadius: "var(--radius-pill)",
   cursor: "pointer",
+};
+
+const suggestionChipStyle: CSSProperties = {
+  minHeight: 40,
+  padding: "0 16px",
+  borderRadius: 999,
+  border: "1px solid rgba(15,23,42,0.1)",
+  backgroundColor: "var(--soft-surface)",
+  color: "var(--foreground)",
+  fontSize: 14,
+  fontWeight: 600,
+  lineHeight: 1.2,
+  cursor: "pointer",
+};
+
+const producerBadgeStyle: CSSProperties = {
+  height: 40,
+  padding: "0 14px",
+  borderRadius: 999,
+  border: "1px solid rgba(15,23,42,0.08)",
+  backgroundColor: "rgba(255,255,255,0.88)",
+  color: "var(--foreground)",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 8,
+  fontSize: 13,
+  fontWeight: 700,
+  flex: "0 0 auto",
 };
 
 const overlayMenuStyle: CSSProperties = {

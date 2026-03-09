@@ -1,6 +1,7 @@
 import type { Locale } from "@/features/entrance/EntranceLocaleContext";
 import { agenticCopyByLocale } from "../i18n/agentic.copy";
 import type {
+  AgenticExperience,
   MusicianTarget,
   ArrangementTrack,
 } from "./agentic.types";
@@ -31,43 +32,25 @@ export const initialTracks: ArrangementTrack[] = [
 const jamyTracks: ArrangementTrack[] = [
   {
     id: "audio",
-    name: "Audio",
+    name: "Audio Track",
     icon: "default",
     role: "Capture",
-    level: "-6.0 dB",
+    level: "-inf dB",
     defaultVolume: 74,
     volume: 74,
-    pan: -4,
-    clips: [
-      {
-        id: "audio-take-a",
-        label: "Take 01",
-        startBeat: 8,
-        durationBeats: 48,
-        fill: "linear-gradient(135deg, rgba(248, 113, 113, 0.96), rgba(185, 28, 28, 0.92))",
-        accent: "#FFF1F2",
-      },
-    ],
+    pan: 0,
+    clips: [],
   },
   {
     id: "backing-track",
     name: "Backing Track",
     icon: "default",
     role: "Guide",
-    level: "-3.0 dB",
+    level: "-inf dB",
     defaultVolume: 82,
     volume: 82,
-    pan: 4,
-    clips: [
-      {
-        id: "backing-track-a",
-        label: "Midnight Neo-Soul",
-        startBeat: 0,
-        durationBeats: 96,
-        fill: "linear-gradient(135deg, rgba(96, 165, 250, 0.96), rgba(37, 99, 235, 0.92))",
-        accent: "#EFF6FF",
-      },
-    ],
+    pan: 0,
+    clips: [],
   },
 ];
 
@@ -145,15 +128,8 @@ export function getJamyTracksForLocale(locale: Locale) {
   const trackNameMap =
     locale === "zh-CN"
       ? {
-          audio: { name: "Audio", role: "录音" },
+          audio: { name: "Audio Track", role: "录音" },
           "backing-track": { name: "Backing Track", role: "伴奏" },
-        }
-      : null;
-  const clipLabelMap =
-    locale === "zh-CN"
-      ? {
-          "audio-take-a": "Take 01",
-          "backing-track-a": "午夜 Neo-Soul",
         }
       : null;
 
@@ -161,10 +137,7 @@ export function getJamyTracksForLocale(locale: Locale) {
     ...track,
     name: trackNameMap?.[track.id as keyof typeof trackNameMap]?.name ?? track.name,
     role: trackNameMap?.[track.id as keyof typeof trackNameMap]?.role ?? track.role,
-    clips: track.clips.map((clip) => ({
-      ...clip,
-      label: clipLabelMap?.[clip.id as keyof typeof clipLabelMap] ?? clip.label,
-    })),
+    clips: track.clips,
   }));
 }
 
@@ -196,8 +169,22 @@ export function getAgentModeOptionsForLocale(locale: Locale) {
   ];
 }
 
-export function getInitialProducerMessagesForLocale(locale: Locale) {
+export function getInitialProducerMessagesForLocale(
+  locale: Locale,
+  experience: AgenticExperience = "default",
+) {
   const copy = agenticCopyByLocale[locale];
+  if (experience === "jam") {
+    return [
+      {
+        id: "producer-intro",
+        role: "agent" as const,
+        text: copy.jamProducerIntro,
+        timestamp: copy.ready,
+      },
+    ];
+  }
+
   return [
     {
       id: "producer-intro",
@@ -211,8 +198,15 @@ export function getInitialProducerMessagesForLocale(locale: Locale) {
   ];
 }
 
-export function getInitialAudioQueueForLocale(locale: Locale) {
+export function getInitialAudioQueueForLocale(
+  locale: Locale,
+  experience: AgenticExperience = "default",
+) {
   const copy = agenticCopyByLocale[locale];
+  if (experience === "jam") {
+    return [];
+  }
+
   const targets = getMusicianTargetsForLocale(locale);
   const vocalist = targets.find((item) => item.id === "ai-vocalist")?.label ?? "AI Vocalist";
   const bassist = targets.find((item) => item.id === "ai-bassist")?.label ?? "AI Bassist";
@@ -245,8 +239,15 @@ export function getInitialAudioQueueForLocale(locale: Locale) {
   ];
 }
 
-export function getInitialGenerationHistoryForLocale(locale: Locale) {
+export function getInitialGenerationHistoryForLocale(
+  locale: Locale,
+  experience: AgenticExperience = "default",
+) {
   const copy = agenticCopyByLocale[locale];
+  if (experience === "jam") {
+    return [];
+  }
+
   const targets = getMusicianTargetsForLocale(locale);
   const drummer = targets.find((item) => item.id === "ai-drummer")?.label ?? "AI Drummer";
   const guitarist = targets.find((item) => item.id === "ai-guitarist")?.label ?? "AI Guitarist";

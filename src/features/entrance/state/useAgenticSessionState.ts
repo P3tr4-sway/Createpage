@@ -7,6 +7,7 @@ import {
   getInitialTracksForLocale,
 } from "@/features/entrance/model/agentic.mock";
 import type {
+  AgenticExperience,
   AgentMode,
   ArrangementTrack,
   AudioQueueItem,
@@ -17,6 +18,7 @@ import type {
 } from "@/features/entrance/model/agentic.types";
 
 interface UseAgenticSessionStateParams {
+  experience?: AgenticExperience;
   locale: Locale;
   defaultLyricsDraft: string;
   trackName: (index: number) => string;
@@ -25,6 +27,7 @@ interface UseAgenticSessionStateParams {
 }
 
 export function useAgenticSessionState({
+  experience = "default",
   locale,
   defaultLyricsDraft,
   trackName,
@@ -47,20 +50,24 @@ export function useAgenticSessionState({
   const [scrollLeft, setScrollLeft] = useState(0);
   const [scrollTop, setScrollTop] = useState(0);
   const [isDraggingPlayhead, setIsDraggingPlayhead] = useState(false);
-  const [agentMode, setAgentMode] = useState<AgentMode>("musician");
+  const defaultAgentMode: AgentMode = experience === "jam" ? "producer" : "musician";
+  const [agentMode, setAgentMode] = useState<AgentMode>(defaultAgentMode);
   const [openOverlayMenu, setOpenOverlayMenu] = useState<OverlayMenu>(null);
   const [musicianTargetId, setMusicianTargetId] =
     useState<MusicianTargetId>("ai-drummer");
   const [styleDraft, setStyleDraft] = useState("");
   const [lyricsDraft, setLyricsDraft] = useState<string>(() => defaultLyricsDraft);
   const [producerDraft, setProducerDraft] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
   const [producerWorkspaceOpen, setProducerWorkspaceOpen] = useState(false);
   const [producerMessages, setProducerMessages] =
-    useState<ProducerMessage[]>(() => getInitialProducerMessagesForLocale(locale));
+    useState<ProducerMessage[]>(() => getInitialProducerMessagesForLocale(locale, experience));
   const [audioQueue, setAudioQueue] =
-    useState<AudioQueueItem[]>(() => getInitialAudioQueueForLocale(locale));
+    useState<AudioQueueItem[]>(() => getInitialAudioQueueForLocale(locale, experience));
   const [generationHistory, setGenerationHistory] =
-    useState<GenerationHistoryItem[]>(() => getInitialGenerationHistoryForLocale(locale));
+    useState<GenerationHistoryItem[]>(() =>
+      getInitialGenerationHistoryForLocale(locale, experience),
+    );
 
   useEffect(() => {
     const nextTracks = resolvedInitialTracks;
@@ -74,17 +81,18 @@ export function useAgenticSessionState({
     setScrollLeft(0);
     setScrollTop(0);
     setIsDraggingPlayhead(false);
-    setAgentMode("musician");
+    setAgentMode(defaultAgentMode);
     setOpenOverlayMenu(null);
     setMusicianTargetId("ai-drummer");
     setStyleDraft("");
     setLyricsDraft(defaultLyricsDraft);
     setProducerDraft("");
+    setIsRecording(false);
     setProducerWorkspaceOpen(false);
-    setProducerMessages(getInitialProducerMessagesForLocale(locale));
-    setAudioQueue(getInitialAudioQueueForLocale(locale));
-    setGenerationHistory(getInitialGenerationHistoryForLocale(locale));
-  }, [defaultLyricsDraft, locale, resolvedInitialTracks]);
+    setProducerMessages(getInitialProducerMessagesForLocale(locale, experience));
+    setAudioQueue(getInitialAudioQueueForLocale(locale, experience));
+    setGenerationHistory(getInitialGenerationHistoryForLocale(locale, experience));
+  }, [defaultAgentMode, defaultLyricsDraft, experience, locale, resolvedInitialTracks]);
 
   const pushQueueItem = (item: AudioQueueItem) => {
     setAudioQueue((prev) => [item, ...prev].slice(0, 6));
@@ -201,6 +209,8 @@ export function useAgenticSessionState({
     setLyricsDraft,
     producerDraft,
     setProducerDraft,
+    isRecording,
+    setIsRecording,
     producerWorkspaceOpen,
     setProducerWorkspaceOpen,
     producerMessages,

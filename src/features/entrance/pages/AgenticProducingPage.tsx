@@ -1,8 +1,10 @@
 import {
   type CSSProperties,
   type PointerEvent as ReactPointerEvent,
+  useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import {
   X,
@@ -15,12 +17,10 @@ import {
   Pause,
   Circle,
   Repeat,
-  MicOff,
-  SlidersHorizontal,
+  Headphones,
   AudioWaveform,
   Drum,
 } from "lucide-react";
-import { Slider } from "@/app/components/ui/slider";
 import { AgenticOverlayDock } from "@/features/entrance/components/AgenticOverlayDock";
 import { useEntranceLocale } from "@/features/entrance/EntranceLocaleContext";
 import { agenticCopyByLocale } from "@/features/entrance/i18n/agentic.copy";
@@ -28,7 +28,11 @@ import {
   getInitialTracksForLocale,
   getMusicianTargetsForLocale,
 } from "@/features/entrance/model/agentic.mock";
-import type { ArrangementTrack } from "@/features/entrance/model/agentic.types";
+import type {
+  AgenticExperience,
+  ArrangementTrack,
+  JamSuggestionStage,
+} from "@/features/entrance/model/agentic.types";
 import { useAgenticOverlayController } from "@/features/entrance/pages/agentic/useAgenticOverlayController";
 import { useAgenticTimelineController } from "@/features/entrance/pages/agentic/useAgenticTimelineController";
 import { useAgenticSessionState } from "@/features/entrance/state/useAgenticSessionState";
@@ -38,6 +42,7 @@ interface AgenticProducingPageProps {
   previewMode?: boolean;
   projectTitle?: string;
   showAgentOverlay?: boolean;
+  experience?: AgenticExperience;
   allowAddTrack?: boolean;
   initialTracks?: ArrangementTrack[];
 }
@@ -46,11 +51,13 @@ export function AgenticProducingPage({
   previewMode = false,
   projectTitle,
   showAgentOverlay: showAgentOverlayProp,
+  experience = "default",
   allowAddTrack = true,
   initialTracks,
 }: AgenticProducingPageProps) {
   const locale = useEntranceLocale();
   const copy = agenticCopyByLocale[locale];
+  const isJamExperience = experience === "jam";
   const localizedTargets = getMusicianTargetsForLocale(locale);
   const resolvedInitialTracks = useMemo(
     () => initialTracks ?? getInitialTracksForLocale(locale),
@@ -58,6 +65,7 @@ export function AgenticProducingPage({
   );
   const {
     tracks,
+    setTracks,
     selectedTrackId,
     setSelectedTrackId,
     mutedTrackIds,
@@ -85,6 +93,8 @@ export function AgenticProducingPage({
     setLyricsDraft,
     producerDraft,
     setProducerDraft,
+    isRecording,
+    setIsRecording,
     producerWorkspaceOpen,
     setProducerWorkspaceOpen,
     producerMessages,
@@ -101,6 +111,7 @@ export function AgenticProducingPage({
     toggleSolo,
   } = useAgenticSessionState({
     locale,
+    experience,
     defaultLyricsDraft: copy.defaultLyricsDraft,
     trackName: copy.trackName,
     ideaLane: copy.ideaLane,
@@ -115,7 +126,11 @@ export function AgenticProducingPage({
   const selectedMusicianTarget =
     localizedTargets.find((target) => target.id === musicianTargetId) ?? localizedTargets[0];
   const selectedStyle = styleDraft.trim() || copy.selectedStyleFallback;
-  const producerWorkspaceVisible = showAgentOverlay && agentMode === "producer" && producerWorkspaceOpen;
+  const producerWorkspaceVisible =
+    !isJamExperience && showAgentOverlay && agentMode === "producer" && producerWorkspaceOpen;
+  const [jamSuggestionStage, setJamSuggestionStage] =
+    useState<JamSuggestionStage>("pre-record");
+  const [timelineViewportHeight, setTimelineViewportHeight] = useState(0);
   const {
     handlePlayheadPointerDown,
     handleSeekPointerDown,
@@ -139,6 +154,42 @@ export function AgenticProducingPage({
     setScrollLeft,
     setScrollTop,
   });
+  useEffect(() => {
+    if (!isJamExperience) {
+      return;
+    }
+
+    setJamSuggestionStage("pre-record");
+  }, [isJamExperience, locale, resolvedInitialTracks]);
+
+  useEffect(() => {
+    if (!isJamExperience) {
+      return;
+    }
+
+    const timelineBody = timelineBodyRef.current;
+    if (!timelineBody) {
+      return;
+    }
+
+    const updateViewportHeight = () => {
+      setTimelineViewportHeight(timelineBody.clientHeight);
+    };
+
+    updateViewportHeight();
+
+    const observer = new ResizeObserver(updateViewportHeight);
+    observer.observe(timelineBody);
+
+    return () => observer.disconnect();
+  }, [isJamExperience, timelineBodyRef]);
+
+  const jamTrackInset = isJamExperience
+    ? Math.max((timelineViewportHeight - tracks.length * metrics.trackRowHeight) / 2, 0)
+    : 0;
+  const producerSuggestions = isJamExperience
+    ? copy.jamProducerSuggestions[jamSuggestionStage]
+    : undefined;
   const {
     handleMusicianGenerate,
     handleProducerSubmit,
@@ -160,12 +211,64 @@ export function AgenticProducingPage({
     tracks,
   });
 
+  const handleAddTrack = () => {
+    addTrack();
+
+    if (isJamExperience) {
+      setJamSuggestionStage("second-track");
+    }
+  };
+
+  const handleJamBackingSourceSelect = (
+    source: "ai" | "lava" | "cloud",
+  ) => {
+    setSelectedTrackId("backing-track");
+    setTracks((prev) =>
+      prev.map((track) =>
+        track.id === "backing-track"
+          ? {
+              ...track,
+              level: "-3.0 dB",
+              clips: [createJamBackingClip(locale, source)],
+            }
+          : track,
+      ),
+    );
+  };
+
+  const handleRecordToggle = () => {
+    if (!isPlaying && currentBeat >= metrics.maxTimelineBeat) {
+      seekToBeat(0);
+    }
+
+    setSelectedTrackId("audio");
+
+    if (isRecording) {
+      setTracks((prev) =>
+        prev.map((track) =>
+          track.id === "audio" && track.clips.length === 0
+            ? {
+                ...track,
+                level: "-6.0 dB",
+                clips: [createJamRecordingClip(locale)],
+              }
+            : track,
+        ),
+      );
+      setJamSuggestionStage("post-record");
+      setIsRecording(false);
+      return;
+    }
+
+    setIsRecording(true);
+  };
+
   return (
     <section
       ref={previewRootRef}
       className="flex h-full w-full overflow-hidden"
       style={{
-        backgroundColor: "var(--agentic-bg)",
+        backgroundColor: isJamExperience ? "#EEF2F7" : "var(--agentic-bg)",
         fontFamily: "var(--app-font-family)",
       }}
     >
@@ -176,7 +279,7 @@ export function AgenticProducingPage({
             style={{
               height: 72,
               padding: "0 18px",
-              backgroundColor: "var(--agentic-topbar)",
+                backgroundColor: isJamExperience ? "#F5F7FB" : "var(--agentic-topbar)",
               borderBottom: "1px solid var(--agentic-border)",
             }}
           >
@@ -217,21 +320,23 @@ export function AgenticProducingPage({
             )}
 
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                aria-label={copy.undo}
-                className="tablet-icon-target tablet-pressable inline-flex items-center justify-center"
-                style={toolbarIconStyle}
-              >
-                <Undo2 size={16} strokeWidth={1.8} />
-              </button>
+              {!isJamExperience ? (
+                <button
+                  type="button"
+                  aria-label={copy.undo}
+                  className="tablet-icon-target tablet-pressable inline-flex items-center justify-center"
+                  style={toolbarIconStyle}
+                >
+                  <Undo2 size={16} strokeWidth={1.8} />
+                </button>
+              ) : null}
               <button
                 type="button"
                 aria-label={copy.importAudio}
                 className="tablet-icon-target tablet-pressable inline-flex items-center justify-center"
                 style={toolbarIconStyle}
               >
-                <Upload size={16} strokeWidth={1.8} />
+                {isJamExperience ? <Upload size={18} strokeWidth={1.8} /> : <Upload size={16} strokeWidth={1.8} />}
               </button>
               <button
                 type="button"
@@ -262,7 +367,7 @@ export function AgenticProducingPage({
             <div
               className="flex min-h-0 flex-1"
               style={{
-                backgroundColor: "var(--agentic-bg)",
+                backgroundColor: isJamExperience ? "#F1F5F9" : "var(--agentic-bg)",
                 borderBottom: "1px solid var(--agentic-border)",
               }}
             >
@@ -271,8 +376,9 @@ export function AgenticProducingPage({
                 style={{
                   width: metrics.trackPanelWidth,
                   borderRight: "1px solid var(--agentic-border-strong)",
-                  background:
-                    "linear-gradient(180deg, rgba(10,12,17,0.92), rgba(19,24,33,0.92))",
+                  background: isJamExperience
+                    ? "linear-gradient(180deg, #F8FAFC, #F1F5F9)"
+                    : "linear-gradient(180deg, rgba(10,12,17,0.92), rgba(19,24,33,0.92))",
                 }}
               >
                 <div
@@ -280,7 +386,9 @@ export function AgenticProducingPage({
                   style={{
                     height: metrics.arrangementHeaderHeight,
                     padding: previewMode ? "0 12px" : "0 16px",
-                    borderBottom: "1px solid rgba(255,255,255,0.08)",
+                    borderBottom: isJamExperience
+                      ? "1px solid rgba(15,23,42,0.08)"
+                      : "1px solid rgba(255,255,255,0.08)",
                   }}
                 >
                   <div>
@@ -297,16 +405,18 @@ export function AgenticProducingPage({
                   {allowAddTrack ? (
                     <button
                       type="button"
-                      onClick={addTrack}
+                      onClick={handleAddTrack}
                       aria-label={copy.addTrack}
                       className="tablet-touch-target tablet-pressable inline-flex items-center justify-center"
                       style={{
                         width: previewMode ? 28 : 32,
                         height: previewMode ? 28 : 32,
                         borderRadius: "var(--radius-control)",
-                        border: "none",
-                        backgroundColor: "transparent",
-                        color: "var(--agentic-contrast)",
+                        border: isJamExperience
+                          ? "1px solid rgba(15,23,42,0.1)"
+                          : "none",
+                        backgroundColor: isJamExperience ? "rgba(255,255,255,0.86)" : "transparent",
+                        color: isJamExperience ? "var(--foreground)" : "var(--agentic-contrast)",
                       }}
                     >
                       <Plus size={previewMode ? 14 : 16} strokeWidth={2.2} />
@@ -317,7 +427,13 @@ export function AgenticProducingPage({
                 </div>
 
                 <div className="min-h-0 flex-1 overflow-hidden">
-                  <div style={{ transform: `translateY(-${scrollTop}px)` }}>
+                  <div
+                    style={{
+                      transform: `translateY(-${scrollTop}px)`,
+                      paddingTop: jamTrackInset,
+                      paddingBottom: jamTrackInset,
+                    }}
+                  >
                     {tracks.map((track) => {
                       const isSelected = track.id === selectedTrackId;
                       const isMuted = mutedTrackIds.includes(track.id);
@@ -331,17 +447,24 @@ export function AgenticProducingPage({
                           style={{
                             height: metrics.trackRowHeight,
                             padding: previewMode ? "12px 12px" : "14px 16px",
-                            borderBottom: "1px solid rgba(255,255,255,0.08)",
-                            background:
-                              isSelected
+                            borderBottom: isJamExperience
+                              ? "none"
+                              : "1px solid rgba(255,255,255,0.08)",
+                            background: isJamExperience
+                              ? "transparent"
+                              : isSelected
                                 ? "linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.04))"
                                 : "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015))",
-                            boxShadow: isSelected
-                              ? "inset 0 1px 0 rgba(255,255,255,0.08)"
-                              : "none",
+                            boxShadow:
+                              !isJamExperience && isSelected
+                                ? "inset 0 1px 0 rgba(255,255,255,0.08)"
+                                : "none",
                           }}
                         >
-                          <div className="min-w-0 flex-1">
+                          <div
+                            className="min-w-0 flex-1"
+                            style={isJamExperience ? jamTrackCardStyle(isSelected) : undefined}
+                          >
                             <button
                               type="button"
                               onClick={() => setSelectedTrackId(track.id)}
@@ -356,7 +479,7 @@ export function AgenticProducingPage({
                               <span
                                 style={{
                                   width: previewMode ? 18 : 20,
-                                  color: "rgba(255,255,255,0.52)",
+                                  color: isJamExperience ? "rgba(15,23,42,0.45)" : "rgba(255,255,255,0.52)",
                                   fontSize: previewMode ? 13 : 14,
                                   fontWeight: 600,
                                   letterSpacing: "0.08em",
@@ -370,7 +493,7 @@ export function AgenticProducingPage({
                                 style={{
                                   width: previewMode ? 18 : 20,
                                   height: previewMode ? 18 : 20,
-                                  color: "rgba(255,255,255,0.96)",
+                                  color: isJamExperience ? "var(--foreground)" : "rgba(255,255,255,0.96)",
                                   flexShrink: 0,
                                 }}
                               >
@@ -379,7 +502,7 @@ export function AgenticProducingPage({
                               <span
                                 className="min-w-0 flex-1"
                                 style={{
-                                  color: "rgba(255,255,255,0.96)",
+                                  color: isJamExperience ? "var(--foreground)" : "rgba(255,255,255,0.96)",
                                   fontSize: previewMode ? 15 : 17,
                                   fontWeight: 600,
                                   letterSpacing: "-0.01em",
@@ -391,46 +514,62 @@ export function AgenticProducingPage({
                               >
                                 {track.name}
                               </span>
+                              {isJamExperience ? (
+                                <span style={jamTrackRoleStyle}>{track.role}</span>
+                              ) : null}
                             </button>
 
                             <div
                               className="mt-4 flex items-center"
                               style={{ gap: previewMode ? 8 : 10 }}
                             >
-                              <button
-                                type="button"
-                                onClick={() => toggleMuted(track.id)}
-                                aria-label={`${isMuted ? copy.unmute : copy.mute} ${track.name}`}
-                                style={{
-                                  ...trackTogglePillStyle,
-                                  width: previewMode ? 34 : 38,
-                                  height: previewMode ? 30 : 32,
-                                  backgroundColor: isMuted
-                                    ? "rgba(255,255,255,0.92)"
-                                    : "rgba(0,0,0,0.44)",
-                                  border: "1px solid rgba(255,255,255,0.18)",
-                                  color: isMuted ? "#111111" : "rgba(255,255,255,0.88)",
-                                }}
-                              >
-                                M
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => toggleSolo(track.id)}
-                                aria-label={`${isSolo ? copy.disableSolo : copy.solo} ${track.name}`}
-                                style={{
-                                  ...trackTogglePillStyle,
-                                  width: previewMode ? 34 : 38,
-                                  height: previewMode ? 30 : 32,
-                                  backgroundColor: isSolo
-                                    ? "rgba(255,255,255,0.92)"
-                                    : "rgba(0,0,0,0.44)",
-                                  border: "1px solid rgba(255,255,255,0.18)",
-                                  color: isSolo ? "#111111" : "rgba(255,255,255,0.88)",
-                                }}
-                              >
-                                S
-                              </button>
+                              {isJamExperience ? (
+                                <button
+                                  type="button"
+                                  onClick={() => toggleSolo(track.id)}
+                                  aria-label={`${isSolo ? copy.disableHeadphoneMonitor : copy.enableHeadphoneMonitor} ${track.name}`}
+                                  style={jamHeadphoneButtonStyle(isSolo)}
+                                >
+                                  <Headphones size={16} strokeWidth={2} />
+                                </button>
+                              ) : (
+                                <>
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleMuted(track.id)}
+                                    aria-label={`${isMuted ? copy.unmute : copy.mute} ${track.name}`}
+                                    style={{
+                                      ...trackTogglePillStyle,
+                                      width: previewMode ? 34 : 38,
+                                      height: previewMode ? 30 : 32,
+                                      backgroundColor: isMuted
+                                        ? "rgba(255,255,255,0.92)"
+                                        : "rgba(0,0,0,0.44)",
+                                      border: "1px solid rgba(255,255,255,0.18)",
+                                      color: isMuted ? "#111111" : "rgba(255,255,255,0.88)",
+                                    }}
+                                  >
+                                    M
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleSolo(track.id)}
+                                    aria-label={`${isSolo ? copy.disableSolo : copy.solo} ${track.name}`}
+                                    style={{
+                                      ...trackTogglePillStyle,
+                                      width: previewMode ? 34 : 38,
+                                      height: previewMode ? 30 : 32,
+                                      backgroundColor: isSolo
+                                        ? "rgba(255,255,255,0.92)"
+                                        : "rgba(0,0,0,0.44)",
+                                      border: "1px solid rgba(255,255,255,0.18)",
+                                      color: isSolo ? "#111111" : "rgba(255,255,255,0.88)",
+                                    }}
+                                  >
+                                    S
+                                  </button>
+                                </>
+                              )}
 
                               <div className="min-w-0 flex-1">
                                 <div
@@ -442,7 +581,7 @@ export function AgenticProducingPage({
                                 >
                                   <span
                                     style={{
-                                      color: "rgba(255,255,255,0.64)",
+                                      color: isJamExperience ? "rgba(15,23,42,0.52)" : "rgba(255,255,255,0.64)",
                                       fontSize: previewMode ? 9 : 10,
                                       fontWeight: 700,
                                       letterSpacing: "0.08em",
@@ -453,7 +592,7 @@ export function AgenticProducingPage({
                                   </span>
                                   <span
                                     style={{
-                                      color: "rgba(255,255,255,0.74)",
+                                      color: isJamExperience ? "rgba(15,23,42,0.68)" : "rgba(255,255,255,0.74)",
                                       fontSize: previewMode ? 10 : 11,
                                       fontWeight: 600,
                                     }}
@@ -461,31 +600,60 @@ export function AgenticProducingPage({
                                     {Math.round(track.volume)}
                                   </span>
                                 </div>
-                                <Slider
+                                <input
+                                  type="range"
                                   min={0}
                                   max={100}
                                   step={1}
-                                  value={[track.volume]}
+                                  value={track.volume}
                                   aria-label={`${copy.volume} ${track.name}`}
                                   onDoubleClick={() =>
                                     updateTrackVolume(track.id, track.defaultVolume)
                                   }
-                                  onValueChange={(values) =>
-                                    updateTrackVolume(track.id, values[0] ?? track.volume)
+                                  onChange={(event) =>
+                                    updateTrackVolume(track.id, Number(event.target.value))
                                   }
-                                  className="w-full [&_[data-slot=slider-track]]:h-6 [&_[data-slot=slider-track]]:rounded-full [&_[data-slot=slider-track]]:bg-[rgba(16,16,16,0.96)] [&_[data-slot=slider-track]]:shadow-[inset_0_1px_2px_rgba(255,255,255,0.06)] [&_[data-slot=slider-range]]:bg-[rgba(255,255,255,0.08)] [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border-[rgba(255,255,255,0.22)] [&_[data-slot=slider-thumb]]:bg-[#F4F4F5] [&_[data-slot=slider-thumb]]:shadow-[0_3px_10px_rgba(0,0,0,0.4)]"
+                                  style={jamOrAgenticSliderStyle(isJamExperience)}
                                 />
                               </div>
 
-                              <PanControl
-                                centeredLabel={copy.centeredPan}
-                                name={track.name}
-                                pan={track.pan}
-                                panLabel={copy.pan}
-                                previewMode={previewMode}
-                                onChange={(nextPan) => updateTrackPan(track.id, nextPan)}
-                              />
+                              {!isJamExperience ? (
+                                <PanControl
+                                  centeredLabel={copy.centeredPan}
+                                  name={track.name}
+                                  pan={track.pan}
+                                  panLabel={copy.pan}
+                                  previewMode={previewMode}
+                                  onChange={(nextPan) => updateTrackPan(track.id, nextPan)}
+                                />
+                              ) : null}
                             </div>
+
+                            {isJamExperience && track.id === "backing-track" ? (
+                              <div className="mt-3 flex flex-wrap" style={{ gap: 8 }}>
+                                <button
+                                  type="button"
+                                  onClick={() => handleJamBackingSourceSelect("ai")}
+                                  style={jamSourceButtonStyle(track.clips.length > 0)}
+                                >
+                                  {copy.jamSourceAi}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleJamBackingSourceSelect("lava")}
+                                  style={jamSourceButtonStyle(false)}
+                                >
+                                  {copy.jamSourceLava}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleJamBackingSourceSelect("cloud")}
+                                  style={jamSourceButtonStyle(false)}
+                                >
+                                  {copy.jamSourceCloud}
+                                </button>
+                              </div>
+                            ) : null}
                           </div>
                         </div>
                       );
@@ -499,7 +667,7 @@ export function AgenticProducingPage({
                   className="relative shrink-0 overflow-hidden"
                   style={{
                     height: metrics.arrangementHeaderHeight,
-                    backgroundColor: "var(--agentic-surface)",
+                    backgroundColor: isJamExperience ? "#F8FAFC" : "var(--agentic-surface)",
                     borderBottom: "1px solid var(--agentic-border-strong)",
                   }}
                   onPointerDown={handleSeekPointerDown}
@@ -511,8 +679,9 @@ export function AgenticProducingPage({
                       paddingLeft: metrics.timelineLeadingInset,
                       paddingRight: metrics.timelineTrailingInset,
                       transform: `translateX(-${scrollLeft}px)`,
-                      background:
-                        "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015))",
+                      background: isJamExperience
+                        ? "linear-gradient(180deg, rgba(255,255,255,0.9), rgba(248,250,252,0.98))"
+                        : "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015))",
                     }}
                   >
                     <span
@@ -538,7 +707,7 @@ export function AgenticProducingPage({
                             minWidth: metrics.barWidth,
                             borderRight: "1px solid var(--agentic-border-strong)",
                             backgroundColor:
-                              label % 2 === 0
+                              !isJamExperience && label % 2 === 0
                                 ? "rgba(255,255,255,0.03)"
                                 : "transparent",
                           }}
@@ -549,10 +718,10 @@ export function AgenticProducingPage({
                               left: previewMode ? 10 : 14,
                               top: previewMode ? 9 : 13,
                               zIndex: 2,
-                              color: "rgba(226,232,240,0.78)",
+                              color: isJamExperience ? "rgba(15,23,42,0.62)" : "rgba(226,232,240,0.78)",
                               fontSize: previewMode ? 12 : 15,
                               fontWeight: 600,
-                              textShadow: "0 1px 0 rgba(0,0,0,0.3)",
+                              textShadow: isJamExperience ? "none" : "0 1px 0 rgba(0,0,0,0.3)",
                             }}
                           >
                             {label}
@@ -567,7 +736,7 @@ export function AgenticProducingPage({
                                 top: previewMode ? 20 : 24,
                                 bottom: previewMode ? 7 : 9,
                                 width: 1,
-                                backgroundColor: "rgba(255,255,255,0.09)",
+                                backgroundColor: isJamExperience ? "rgba(15,23,42,0.08)" : "rgba(255,255,255,0.09)",
                               }}
                             />
                           ))}
@@ -591,9 +760,15 @@ export function AgenticProducingPage({
                   ref={timelineBodyRef}
                   className="min-h-0 flex-1 overflow-x-auto overflow-y-auto"
                   onScroll={handleTimelineScroll}
-                  style={{ backgroundColor: "var(--agentic-topbar)" }}
+                  style={{ backgroundColor: isJamExperience ? "#F8FAFC" : "var(--agentic-topbar)" }}
                 >
-                  <div style={{ width: metrics.timelineContentWidth }}>
+                  <div
+                    style={{
+                      width: metrics.timelineContentWidth,
+                      paddingTop: jamTrackInset,
+                      paddingBottom: jamTrackInset,
+                    }}
+                  >
                     {tracks.map((track, rowIndex) => {
                       const isSelected = track.id === selectedTrackId;
 
@@ -603,12 +778,15 @@ export function AgenticProducingPage({
                           className="relative"
                           style={{
                             height: metrics.trackRowHeight,
-                            borderBottom: "1px solid var(--agentic-border)",
-                            backgroundColor: isSelected
-                              ? "rgba(255,255,255,0.03)"
-                              : "transparent",
-                            backgroundImage:
-                              "linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(to right, rgba(255,255,255,0.16) 1px, transparent 1px)",
+                            borderBottom: isJamExperience ? "none" : "1px solid var(--agentic-border)",
+                            backgroundColor: isJamExperience
+                              ? "transparent"
+                              : isSelected
+                                ? "rgba(255,255,255,0.03)"
+                                : "transparent",
+                            backgroundImage: isJamExperience
+                              ? "linear-gradient(to right, rgba(15,23,42,0.05) 1px, transparent 1px), linear-gradient(to right, rgba(15,23,42,0.08) 1px, transparent 1px)"
+                              : "linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(to right, rgba(255,255,255,0.16) 1px, transparent 1px)",
                             backgroundSize: `${metrics.pixelsPerBeat}px 100%, ${metrics.barWidth}px 100%`,
                             backgroundPosition: `${metrics.timelineLeadingInset}px 0, ${metrics.timelineLeadingInset}px 0`,
                           }}
@@ -622,11 +800,11 @@ export function AgenticProducingPage({
                               top: 0,
                               bottom: 0,
                               width: 1,
-                              backgroundColor: "rgba(255,255,255,0.16)",
+                              backgroundColor: isJamExperience ? "rgba(15,23,42,0.12)" : "rgba(255,255,255,0.16)",
                               zIndex: 1,
                             }}
                           />
-                          {rowIndex % 2 === 1 ? (
+                          {!isJamExperience && rowIndex % 2 === 1 ? (
                             <span
                               aria-hidden="true"
                               style={{
@@ -635,6 +813,67 @@ export function AgenticProducingPage({
                                 backgroundColor: "rgba(255,255,255,0.015)",
                               }}
                             />
+                          ) : null}
+
+                          {isJamExperience && !previewMode && track.clips.length === 0 ? (
+                            <div
+                              style={jamEmptyLaneStyle(
+                                track.id === "backing-track",
+                                isSelected,
+                                metrics.trackRowHeight,
+                                metrics.timelineLeadingInset,
+                              )}
+                            >
+                              <div style={jamEmptyLaneTitleStyle}>
+                                {track.id === "backing-track"
+                                  ? copy.jamBackingTrackTitle
+                                  : copy.jamAudioTrackTitle}
+                              </div>
+                              <div style={jamEmptyLaneHintStyle}>
+                                {track.id === "backing-track"
+                                  ? copy.jamBackingTrackHint
+                                  : copy.jamAudioTrackHint}
+                              </div>
+                              <div className="mt-3 flex flex-wrap" style={{ gap: 8 }}>
+                                {track.id === "backing-track" ? (
+                                  <>
+                                    <button
+                                      type="button"
+                                      onPointerDown={(event) => event.stopPropagation()}
+                                      onClick={() => handleJamBackingSourceSelect("ai")}
+                                      style={jamEmptyLaneActionStyle}
+                                    >
+                                      {copy.jamSourceAi}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onPointerDown={(event) => event.stopPropagation()}
+                                      onClick={() => handleJamBackingSourceSelect("lava")}
+                                      style={jamEmptyLaneActionStyle}
+                                    >
+                                      {copy.jamSourceLava}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onPointerDown={(event) => event.stopPropagation()}
+                                      onClick={() => handleJamBackingSourceSelect("cloud")}
+                                      style={jamEmptyLaneActionStyle}
+                                    >
+                                      {copy.jamSourceCloud}
+                                    </button>
+                                  </>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onPointerDown={(event) => event.stopPropagation()}
+                                    onClick={handleRecordToggle}
+                                    style={jamEmptyLanePrimaryActionStyle}
+                                  >
+                                    {copy.jamRecordTake}
+                                  </button>
+                                )}
+                              </div>
+                            </div>
                           ) : null}
 
                           {!previewMode
@@ -652,17 +891,23 @@ export function AgenticProducingPage({
                                       metrics.timelineLeadingInset +
                                       clip.startBeat * metrics.pixelsPerBeat +
                                       4,
-                                    top: previewMode ? 10 : 12,
+                                    top: isJamExperience ? 18 : previewMode ? 10 : 12,
                                     width: clip.durationBeats * metrics.pixelsPerBeat - 8,
-                                    height: metrics.trackRowHeight - (previewMode ? 20 : 24),
-                                    borderRadius: previewMode ? 12 : 14,
-                                    border: isSelected
-                                      ? "1px solid rgba(255,255,255,0.38)"
-                                      : "1px solid rgba(255,255,255,0.16)",
+                                    height: isJamExperience
+                                      ? metrics.trackRowHeight - 36
+                                      : metrics.trackRowHeight - (previewMode ? 20 : 24),
+                                    borderRadius: isJamExperience ? 22 : previewMode ? 12 : 14,
+                                    border: isJamExperience
+                                      ? `1px solid ${isSelected ? "rgba(15,23,42,0.12)" : "rgba(15,23,42,0.08)"}`
+                                      : isSelected
+                                        ? "1px solid rgba(255,255,255,0.38)"
+                                        : "1px solid rgba(255,255,255,0.16)",
                                     background: clip.fill,
-                                    boxShadow: isSelected
-                                      ? "0 16px 28px rgba(15,23,42,0.28)"
-                                      : "0 10px 18px rgba(15,23,42,0.2)",
+                                    boxShadow: isJamExperience
+                                      ? "0 12px 24px rgba(15,23,42,0.08)"
+                                      : isSelected
+                                        ? "0 16px 28px rgba(15,23,42,0.28)"
+                                        : "0 10px 18px rgba(15,23,42,0.2)",
                                     padding: previewMode ? "10px 10px" : "12px 12px",
                                     color: clip.accent,
                                   }}
@@ -761,112 +1006,169 @@ export function AgenticProducingPage({
                 height: metrics.bottomTransportHeight,
                 padding: previewMode ? "0 14px" : "0 16px",
                 borderTop: "1px solid var(--agentic-border)",
-                backgroundColor: "var(--agentic-surface)",
+                backgroundColor: isJamExperience ? "#F5F7FB" : "var(--agentic-surface)",
               }}
             >
-              <div className="flex items-center" style={{ gap: previewMode ? 12 : 18 }}>
-                <div
-                  style={{
-                    minWidth: previewMode ? 86 : 108,
-                    padding: previewMode ? "10px 12px" : "12px 14px",
-                    borderRadius: 14,
-                    border: "1px solid var(--agentic-border)",
-                    backgroundColor: "var(--agentic-elevated)",
-                    color: "var(--agentic-foreground)",
-                    fontSize: previewMode ? 13 : 15,
-                    fontWeight: 700,
-                    textAlign: "center",
-                  }}
-                >
-                  {transportPosition}
-                </div>
+              {isJamExperience ? (
+                <>
+                  <div className="flex items-center" style={{ gap: 10 }}>
+                    <div style={jamTransportBadgeStyle}>{transportPosition}</div>
+                    <div style={jamTransportSubtleBadgeStyle}>{copy.jamTrackSummary(tracks.length)}</div>
+                  </div>
 
-                <div className="flex items-center" style={{ gap: previewMode ? 8 : 10 }}>
-                  <button type="button" style={bottomIconStyle} aria-label={copy.waveformTools}>
-                    <AudioWaveform size={20} strokeWidth={1.8} />
-                  </button>
-                  <button type="button" style={bottomIconStyle} aria-label={copy.microphoneMonitor}>
-                    <MicOff size={20} strokeWidth={1.8} />
-                  </button>
-                  <button type="button" style={bottomIconStyle} aria-label={copy.mixerControls}>
-                    <SlidersHorizontal size={20} strokeWidth={1.8} />
-                  </button>
-                </div>
-              </div>
+                  <div className="flex items-center" style={{ gap: previewMode ? 10 : 12 }}>
+                    <button
+                      type="button"
+                      onClick={() => seekToBeat(0)}
+                      aria-label={copy.returnToStart}
+                      style={jamTransportButtonStyle}
+                    >
+                      <SkipBack size={previewMode ? 20 : 24} strokeWidth={2.1} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!isPlaying && currentBeat >= metrics.maxTimelineBeat) {
+                          seekToBeat(0);
+                        }
+                        setIsPlaying((prev) => !prev);
+                      }}
+                      aria-label={isPlaying ? copy.pausePlayback : copy.startPlayback}
+                      style={{
+                        ...jamTransportPrimaryButtonStyle,
+                        width: previewMode ? 52 : 58,
+                        height: previewMode ? 52 : 58,
+                      }}
+                    >
+                      {isPlaying ? (
+                        <Pause size={previewMode ? 22 : 26} strokeWidth={2.2} />
+                      ) : (
+                        <Play size={previewMode ? 22 : 26} strokeWidth={2.2} />
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleRecordToggle}
+                      aria-label={copy.record}
+                      style={jamRecordButtonStyle(isRecording)}
+                    >
+                      <Circle size={previewMode ? 18 : 22} fill="currentColor" strokeWidth={2} />
+                    </button>
+                  </div>
 
-              <div className="flex items-center" style={{ gap: previewMode ? 10 : 12 }}>
-                <button
-                  type="button"
-                  onClick={() => seekToBeat(0)}
-                  aria-label={copy.returnToStart}
-                  style={transportStyle}
-                >
-                  <SkipBack size={previewMode ? 20 : 24} strokeWidth={2.1} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!isPlaying && currentBeat >= metrics.maxTimelineBeat) {
-                      seekToBeat(0);
-                    }
-                    setIsPlaying((prev) => !prev);
-                  }}
-                  aria-label={isPlaying ? copy.pausePlayback : copy.startPlayback}
-                  style={{
-                    ...transportStyle,
-                    width: previewMode ? 52 : 58,
-                    height: previewMode ? 52 : 58,
-                    backgroundColor: "var(--agentic-marker)",
-                    color: "#FFFFFF",
-                    border: "none",
-                  }}
-                >
-                  {isPlaying ? (
-                    <Pause size={previewMode ? 22 : 26} strokeWidth={2.2} />
-                  ) : (
-                    <Play size={previewMode ? 22 : 26} strokeWidth={2.2} />
-                  )}
-                </button>
-                <button
-                  type="button"
-                  aria-label={copy.record}
-                  style={{ ...transportStyle, color: "var(--agentic-danger)" }}
-                >
-                  <Circle size={previewMode ? 18 : 22} fill="currentColor" strokeWidth={2} />
-                </button>
-              </div>
+                  <div className="flex items-center" style={{ gap: 10 }}>
+                    <button
+                      type="button"
+                      onClick={() => setLoopEnabled((prev) => !prev)}
+                      style={{
+                        ...bottomPillStyle,
+                        backgroundColor: loopEnabled ? "rgba(59,130,246,0.16)" : "rgba(255,255,255,0.92)",
+                        color: loopEnabled ? "#1D4ED8" : "var(--foreground)",
+                        border: "1px solid rgba(15,23,42,0.08)",
+                      }}
+                    >
+                      <Repeat size={16} strokeWidth={2} />
+                      {copy.loop}
+                    </button>
+                    <div style={jamTransportSubtleBadgeStyle}>{metrics.tempo} BPM</div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center" style={{ gap: previewMode ? 12 : 18 }}>
+                    <div
+                      style={{
+                        minWidth: previewMode ? 86 : 108,
+                        padding: previewMode ? "10px 12px" : "12px 14px",
+                        borderRadius: 14,
+                        border: "1px solid var(--agentic-border)",
+                        backgroundColor: "var(--agentic-elevated)",
+                        color: "var(--agentic-foreground)",
+                        fontSize: previewMode ? 13 : 15,
+                        fontWeight: 700,
+                        textAlign: "center",
+                      }}
+                    >
+                      {transportPosition}
+                    </div>
+                  </div>
 
-              <div className="flex items-center" style={{ gap: previewMode ? 8 : 10 }}>
-                <button
-                  type="button"
-                  onClick={() => setLoopEnabled((prev) => !prev)}
-                  style={{
-                    ...bottomPillStyle,
-                    backgroundColor: loopEnabled
-                      ? "rgba(59,130,246,0.16)"
-                      : "var(--agentic-elevated)",
-                    color: loopEnabled ? "#DBEAFE" : "var(--agentic-control-text)",
-                  }}
-                >
-                  <Repeat size={16} strokeWidth={2} />
-                  {copy.loop}
-                </button>
-                <button type="button" style={bottomPillStyle}>
-                  {selectedTrack.name}
-                </button>
-                <button type="button" style={bottomPillStyle}>
-                  4/4
-                </button>
-                <button type="button" style={bottomPillStyle}>
-                  {metrics.tempo} BPM
-                </button>
-              </div>
+                  <div className="flex items-center" style={{ gap: previewMode ? 10 : 12 }}>
+                    <button
+                      type="button"
+                      onClick={() => seekToBeat(0)}
+                      aria-label={copy.returnToStart}
+                      style={transportStyle}
+                    >
+                      <SkipBack size={previewMode ? 20 : 24} strokeWidth={2.1} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!isPlaying && currentBeat >= metrics.maxTimelineBeat) {
+                          seekToBeat(0);
+                        }
+                        setIsPlaying((prev) => !prev);
+                      }}
+                      aria-label={isPlaying ? copy.pausePlayback : copy.startPlayback}
+                      style={{
+                        ...transportStyle,
+                        width: previewMode ? 52 : 58,
+                        height: previewMode ? 52 : 58,
+                        backgroundColor: "var(--agentic-marker)",
+                        color: "#FFFFFF",
+                        border: "none",
+                      }}
+                    >
+                      {isPlaying ? (
+                        <Pause size={previewMode ? 22 : 26} strokeWidth={2.2} />
+                      ) : (
+                        <Play size={previewMode ? 22 : 26} strokeWidth={2.2} />
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={copy.record}
+                      style={{ ...transportStyle, color: "var(--agentic-danger)" }}
+                    >
+                      <Circle size={previewMode ? 18 : 22} fill="currentColor" strokeWidth={2} />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center" style={{ gap: previewMode ? 8 : 10 }}>
+                    <button
+                      type="button"
+                      onClick={() => setLoopEnabled((prev) => !prev)}
+                      style={{
+                        ...bottomPillStyle,
+                        backgroundColor: loopEnabled
+                          ? "rgba(59,130,246,0.16)"
+                          : "var(--agentic-elevated)",
+                        color: loopEnabled ? "#DBEAFE" : "var(--agentic-control-text)",
+                      }}
+                    >
+                      <Repeat size={16} strokeWidth={2} />
+                      {copy.loop}
+                    </button>
+                    <button type="button" style={bottomPillStyle}>
+                      {selectedTrack.name}
+                    </button>
+                    <button type="button" style={bottomPillStyle}>
+                      4/4
+                    </button>
+                    <button type="button" style={bottomPillStyle}>
+                      {metrics.tempo} BPM
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
           {showAgentOverlay ? (
             <AgenticOverlayDock
               bottomTransportHeight={metrics.bottomTransportHeight}
+              experience={experience}
               producerWorkspaceVisible={producerWorkspaceVisible}
               producerMessages={producerMessages}
               audioQueue={audioQueue}
@@ -881,6 +1183,7 @@ export function AgenticProducingPage({
               lyricsDraft={lyricsDraft}
               producerDraft={producerDraft}
               producerWorkspaceOpen={producerWorkspaceOpen}
+              producerSuggestions={producerSuggestions}
               onTargetToggle={() =>
                 setOpenOverlayMenu((prev) => (prev === "target" ? null : "target"))
               }
@@ -896,7 +1199,7 @@ export function AgenticProducingPage({
               onGenerate={handleMusicianGenerate}
               onSelectMode={selectAgentMode}
               onDraftChange={setProducerDraft}
-              onDraftSubmit={handleProducerSubmit}
+              onDraftSubmit={(text) => handleProducerSubmit(text)}
               onOpenWorkspace={openProducerWorkspace}
             />
           ) : null}
@@ -1039,6 +1342,42 @@ function clampPan(pan: number) {
   return Math.max(-50, Math.min(50, pan));
 }
 
+function createJamRecordingClip(locale: "en" | "zh-CN") {
+  return {
+    id: "audio-take-a",
+    label: locale === "zh-CN" ? "Take 01" : "Take 01",
+    startBeat: 8,
+    durationBeats: 24,
+    fill: "linear-gradient(135deg, rgba(251, 113, 133, 0.96), rgba(239, 68, 68, 0.88))",
+    accent: "#FFF1F2",
+  };
+}
+
+function createJamBackingClip(
+  locale: "en" | "zh-CN",
+  source: "ai" | "lava" | "cloud",
+) {
+  const labelMap = {
+    ai: locale === "zh-CN" ? "Jazz x Metal Blend" : "Jazz x Metal Blend",
+    lava: locale === "zh-CN" ? "Lava Sunset Drive" : "Lava Sunset Drive",
+    cloud: locale === "zh-CN" ? "Imported Session Stem" : "Imported Session Stem",
+  } as const;
+
+  return {
+    id: `backing-track-${source}`,
+    label: labelMap[source],
+    startBeat: 0,
+    durationBeats: 48,
+    fill:
+      source === "ai"
+        ? "linear-gradient(135deg, rgba(96, 165, 250, 0.94), rgba(37, 99, 235, 0.9))"
+        : source === "lava"
+          ? "linear-gradient(135deg, rgba(45, 212, 191, 0.94), rgba(13, 148, 136, 0.9))"
+          : "linear-gradient(135deg, rgba(167, 139, 250, 0.94), rgba(124, 58, 237, 0.88))",
+    accent: "#EFF6FF",
+  };
+}
+
 const toolbarIconStyle: CSSProperties = {
   width: 44,
   height: 44,
@@ -1059,18 +1398,166 @@ const trackTogglePillStyle: CSSProperties = {
   cursor: "pointer",
 };
 
-const bottomIconStyle: CSSProperties = {
-  width: 44,
-  height: 44,
-  borderRadius: "var(--radius-control)",
-  border: "1px solid var(--agentic-border)",
-  backgroundColor: "var(--agentic-elevated)",
-  color: "var(--agentic-control-text)",
+const jamTrackCardStyle = (isSelected: boolean): CSSProperties => ({
+  borderRadius: 28,
+  border: `1px solid ${isSelected ? "rgba(59,130,246,0.24)" : "rgba(15,23,42,0.1)"}`,
+  backgroundColor: isSelected ? "rgba(255,255,255,1)" : "rgba(255,255,255,0.96)",
+  boxShadow: isSelected ? "0 18px 34px rgba(59,130,246,0.12)" : "0 12px 28px rgba(15,23,42,0.07)",
+  padding: "18px 18px 16px",
+});
+
+const jamTrackRoleStyle: CSSProperties = {
+  padding: "6px 12px",
+  borderRadius: 999,
+  backgroundColor: "rgba(226,232,240,0.9)",
+  color: "rgba(15,23,42,0.72)",
+  fontSize: 12,
+  fontWeight: 700,
+  flex: "0 0 auto",
+};
+
+const jamHeadphoneButtonStyle = (active: boolean): CSSProperties => ({
+  width: 40,
+  height: 40,
+  borderRadius: 999,
+  border: `1px solid ${active ? "rgba(59,130,246,0.22)" : "rgba(15,23,42,0.08)"}`,
+  backgroundColor: active ? "rgba(59,130,246,0.12)" : "rgba(248,250,252,0.92)",
+  color: active ? "#1D4ED8" : "rgba(15,23,42,0.72)",
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
   cursor: "pointer",
+  flexShrink: 0,
+});
+
+const jamSourceButtonStyle = (active: boolean): CSSProperties => ({
+  minHeight: 34,
+  padding: "0 12px",
+  borderRadius: 999,
+  border: `1px solid ${active ? "rgba(59,130,246,0.28)" : "rgba(15,23,42,0.12)"}`,
+  backgroundColor: active ? "rgba(59,130,246,0.16)" : "#FFFFFF",
+  color: active ? "#1D4ED8" : "rgba(15,23,42,0.82)",
+  fontSize: 12,
+  fontWeight: 700,
+  cursor: "pointer",
+});
+
+const jamEmptyLaneStyle = (
+  isBackingTrack: boolean,
+  isSelected: boolean,
+  trackRowHeight: number,
+  timelineLeadingInset: number,
+): CSSProperties => ({
+  position: "absolute",
+  left: timelineLeadingInset + 14,
+  top: 16,
+  minHeight: trackRowHeight - 32,
+  width: isBackingTrack ? "min(620px, calc(100% - 28px))" : "min(360px, calc(100% - 28px))",
+  padding: "16px 18px",
+  borderRadius: 24,
+  border: `1px dashed ${isSelected ? "rgba(59,130,246,0.24)" : "rgba(15,23,42,0.18)"}`,
+  backgroundColor: isSelected ? "rgba(255,255,255,0.98)" : "rgba(255,255,255,0.92)",
+  boxShadow: "0 12px 28px rgba(15,23,42,0.06)",
+});
+
+const jamEmptyLaneTitleStyle: CSSProperties = {
+  color: "var(--foreground)",
+  fontSize: 15,
+  fontWeight: 700,
+  lineHeight: 1.2,
 };
+
+const jamEmptyLaneHintStyle: CSSProperties = {
+  marginTop: 6,
+  color: "rgba(15,23,42,0.62)",
+  fontSize: 13,
+  lineHeight: 1.35,
+};
+
+const jamEmptyLaneActionStyle: CSSProperties = {
+  minHeight: 34,
+  padding: "0 12px",
+  borderRadius: 999,
+  border: "1px solid rgba(15,23,42,0.12)",
+  backgroundColor: "#FFFFFF",
+  color: "rgba(15,23,42,0.84)",
+  fontSize: 12,
+  fontWeight: 700,
+  cursor: "pointer",
+};
+
+const jamEmptyLanePrimaryActionStyle: CSSProperties = {
+  ...jamEmptyLaneActionStyle,
+  backgroundColor: "rgba(59,130,246,0.12)",
+  border: "1px solid rgba(59,130,246,0.2)",
+  color: "#1D4ED8",
+};
+
+const jamTransportBadgeStyle: CSSProperties = {
+  minWidth: 104,
+  padding: "12px 14px",
+  borderRadius: 18,
+  border: "1px solid rgba(15,23,42,0.08)",
+  backgroundColor: "rgba(255,255,255,0.96)",
+  color: "var(--foreground)",
+  fontSize: 15,
+  fontWeight: 700,
+  textAlign: "center",
+};
+
+const jamTransportSubtleBadgeStyle: CSSProperties = {
+  minHeight: 44,
+  padding: "0 14px",
+  borderRadius: 999,
+  border: "1px solid rgba(15,23,42,0.08)",
+  backgroundColor: "rgba(255,255,255,0.88)",
+  color: "rgba(15,23,42,0.72)",
+  fontSize: 14,
+  fontWeight: 600,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+const jamTransportButtonStyle: CSSProperties = {
+  width: 50,
+  height: 50,
+  borderRadius: 18,
+  border: "1px solid rgba(15,23,42,0.1)",
+  backgroundColor: "#FFFFFF",
+  color: "rgba(15,23,42,0.8)",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  cursor: "pointer",
+  boxShadow: "0 10px 24px rgba(15,23,42,0.08)",
+};
+
+const jamTransportPrimaryButtonStyle: CSSProperties = {
+  ...jamTransportButtonStyle,
+  backgroundColor: "#2563EB",
+  border: "none",
+  color: "#FFFFFF",
+};
+
+const jamRecordButtonStyle = (isRecording: boolean): CSSProperties => ({
+  ...jamTransportButtonStyle,
+  backgroundColor: isRecording ? "#EF4444" : "#FFFFFF",
+  color: isRecording ? "#FFFFFF" : "#EF4444",
+  border: isRecording ? "none" : "1px solid rgba(239,68,68,0.22)",
+});
+
+const jamOrAgenticSliderStyle = (isJamExperience: boolean): CSSProperties => ({
+  width: "100%",
+  appearance: "none",
+  height: isJamExperience ? 20 : 24,
+  borderRadius: 999,
+  background: isJamExperience
+    ? "linear-gradient(90deg, rgba(59,130,246,0.18), rgba(226,232,240,0.92))"
+    : "linear-gradient(90deg, rgba(255,255,255,0.14), rgba(16,16,16,0.96))",
+  outline: "none",
+  cursor: "pointer",
+});
 
 const transportStyle: CSSProperties = {
   width: 50,

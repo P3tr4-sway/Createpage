@@ -203,7 +203,7 @@ export function useAgenticTimelineController({
       );
 
       if (Math.abs(timelineBody.scrollLeft - nextScrollLeft) > 1) {
-        timelineBody.scrollTo({ left: nextScrollLeft });
+        scrollTimelineBody(timelineBody, nextScrollLeft);
       }
       return;
     }
@@ -214,17 +214,15 @@ export function useAgenticTimelineController({
     const rightPadding = 92;
 
     if (markerX < viewportStart + leftPadding) {
-      timelineBody.scrollTo({ left: Math.max(markerX - leftPadding, 0) });
+      scrollTimelineBody(timelineBody, Math.max(markerX - leftPadding, 0));
       return;
     }
 
     if (markerX > viewportEnd - rightPadding) {
-      timelineBody.scrollTo({
-        left: Math.min(
-          markerX - timelineBody.clientWidth + rightPadding,
-          maxScrollLeft,
-        ),
-      });
+      scrollTimelineBody(
+        timelineBody,
+        Math.min(markerX - timelineBody.clientWidth + rightPadding, maxScrollLeft),
+      );
     }
   }, [
     currentBeat,
@@ -258,4 +256,13 @@ export function useAgenticTimelineController({
     timelinePaneRef,
     transportPosition,
   };
+}
+
+function scrollTimelineBody(element: HTMLDivElement, left: number) {
+  if (typeof element.scrollTo === "function") {
+    element.scrollTo({ left });
+    return;
+  }
+
+  element.scrollLeft = left;
 }

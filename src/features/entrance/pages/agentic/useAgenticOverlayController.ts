@@ -111,8 +111,8 @@ export function useAgenticOverlayController({
     setProducerWorkspaceOpen(true);
   }, [setOpenOverlayMenu, setProducerWorkspaceOpen]);
 
-  const handleProducerSubmit = useCallback(() => {
-    const nextDraft = producerDraft.trim();
+  const handleProducerSubmit = useCallback((nextText?: string) => {
+    const nextDraft = (nextText ?? producerDraft).trim();
     if (!nextDraft) {
       return;
     }

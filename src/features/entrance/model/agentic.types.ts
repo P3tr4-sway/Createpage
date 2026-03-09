@@ -22,6 +22,8 @@ export type ArrangementTrack = {
 };
 
 export type AgentMode = "musician" | "producer";
+export type AgenticExperience = "default" | "jam";
+export type JamSuggestionStage = "pre-record" | "post-record" | "second-track";
 
 export type MusicianTargetId =
   | "ai-drummer"
