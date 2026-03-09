@@ -220,7 +220,7 @@ const libraryFilters = new Set(["Saved", "Hot", "New"]);
 
 function LooperDialGraphic() {
   return (
-    <div className="relative aspect-square w-full max-w-[760px]">
+    <div className="relative aspect-square w-full max-w-[620px]">
       <div
         className="absolute inset-0 rounded-full"
         style={{
@@ -280,6 +280,9 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
   const [activeFilter, setActiveFilter] = useState("Hot");
   const [selectedTrackId, setSelectedTrackId] = useState(tracks[0]?.id ?? "");
   const [libraryCollapsed, setLibraryCollapsed] = useState(false);
+  const expandedLibraryWidth = 348;
+  const collapsedLibraryWidth = 92;
+  const libraryWidth = libraryCollapsed ? collapsedLibraryWidth : expandedLibraryWidth;
 
   useEffect(() => {
     setActiveFilter(filters.includes(initialFilter) ? initialFilter : "Hot");
@@ -322,14 +325,14 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
 
   return (
     <section
-      className="relative flex h-full min-h-[960px] w-full flex-col overflow-hidden"
+      className="relative flex h-full min-h-[760px] w-full flex-col overflow-hidden"
       style={{
         fontFamily: "var(--app-font-family)",
         backgroundColor: "var(--card)",
       }}
     >
       <div
-        className="relative z-20 flex items-start justify-between px-6 pb-0 pt-5 xl:px-8"
+        className="relative z-20 flex items-start justify-between px-6 pb-0 pt-4 xl:px-8"
         style={{
           backgroundColor: "transparent",
         }}
@@ -381,16 +384,22 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
       </div>
 
       <div className="relative min-h-0 flex-1 overflow-hidden">
-        <div className="absolute inset-0 flex min-h-0 items-center justify-center overflow-hidden px-4 py-8 xl:px-8 xl:py-10">
-          <div className="relative z-10 flex h-full w-full max-w-[1120px] flex-col items-center justify-center">
+        <div
+          className="absolute inset-0 flex min-h-0 items-center justify-center overflow-hidden px-4 py-6 xl:px-8 xl:py-8"
+          style={{
+            paddingRight: libraryWidth + 40,
+            transition: "padding-right 220ms ease",
+          }}
+        >
+          <div className="relative z-10 flex h-full w-full max-w-[980px] flex-col items-center justify-center">
             <LooperDialGraphic />
 
-            <div className="mt-8 flex max-w-[720px] flex-col items-center gap-3 text-center">
+            <div className="mt-6 flex max-w-[640px] flex-col items-center gap-2.5 text-center">
               <h3
                 style={{
                   margin: 0,
                   color: "var(--foreground)",
-                  fontSize: "clamp(32px, 3.4vw, 56px)",
+                  fontSize: "clamp(28px, 3vw, 46px)",
                   fontWeight: "var(--font-weight-bold)",
                   lineHeight: 0.96,
                 }}
@@ -408,16 +417,16 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
               >
                 {copy.workspaceHint}
               </p>
-              <div className="flex flex-wrap items-center justify-center gap-2.5">
+              <div className="flex flex-wrap items-center justify-center gap-2">
                 {selectedFacts.map((fact) => (
                   <span
                     key={fact}
-                    className="rounded-full px-4 py-2"
+                    className="rounded-full px-3.5 py-1.5"
                     style={{
                       border: "1px solid rgba(148, 163, 184, 0.16)",
                       backgroundColor: "var(--card)",
                       color: "var(--foreground)",
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: 700,
                     }}
                   >
@@ -430,11 +439,11 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
         </div>
 
         <aside
-          className="absolute inset-y-0 right-0 z-20 flex min-h-[420px] flex-col border-l px-4 py-5 xl:min-h-0 xl:px-5 xl:py-6"
+          className="absolute inset-y-0 right-0 z-20 flex min-h-[360px] flex-col border-l px-3.5 py-4 xl:min-h-0 xl:px-4 xl:py-5"
           style={{
             borderColor: "var(--border)",
             backgroundColor: "var(--card)",
-            width: libraryCollapsed ? 104 : 399,
+            width: libraryWidth,
             transition: "width 220ms ease",
           }}
         >
@@ -536,7 +545,7 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
                 {copy.activeFilterLabel}: {activeFilterLabel}
               </p>
               <div
-                className="mt-4 flex gap-3 overflow-x-auto pb-2"
+                className="mt-4 flex gap-2.5 overflow-x-auto pb-2"
                 style={{ WebkitOverflowScrolling: "touch" }}
               >
                 {filters.map((filter) => {
@@ -547,16 +556,16 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
                       key={filter}
                       type="button"
                       onClick={() => setActiveFilter(filter)}
-                      className="tablet-touch-target tablet-pressable inline-flex h-[56px] shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-full border px-7"
+                      className="tablet-touch-target tablet-pressable inline-flex h-[48px] shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-full border px-[22px]"
                       style={{
                         borderColor: isActive
                           ? "var(--chip-active-border)"
                           : "rgba(148, 163, 184, 0.18)",
                         backgroundColor: isActive ? "var(--chip-active-bg)" : "var(--chip-bg)",
                         color: isActive ? "var(--chip-active-text)" : "var(--chip-text)",
-                        fontSize: 13,
+                        fontSize: 12,
                         fontWeight: isActive ? 700 : 600,
-                        minWidth: 88,
+                        minWidth: 80,
                       }}
                     >
                       {isDrumless ? <CirclePlus size={14} strokeWidth={1.8} /> : null}
@@ -588,7 +597,7 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
             className="flex min-h-0 flex-1 flex-col overflow-y-auto pr-1"
             style={{
               maxHeight: "100%",
-              marginTop: libraryCollapsed ? 8 : 16,
+              marginTop: libraryCollapsed ? 8 : 14,
               gap: libraryCollapsed ? 10 : 8,
             }}
           >
@@ -610,7 +619,7 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
                     boxShadow: isSelected
                       ? "inset 0 0 0 1px color-mix(in srgb, var(--foreground) 12%, transparent)"
                       : "none",
-                    padding: libraryCollapsed ? 6 : "10px 10px 10px 12px",
+                    padding: libraryCollapsed ? 6 : "8px 8px 8px 10px",
                   }}
                 >
                   <div
@@ -624,7 +633,7 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
                       className="relative overflow-hidden"
                       style={{
                         borderRadius: libraryCollapsed ? 14 : 16,
-                        minHeight: libraryCollapsed ? 68 : 52,
+                        minHeight: libraryCollapsed ? 64 : 48,
                         width: libraryCollapsed ? "100%" : 52,
                         flexShrink: 0,
                         backgroundColor: "var(--soft-surface)",
@@ -646,42 +655,42 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
 
                     {libraryCollapsed ? null : (
                       <div className="min-w-0">
-                      <div className="flex items-center gap-3">
-                        <div className="min-w-0 flex-1">
-                          <h4
-                            className="truncate"
-                            style={{
-                              margin: 0,
-                              color: "var(--foreground)",
-                              fontSize: 15,
-                              fontWeight: "var(--font-weight-bold)",
-                              lineHeight: 1.1,
-                            }}
-                          >
-                            {track.title}
-                          </h4>
-                          <p
-                            className="truncate"
-                            style={{
-                              margin: "4px 0 0",
-                              color: "var(--secondary)",
-                              fontSize: 12,
-                              fontWeight: 600,
-                              lineHeight: 1.35,
-                            }}
-                          >
-                            {track.meta}
-                          </p>
-                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="min-w-0 flex-1">
+                            <h4
+                              className="truncate"
+                              style={{
+                                margin: 0,
+                                color: "var(--foreground)",
+                                fontSize: 15,
+                                fontWeight: "var(--font-weight-bold)",
+                                lineHeight: 1.1,
+                              }}
+                            >
+                              {track.title}
+                            </h4>
+                            <p
+                              className="truncate"
+                              style={{
+                                margin: "4px 0 0",
+                                color: "var(--secondary)",
+                                fontSize: 12,
+                                fontWeight: 600,
+                                lineHeight: 1.35,
+                              }}
+                            >
+                              {track.meta}
+                            </p>
+                          </div>
 
-                        <div className="ml-auto flex items-center justify-end">
-                          <ChevronRight
-                            size={16}
-                            strokeWidth={1.8}
-                            style={{ color: "var(--secondary)", flexShrink: 0 }}
-                          />
+                          <div className="ml-auto flex items-center justify-end">
+                            <ChevronRight
+                              size={16}
+                              strokeWidth={1.8}
+                              style={{ color: "var(--secondary)", flexShrink: 0 }}
+                            />
+                          </div>
                         </div>
-                      </div>
                       </div>
                     )}
                   </div>
