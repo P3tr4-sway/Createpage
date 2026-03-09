@@ -2,7 +2,7 @@ import { useReducer } from "react";
 
 export type SectionId = "studio" | "launch" | "community";
 export type EntranceBoard = "play" | "create";
-export type FullscreenView = "agentic-producing" | null;
+export type FullscreenView = "agentic-producing" | "jamy" | null;
 export type HomeSubView =
   | "home"
   | "looper"

@@ -1,4 +1,9 @@
-import { type CSSProperties, type PointerEvent as ReactPointerEvent, useRef } from "react";
+import {
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+  useMemo,
+  useRef,
+} from "react";
 import {
   X,
   Undo2,
@@ -19,8 +24,11 @@ import { Slider } from "@/app/components/ui/slider";
 import { AgenticOverlayDock } from "@/features/entrance/components/AgenticOverlayDock";
 import { useEntranceLocale } from "@/features/entrance/EntranceLocaleContext";
 import { agenticCopyByLocale } from "@/features/entrance/i18n/agentic.copy";
+import {
+  getInitialTracksForLocale,
+  getMusicianTargetsForLocale,
+} from "@/features/entrance/model/agentic.mock";
 import type { ArrangementTrack } from "@/features/entrance/model/agentic.types";
-import { getMusicianTargetsForLocale } from "@/features/entrance/model/agentic.mock";
 import { useAgenticOverlayController } from "@/features/entrance/pages/agentic/useAgenticOverlayController";
 import { useAgenticTimelineController } from "@/features/entrance/pages/agentic/useAgenticTimelineController";
 import { useAgenticSessionState } from "@/features/entrance/state/useAgenticSessionState";
@@ -28,14 +36,26 @@ import { useAgenticSessionState } from "@/features/entrance/state/useAgenticSess
 interface AgenticProducingPageProps {
   onBack?: () => void;
   previewMode?: boolean;
+  projectTitle?: string;
+  showAgentOverlay?: boolean;
+  allowAddTrack?: boolean;
+  initialTracks?: ArrangementTrack[];
 }
 export function AgenticProducingPage({
   onBack,
   previewMode = false,
+  projectTitle,
+  showAgentOverlay: showAgentOverlayProp,
+  allowAddTrack = true,
+  initialTracks,
 }: AgenticProducingPageProps) {
   const locale = useEntranceLocale();
   const copy = agenticCopyByLocale[locale];
   const localizedTargets = getMusicianTargetsForLocale(locale);
+  const resolvedInitialTracks = useMemo(
+    () => initialTracks ?? getInitialTracksForLocale(locale),
+    [initialTracks, locale],
+  );
   const {
     tracks,
     selectedTrackId,
@@ -84,11 +104,13 @@ export function AgenticProducingPage({
     defaultLyricsDraft: copy.defaultLyricsDraft,
     trackName: copy.trackName,
     ideaLane: copy.ideaLane,
+    initialTracks: resolvedInitialTracks,
   });
 
-  const showAgentOverlay = !previewMode;
+  const showAgentOverlay = showAgentOverlayProp ?? !previewMode;
   const showProjectTitle = !previewMode;
   const showBackButton = !previewMode && typeof onBack === "function";
+  const pageTitle = projectTitle ?? copy.projectTitle;
   const selectedTrack = tracks.find((track) => track.id === selectedTrackId) ?? tracks[0];
   const selectedMusicianTarget =
     localizedTargets.find((target) => target.id === musicianTargetId) ?? localizedTargets[0];
@@ -187,11 +209,11 @@ export function AgenticProducingPage({
                   fontWeight: 700,
                   letterSpacing: "0.01em",
                 }}
-              >
-                {copy.projectTitle}
-              </h2>
-            ) : (
-              <div />
+                >
+                  {pageTitle}
+                </h2>
+              ) : (
+                <div />
             )}
 
             <div className="flex items-center gap-2">
@@ -272,22 +294,26 @@ export function AgenticProducingPage({
                     </div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={addTrack}
-                    aria-label={copy.addTrack}
-                    className="tablet-touch-target tablet-pressable inline-flex items-center justify-center"
-                    style={{
-                      width: previewMode ? 28 : 32,
-                      height: previewMode ? 28 : 32,
-                      borderRadius: "var(--radius-control)",
-                      border: "none",
-                      backgroundColor: "transparent",
-                      color: "var(--agentic-contrast)",
-                    }}
-                  >
-                    <Plus size={previewMode ? 14 : 16} strokeWidth={2.2} />
-                  </button>
+                  {allowAddTrack ? (
+                    <button
+                      type="button"
+                      onClick={addTrack}
+                      aria-label={copy.addTrack}
+                      className="tablet-touch-target tablet-pressable inline-flex items-center justify-center"
+                      style={{
+                        width: previewMode ? 28 : 32,
+                        height: previewMode ? 28 : 32,
+                        borderRadius: "var(--radius-control)",
+                        border: "none",
+                        backgroundColor: "transparent",
+                        color: "var(--agentic-contrast)",
+                      }}
+                    >
+                      <Plus size={previewMode ? 14 : 16} strokeWidth={2.2} />
+                    </button>
+                  ) : (
+                    <div style={{ width: previewMode ? 28 : 32, height: previewMode ? 28 : 32 }} />
+                  )}
                 </div>
 
                 <div className="min-h-0 flex-1 overflow-hidden">

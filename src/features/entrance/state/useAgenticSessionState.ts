@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Locale } from "@/features/entrance/EntranceLocaleContext";
 import {
   getInitialAudioQueueForLocale,
@@ -21,6 +21,7 @@ interface UseAgenticSessionStateParams {
   defaultLyricsDraft: string;
   trackName: (index: number) => string;
   ideaLane: string;
+  initialTracks?: ArrangementTrack[];
 }
 
 export function useAgenticSessionState({
@@ -28,10 +29,15 @@ export function useAgenticSessionState({
   defaultLyricsDraft,
   trackName,
   ideaLane,
+  initialTracks,
 }: UseAgenticSessionStateParams) {
-  const [tracks, setTracks] = useState(() => getInitialTracksForLocale(locale));
+  const resolvedInitialTracks = useMemo(
+    () => initialTracks ?? getInitialTracksForLocale(locale),
+    [initialTracks, locale],
+  );
+  const [tracks, setTracks] = useState(() => resolvedInitialTracks);
   const [selectedTrackId, setSelectedTrackId] = useState(
-    () => getInitialTracksForLocale(locale)[0].id,
+    () => resolvedInitialTracks[0]?.id ?? "",
   );
   const [mutedTrackIds, setMutedTrackIds] = useState<string[]>([]);
   const [soloTrackIds, setSoloTrackIds] = useState<string[]>([]);
@@ -57,7 +63,7 @@ export function useAgenticSessionState({
     useState<GenerationHistoryItem[]>(() => getInitialGenerationHistoryForLocale(locale));
 
   useEffect(() => {
-    const nextTracks = getInitialTracksForLocale(locale);
+    const nextTracks = resolvedInitialTracks;
     setTracks(nextTracks);
     setSelectedTrackId(nextTracks[0]?.id ?? "");
     setMutedTrackIds([]);
@@ -78,7 +84,7 @@ export function useAgenticSessionState({
     setProducerMessages(getInitialProducerMessagesForLocale(locale));
     setAudioQueue(getInitialAudioQueueForLocale(locale));
     setGenerationHistory(getInitialGenerationHistoryForLocale(locale));
-  }, [defaultLyricsDraft, locale]);
+  }, [defaultLyricsDraft, locale, resolvedInitialTracks]);
 
   const pushQueueItem = (item: AudioQueueItem) => {
     setAudioQueue((prev) => [item, ...prev].slice(0, 6));

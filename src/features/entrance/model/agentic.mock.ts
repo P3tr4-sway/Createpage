@@ -28,6 +28,49 @@ export const initialTracks: ArrangementTrack[] = [
   },
 ];
 
+const jamyTracks: ArrangementTrack[] = [
+  {
+    id: "audio",
+    name: "Audio",
+    icon: "default",
+    role: "Capture",
+    level: "-6.0 dB",
+    defaultVolume: 74,
+    volume: 74,
+    pan: -4,
+    clips: [
+      {
+        id: "audio-take-a",
+        label: "Take 01",
+        startBeat: 8,
+        durationBeats: 48,
+        fill: "linear-gradient(135deg, rgba(248, 113, 113, 0.96), rgba(185, 28, 28, 0.92))",
+        accent: "#FFF1F2",
+      },
+    ],
+  },
+  {
+    id: "backing-track",
+    name: "Backing Track",
+    icon: "default",
+    role: "Guide",
+    level: "-3.0 dB",
+    defaultVolume: 82,
+    volume: 82,
+    pan: 4,
+    clips: [
+      {
+        id: "backing-track-a",
+        label: "Midnight Neo-Soul",
+        startBeat: 0,
+        durationBeats: 96,
+        fill: "linear-gradient(135deg, rgba(96, 165, 250, 0.96), rgba(37, 99, 235, 0.92))",
+        accent: "#EFF6FF",
+      },
+    ],
+  },
+];
+
 export const musicianTargets: MusicianTarget[] = [
   {
     id: "ai-drummer",
@@ -88,6 +131,33 @@ export function getInitialTracksForLocale(locale: Locale) {
       : null;
 
   return initialTracks.map((track) => ({
+    ...track,
+    name: trackNameMap?.[track.id as keyof typeof trackNameMap]?.name ?? track.name,
+    role: trackNameMap?.[track.id as keyof typeof trackNameMap]?.role ?? track.role,
+    clips: track.clips.map((clip) => ({
+      ...clip,
+      label: clipLabelMap?.[clip.id as keyof typeof clipLabelMap] ?? clip.label,
+    })),
+  }));
+}
+
+export function getJamyTracksForLocale(locale: Locale) {
+  const trackNameMap =
+    locale === "zh-CN"
+      ? {
+          audio: { name: "Audio", role: "录音" },
+          "backing-track": { name: "Backing Track", role: "伴奏" },
+        }
+      : null;
+  const clipLabelMap =
+    locale === "zh-CN"
+      ? {
+          "audio-take-a": "Take 01",
+          "backing-track-a": "午夜 Neo-Soul",
+        }
+      : null;
+
+  return jamyTracks.map((track) => ({
     ...track,
     name: trackNameMap?.[track.id as keyof typeof trackNameMap]?.name ?? track.name,
     role: trackNameMap?.[track.id as keyof typeof trackNameMap]?.role ?? track.role,

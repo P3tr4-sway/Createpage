@@ -33,6 +33,7 @@ describe("useEntranceWorkspaceController", () => {
 
     act(() => {
       result.current.openAgenticWorkspace();
+      result.current.openJamyWorkspace();
       result.current.openLooperWorkspace("Rock");
       result.current.openBackingTrackWorkspace("Blues");
       result.current.openHeroPrompt();
@@ -41,6 +42,7 @@ describe("useEntranceWorkspaceController", () => {
     });
 
     expect(setFullscreenView).toHaveBeenCalledWith("agentic-producing");
+    expect(setFullscreenView).toHaveBeenCalledWith("jamy");
     expect(setActiveBoard).toHaveBeenCalledWith("create");
     expect(setActiveBoard).toHaveBeenCalledWith("play");
     expect(setActiveSubView).toHaveBeenCalledWith("looper");

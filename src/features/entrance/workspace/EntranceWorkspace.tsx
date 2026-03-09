@@ -13,6 +13,7 @@ import { useEffect, useMemo, useState } from "react";
 import { EntranceLocaleProvider, type Locale } from "@/features/entrance/EntranceLocaleContext";
 import { AgenticProducingPage } from "@/features/entrance/pages/AgenticProducingPage";
 import { InstantBackingTrackPage } from "@/features/entrance/pages/InstantBackingTrackPage";
+import { JamyPage } from "@/features/entrance/pages/JamyPage";
 import { LooperPage } from "@/features/entrance/pages/LooperPage";
 import { ProjectsSheet } from "@/features/entrance/components/ProjectsSheet";
 import { TemplateSheet } from "@/features/entrance/components/TemplateSheet";
@@ -129,6 +130,7 @@ export function EntranceWorkspace() {
     handleScrollTo,
     handleScroll,
     openAgenticWorkspace,
+    openJamyWorkspace,
     openLooperWorkspace,
     openBackingTrackWorkspace,
     openTemplate,
@@ -185,7 +187,7 @@ export function EntranceWorkspace() {
               id: "jamy",
               label: "Start Jam",
               icon: Guitar,
-              onClick: () => handleScrollTo("launch"),
+              onClick: openJamyWorkspace,
             },
             {
               id: "backing-track",
@@ -320,6 +322,14 @@ export function EntranceWorkspace() {
     );
   }
 
+  if (fullscreenView === "jamy") {
+    return (
+      <EntranceLocaleProvider locale={locale}>
+        <JamyPage onBack={() => setFullscreenView(null)} />
+      </EntranceLocaleProvider>
+    );
+  }
+
   return (
     <EntranceLocaleProvider locale={locale}>
       <div
@@ -339,7 +349,12 @@ export function EntranceWorkspace() {
             backdropFilter: "blur(20px)",
           }}
         >
-          <div className="flex h-full w-full items-stretch">
+          <div
+            className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center"
+            style={{
+              gap: 18,
+            }}
+          >
             {(["play", "create"] as const).map((board) => {
               const isActive = activeBoard === board;
 
@@ -348,12 +363,16 @@ export function EntranceWorkspace() {
                   key={board}
                   type="button"
                   onClick={() => switchBoard(board)}
-                  className="tablet-touch-target tablet-pressable flex-1"
+                  className="tablet-touch-target tablet-pressable"
                   style={{
+                    minWidth: 0,
+                    height: "auto",
+                    padding: 0,
                     border: "none",
+                    borderRadius: 0,
                     backgroundColor: "transparent",
                     color: isActive ? "var(--foreground)" : "var(--secondary)",
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: isActive ? 700 : 520,
                     letterSpacing: isActive ? "0.01em" : "0.02em",
                   }}
@@ -550,7 +569,7 @@ export function EntranceWorkspace() {
                           </div>
 
                           <div className="flex min-h-full flex-col">
-                            <JamWithAI />
+                            <JamWithAI onLaunch={openJamyWorkspace} />
                           </div>
                         </div>
 

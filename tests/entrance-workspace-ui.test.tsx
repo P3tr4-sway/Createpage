@@ -23,8 +23,16 @@ vi.mock("../src/features/entrance/pages/AgenticProducingPage", () => ({
   ),
 }));
 
+vi.mock("../src/features/entrance/pages/JamyPage", () => ({
+  JamyPage: () => <div>jamy-page</div>,
+}));
+
 vi.mock("../src/features/entrance/components/JamWithAI", () => ({
-  JamWithAI: () => <div>jam-with-ai</div>,
+  JamWithAI: ({ onLaunch }: { onLaunch?: () => void }) => (
+    <button type="button" onClick={onLaunch}>
+      jam-with-ai
+    </button>
+  ),
 }));
 
 vi.mock("../src/features/entrance/components/ProjectsSheet", () => ({
@@ -209,5 +217,16 @@ describe("EntranceWorkspace integration", () => {
     expect(screen.getByText("jam-with-ai")).toBeInTheDocument();
     expect(screen.getByText("Start playing right away.")).toBeInTheDocument();
     expect(screen.queryByText("Start with the idea.")).not.toBeInTheDocument();
+  });
+
+  it("opens Jamy from the play card", () => {
+    window.localStorage.setItem(LOCALE_STORAGE_KEY, "en");
+
+    render(<EntranceWorkspace />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Play" }));
+    fireEvent.click(screen.getByRole("button", { name: "jam-with-ai" }));
+
+    expect(screen.getByText("jamy-page")).toBeInTheDocument();
   });
 });

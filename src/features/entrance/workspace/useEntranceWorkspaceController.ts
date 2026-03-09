@@ -172,6 +172,11 @@ export function useEntranceWorkspaceController({
     setFullscreenView("agentic-producing");
   }, [setActiveBoard, setFullscreenView]);
 
+  const openJamyWorkspace = useCallback(() => {
+    setActiveBoard("play");
+    setFullscreenView("jamy");
+  }, [setActiveBoard, setFullscreenView]);
+
   const openLooperWorkspace = useCallback((filter: string) => {
     setActiveBoard("play");
     setLooperInitialFilter(filter);
@@ -264,6 +269,7 @@ export function useEntranceWorkspaceController({
     handleScrollTo,
     handleScroll,
     openAgenticWorkspace,
+    openJamyWorkspace,
     openLooperWorkspace,
     openBackingTrackWorkspace,
     switchBoard,

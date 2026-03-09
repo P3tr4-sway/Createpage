@@ -1,48 +1,41 @@
-import { useState } from "react";
-import { Send } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { useEntranceLocale } from "@/features/entrance/EntranceLocaleContext";
 import { useHasCoarsePointer } from "@/shared/hooks/use-mobile";
 
-const promptSuggestionsByLocale = {
-  en: ["Lo-fi 75 bpm", "Neo-soul E major", "Ambient wide pads"],
-  "zh-CN": ["Lo-fi 75 BPM", "Neo-Soul E 大调", "宽阔的 Ambient Pad"],
-} as const;
-
 const jamCopyByLocale = {
   en: {
     title: "Jamy",
-    subtitle: "Start with a vibe.",
-    placeholder: "Describe a vibe",
-    action: "Jam",
+    subtitle: "Open a stripped-back DAW and jam against a backing track.",
+    action: "Open Jamy",
   },
   "zh-CN": {
-    title: "即兴",
-    subtitle: "从一种 vibe 开始。",
-    placeholder: "描述一种感觉",
-    action: "开始 Jam",
+    title: "Jamy",
+    subtitle: "打开一个更轻量的 DAW，直接对着 backing track 开始 jam。",
+    action: "打开 Jamy",
   },
 } as const;
 
-export function JamWithAI() {
+interface JamWithAIProps {
+  onLaunch?: () => void;
+}
+
+export function JamWithAI({ onLaunch }: JamWithAIProps) {
   const locale = useEntranceLocale();
   const copy = jamCopyByLocale[locale];
-  const promptSuggestions = promptSuggestionsByLocale[locale];
-  const [inputValue, setInputValue] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const hasCoarsePointer = useHasCoarsePointer();
 
-  const handleSuggestionClick = (suggestion: string) => {
-    setInputValue(suggestion);
-  };
-
   return (
-    <div
-      className="relative flex h-full flex-col overflow-hidden rounded-card border border-border p-6"
+    <motion.button
+      type="button"
+      onClick={onLaunch}
+      whileHover={hasCoarsePointer ? undefined : { scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
+      className="tablet-touch-target tablet-pressable relative flex h-full w-full flex-col overflow-hidden rounded-card border border-border p-6 text-left"
       style={{ backgroundColor: "var(--card)" }}
     >
-      <div className="flex items-center justify-between mb-2">
+      <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h3
             style={{
@@ -157,89 +150,21 @@ export function JamWithAI() {
         </div>
       </div>
 
-      <div className="mb-3 flex gap-3">
-        <div
-          className="flex-1 flex items-center gap-3 px-4 py-3 rounded-[var(--radius-control)] border transition-colors"
-          style={{
-            minHeight: "var(--touch-target-comfortable)",
-            backgroundColor: "var(--input-background)",
-            borderColor: isFocused
-              ? "var(--secondary)"
-              : "var(--border)",
-          }}
-        >
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            placeholder={copy.placeholder}
-            className="flex-1 bg-transparent outline-none"
-            style={{
-              color: "var(--foreground)",
-              fontSize: "var(--text-sm)",
-              fontWeight: "var(--font-weight-normal)",
-              fontFamily: "var(--app-font-family)",
-            }}
-          />
-        </div>
-        <motion.button
-          type="button"
-          className="tablet-touch-target tablet-pressable flex items-center gap-2"
-          style={{
-            backgroundColor: "var(--foreground)",
-            color: "var(--background)",
-            fontSize: "var(--text-sm)",
-            fontWeight: "var(--font-weight-bold)",
-            fontFamily: "var(--app-font-family)",
-            minWidth: 96,
-            padding: "0 18px",
-            borderRadius: "var(--radius-control)",
-            border: "none",
-            whiteSpace: "nowrap",
-            letterSpacing: "0.04em",
-          }}
-          whileHover={hasCoarsePointer ? undefined : { scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-        >
-          {copy.action}
-          <Send size={14} strokeWidth={1.5} />
-        </motion.button>
+      <div
+        className="mt-auto inline-flex items-center gap-2 self-start rounded-[var(--radius-control)] border px-4 py-3"
+        style={{
+          minHeight: "var(--touch-target-comfortable)",
+          borderColor: "var(--border)",
+          backgroundColor: "var(--soft-surface)",
+          color: "var(--foreground)",
+          fontSize: "var(--text-sm)",
+          fontWeight: "var(--font-weight-bold)",
+          fontFamily: "var(--app-font-family)",
+        }}
+      >
+        {copy.action}
+        <ArrowUpRight size={14} strokeWidth={1.8} />
       </div>
-
-      <div className="mt-auto flex flex-wrap gap-2">
-        {promptSuggestions.map((suggestion) => (
-          <motion.button
-            key={suggestion}
-            type="button"
-            onClick={() => handleSuggestionClick(suggestion)}
-            className="tablet-touch-target tablet-pressable rounded-[var(--radius-pill)] border px-4"
-            style={{
-              borderColor: "var(--border)",
-              color: "var(--secondary)",
-              fontSize: "var(--text-sm)",
-              fontWeight: "var(--font-weight-normal)",
-              fontFamily: "var(--app-font-family)",
-              backgroundColor: "transparent",
-              opacity: 0.85,
-            }}
-            whileHover={
-              hasCoarsePointer
-                ? undefined
-                : {
-                    backgroundColor: "var(--soft-surface-strong)",
-                    color: "var(--foreground)",
-                    opacity: 1,
-                  }
-            }
-            whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-          >
-            {suggestion}
-          </motion.button>
-        ))}
-      </div>
-    </div>
+    </motion.button>
   );
 }
