@@ -692,7 +692,6 @@ export function EntranceWorkspace() {
                       >
                         <div className="mb-4 flex items-center justify-between">
                           <div>
-                            <p style={eyebrowStyle}>{copy.browseEyebrow}</p>
                             <h3 style={sectionTitleStyle}>{copy.browseTitle}</h3>
                           </div>
                         </div>

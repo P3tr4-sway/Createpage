@@ -1,4 +1,3 @@
-import { ArrowUpRight } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { useEntranceLocale } from "@/features/entrance/EntranceLocaleContext";
 import { useHasCoarsePointer } from "@/shared/hooks/use-mobile";
@@ -7,12 +6,10 @@ const jamCopyByLocale = {
   en: {
     title: "Jamy",
     subtitle: "Open a stripped-back DAW and jam against a backing track.",
-    action: "Open Jamy",
   },
   "zh-CN": {
     title: "Jamy",
     subtitle: "打开一个更轻量的 DAW，直接对着 backing track 开始 jam。",
-    action: "打开 Jamy",
   },
 } as const;
 
@@ -148,22 +145,6 @@ export function JamWithAI({ onLaunch }: JamWithAIProps) {
             transition={{ duration: 16, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: 1.4 }}
           />
         </div>
-      </div>
-
-      <div
-        className="mt-auto inline-flex items-center gap-2 self-start rounded-[var(--radius-control)] border px-4 py-3"
-        style={{
-          minHeight: "var(--touch-target-comfortable)",
-          borderColor: "var(--border)",
-          backgroundColor: "var(--soft-surface)",
-          color: "var(--foreground)",
-          fontSize: "var(--text-sm)",
-          fontWeight: "var(--font-weight-bold)",
-          fontFamily: "var(--app-font-family)",
-        }}
-      >
-        {copy.action}
-        <ArrowUpRight size={14} strokeWidth={1.8} />
       </div>
     </motion.button>
   );

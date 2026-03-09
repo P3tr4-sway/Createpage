@@ -12,7 +12,6 @@ import {
   miniSectionTitleStyle,
   panelStyle,
   quickActionCardStyle,
-  quickActionMetaStyle,
   quickActionTagStyle,
   secondaryButtonStyle,
   sectionDescriptionStyle,
@@ -64,7 +63,7 @@ function QuickActionCard({ action, onClick }: QuickActionCardProps) {
     <button
       type="button"
       onClick={onClick}
-      className="tablet-touch-target tablet-pressable tablet-hover-lift flex h-full items-center gap-3 rounded-[var(--radius-container)] text-left"
+      className="tablet-touch-target tablet-pressable tablet-hover-lift flex h-full w-full items-center gap-2.5 rounded-[var(--radius-container)] text-left"
       style={quickActionCardStyle}
     >
       <div
@@ -82,7 +81,6 @@ function QuickActionCard({ action, onClick }: QuickActionCardProps) {
         <p className="truncate" style={listTitleStyle}>
           {action.title}
         </p>
-        <p style={quickActionMetaStyle}>{action.meta}</p>
       </div>
       <ChevronRight
         size={16}
@@ -131,7 +129,7 @@ export function QuickAccessCarousel({
           cursor: isDragging ? "grabbing" : "grab",
         }}
       >
-        <div className="flex gap-3 pr-6" style={{ width: "max-content" }}>
+        <div className="flex gap-2 pr-4" style={{ width: "max-content" }}>
           {actions.map((action) => (
             <div
               key={action.id}

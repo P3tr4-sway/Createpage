@@ -65,8 +65,8 @@ export const inlineLinkButtonStyle: CSSProperties = {
 };
 
 export const quickActionCardStyle: CSSProperties = {
-  minHeight: 104,
-  padding: 14,
+  minHeight: 114,
+  padding: "16px 14px 16px 12px",
   borderRadius: "var(--radius-container)",
   border: "1px solid var(--border)",
   backgroundColor: "var(--surface-glass-strong)",
