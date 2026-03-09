@@ -417,8 +417,7 @@ export function AgenticProducingPage({
       <div
         className="flex min-w-0 flex-1 flex-col"
         style={{
-          paddingRight: jamSelectorVisible ? jamSelectorWidth + 20 : 0,
-          transition: "padding-right 220ms ease",
+          paddingRight: 0,
         }}
       >
         {!previewMode ? (
@@ -1369,7 +1368,7 @@ export function AgenticProducingPage({
         >
           <div
             className="mb-4 flex items-start gap-3"
-            style={{ justifyContent: jamLibraryCollapsed ? "flex-end" : "space-between" }}
+            style={{ justifyContent: jamLibraryCollapsed ? "center" : "space-between" }}
           >
             {jamLibraryCollapsed ? null : (
               <div>
@@ -1399,7 +1398,10 @@ export function AgenticProducingPage({
               </div>
             )}
 
-            <div className="flex items-center gap-2">
+            <div
+              className="flex items-center gap-2"
+              style={{ width: jamLibraryCollapsed ? "100%" : "auto", justifyContent: jamLibraryCollapsed ? "center" : "flex-start" }}
+            >
               {jamLibraryCollapsed ? null : (
                 <span
                   className="rounded-full border px-3 py-1.5"
@@ -1480,7 +1482,13 @@ export function AgenticProducingPage({
 
           <div
             className="flex min-h-0 flex-1 flex-col overflow-y-auto pr-1"
-            style={{ maxHeight: "100%", marginTop: jamLibraryCollapsed ? 8 : 14, gap: jamLibraryCollapsed ? 10 : 8 }}
+            style={{
+              maxHeight: "100%",
+              marginTop: jamLibraryCollapsed ? 8 : 14,
+              gap: jamLibraryCollapsed ? 10 : 8,
+              paddingRight: jamLibraryCollapsed ? 0 : 4,
+              alignItems: jamLibraryCollapsed ? "center" : "stretch",
+            }}
           >
             {jamLibraryResults.map((track) => {
               const isSelected = track.id === selectedJamTrack?.id;
@@ -1495,6 +1503,7 @@ export function AgenticProducingPage({
                   }}
                   className="tablet-pressable w-full text-left"
                   style={{
+                    width: jamLibraryCollapsed ? 52 : "100%",
                     borderRadius: jamLibraryCollapsed ? 16 : 20,
                     border: "none",
                     backgroundColor: isSelected ? "rgba(255,255,255,1)" : "transparent",
@@ -1508,7 +1517,7 @@ export function AgenticProducingPage({
                       style={{
                         borderRadius: jamLibraryCollapsed ? 14 : 16,
                         minHeight: jamLibraryCollapsed ? 64 : 44,
-                        width: jamLibraryCollapsed ? "100%" : 46,
+                        width: jamLibraryCollapsed ? 40 : 46,
                         flexShrink: 0,
                         backgroundColor: "rgba(226,232,240,0.7)",
                       }}

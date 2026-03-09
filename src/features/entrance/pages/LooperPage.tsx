@@ -433,11 +433,11 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
         </div>
 
         <aside
-          className="absolute bottom-4 right-4 top-4 z-20 flex min-h-[360px] flex-col overflow-hidden rounded-[28px] border px-3.5 py-4 xl:bottom-6 xl:right-6 xl:top-6 xl:px-4 xl:py-5"
+          className="absolute bottom-[88px] right-4 top-[88px] z-20 flex min-h-[360px] flex-col overflow-hidden rounded-[28px] border px-3.5 py-4 xl:right-6 xl:px-4 xl:py-5"
           style={{
-            borderColor: "color-mix(in srgb, var(--foreground) 8%, var(--border))",
+            borderColor: "rgba(15,23,42,0.08)",
             background:
-              "linear-gradient(180deg, color-mix(in srgb, var(--card) 94%, white 6%) 0%, color-mix(in srgb, var(--card) 98%, transparent) 100%)",
+              "linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(248,250,252,0.98) 100%)",
             boxShadow: "0 24px 54px rgba(15, 23, 42, 0.14)",
             backdropFilter: "blur(18px)",
             width: libraryWidth,
@@ -446,14 +446,14 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
         >
           <div
             className="mb-4 flex items-start gap-3"
-            style={{ justifyContent: libraryCollapsed ? "flex-end" : "space-between" }}
+            style={{ justifyContent: libraryCollapsed ? "center" : "space-between" }}
           >
             {libraryCollapsed ? null : (
               <div>
                 <p
                   style={{
                     margin: 0,
-                    color: "var(--secondary)",
+                    color: "rgba(15,23,42,0.48)",
                     fontSize: 12,
                     fontWeight: 700,
                     letterSpacing: "0.14em",
@@ -476,13 +476,16 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
               </div>
             )}
 
-            <div className="flex items-center gap-2">
+            <div
+              className="flex items-center gap-2"
+              style={{ width: libraryCollapsed ? "100%" : "auto", justifyContent: libraryCollapsed ? "center" : "flex-start" }}
+            >
               {libraryCollapsed ? null : (
                 <span
                   className="rounded-full border px-3 py-1.5"
                   style={{
-                    borderColor: "rgba(148, 163, 184, 0.12)",
-                    color: "var(--secondary)",
+                    borderColor: "rgba(148, 163, 184, 0.16)",
+                    color: "rgba(15,23,42,0.52)",
                     fontSize: 11,
                     fontWeight: 700,
                   }}
@@ -500,10 +503,9 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
                 style={{
                   width: 38,
                   height: 38,
-                  border: libraryCollapsed ? "none" : "1px solid var(--border)",
-                  backgroundColor: libraryCollapsed ? "transparent" : "var(--soft-surface)",
+                  border: libraryCollapsed ? "none" : "1px solid rgba(148, 163, 184, 0.16)",
+                  backgroundColor: libraryCollapsed ? "transparent" : "rgba(241,245,249,0.96)",
                   color: "var(--foreground)",
-                  boxShadow: "none",
                 }}
               >
                 {libraryCollapsed ? (
@@ -520,7 +522,7 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
               <p
                 style={{
                   margin: 0,
-                  color: "var(--secondary)",
+                  color: "rgba(15,23,42,0.48)",
                   fontSize: 12,
                   fontWeight: 700,
                   letterSpacing: "0.14em",
@@ -544,10 +546,10 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
                       className="tablet-touch-target tablet-pressable inline-flex shrink-0 items-center justify-center gap-1 whitespace-nowrap rounded-full border px-3.5 py-1.5"
                       style={{
                         borderColor: isActive
-                          ? "var(--chip-active-border)"
-                          : "rgba(148, 163, 184, 0.18)",
-                        backgroundColor: isActive ? "var(--chip-active-bg)" : "var(--chip-bg)",
-                        color: isActive ? "var(--chip-active-text)" : "var(--chip-text)",
+                          ? "rgba(59,130,246,0.22)"
+                          : "rgba(148,163,184,0.18)",
+                        backgroundColor: isActive ? "rgba(59,130,246,0.12)" : "rgba(255,255,255,0.7)",
+                        color: isActive ? "#1D4ED8" : "rgba(15,23,42,0.72)",
                         fontSize: 11,
                         fontWeight: 700,
                         minHeight: 28,
@@ -584,6 +586,8 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
               maxHeight: "100%",
               marginTop: libraryCollapsed ? 8 : 14,
               gap: libraryCollapsed ? 10 : 8,
+              paddingRight: libraryCollapsed ? 0 : 4,
+              alignItems: libraryCollapsed ? "center" : "stretch",
             }}
           >
             {resultTracks.map((track) => {
@@ -596,14 +600,11 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
                   onClick={() => setSelectedTrackId(track.id)}
                   className="tablet-pressable w-full text-left"
                   style={{
+                    width: libraryCollapsed ? 52 : "100%",
                     borderRadius: libraryCollapsed ? 16 : 20,
                     border: "none",
-                    backgroundColor: isSelected
-                      ? "var(--soft-surface-strong)"
-                      : "transparent",
-                    boxShadow: isSelected
-                      ? "inset 0 0 0 1px color-mix(in srgb, var(--foreground) 12%, transparent)"
-                      : "none",
+                    backgroundColor: isSelected ? "rgba(255,255,255,1)" : "transparent",
+                    boxShadow: isSelected ? "inset 0 0 0 1px rgba(59,130,246,0.18)" : "none",
                     padding: libraryCollapsed ? 6 : "7px 8px 7px 9px",
                   }}
                 >
@@ -619,9 +620,9 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
                       style={{
                         borderRadius: libraryCollapsed ? 14 : 16,
                         minHeight: libraryCollapsed ? 64 : 44,
-                        width: libraryCollapsed ? "100%" : 46,
+                        width: libraryCollapsed ? 40 : 46,
                         flexShrink: 0,
-                        backgroundColor: "var(--soft-surface)",
+                        backgroundColor: "rgba(226,232,240,0.7)",
                       }}
                     >
                       <ImageWithFallback
@@ -658,7 +659,7 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
                               className="truncate"
                               style={{
                                 margin: "4px 0 0",
-                                color: "var(--secondary)",
+                                color: "rgba(15,23,42,0.56)",
                                 fontSize: 11,
                                 fontWeight: 600,
                                 lineHeight: 1.35,
@@ -672,7 +673,7 @@ export function LooperPage({ onBack, initialFilter = "Hot" }: LooperPageProps) {
                             <ChevronRight
                               size={14}
                               strokeWidth={1.8}
-                              style={{ color: "var(--secondary)", flexShrink: 0 }}
+                              style={{ color: "rgba(15,23,42,0.34)", flexShrink: 0 }}
                             />
                           </div>
                         </div>

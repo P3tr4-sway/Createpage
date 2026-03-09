@@ -3,31 +3,34 @@ import { EntranceLocaleProvider } from "../src/features/entrance/EntranceLocaleC
 import { JamyPage } from "../src/features/entrance/pages/JamyPage";
 
 describe("JamyPage", () => {
-  it("shows jam-specific AI suggestions across recording and add-track states", () => {
+  it("supports recording a take and adding a new jam track", () => {
     render(
       <EntranceLocaleProvider locale="en">
         <JamyPage onBack={vi.fn()} />
       </EntranceLocaleProvider>,
     );
 
-    expect(
-      screen.getByRole("button", {
-        name: "Generate a backing track that fits my vibe",
-      }),
-    ).toBeInTheDocument();
+    expect(screen.getByText("2 tracks ready")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Record" }));
     fireEvent.click(screen.getByRole("button", { name: "Record" }));
 
-    expect(
-      screen.getByRole("button", { name: "Make the guitar brighter" }),
-    ).toBeInTheDocument();
     expect(screen.getByText("Take 01")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Add track" }));
 
-    expect(
-      screen.getByRole("button", { name: "Generate a bass line" }),
-    ).toBeInTheDocument();
+    expect(screen.getByText("3 tracks ready")).toBeInTheDocument();
+    expect(screen.getByText("Track 3")).toBeInTheDocument();
+  });
+
+  it("keeps the jam library as an overlay without rendering a separate backdrop layer", () => {
+    render(
+      <EntranceLocaleProvider locale="en">
+        <JamyPage onBack={vi.fn()} />
+      </EntranceLocaleProvider>,
+    );
+
+    expect(screen.queryByTestId("jam-library-backdrop")).not.toBeInTheDocument();
+    expect(screen.getByRole("complementary")).toBeInTheDocument();
   });
 });
