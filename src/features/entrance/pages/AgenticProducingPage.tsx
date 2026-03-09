@@ -144,6 +144,7 @@ export function AgenticProducingPage({
   } = useAgenticTimelineController({
     currentBeat,
     isDraggingPlayhead,
+    isJamExperience,
     isPlaying,
     loopEnabled,
     previewMode,

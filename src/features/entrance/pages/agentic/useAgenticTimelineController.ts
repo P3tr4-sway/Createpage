@@ -18,6 +18,7 @@ import {
 interface UseAgenticTimelineControllerParams {
   currentBeat: number;
   isDraggingPlayhead: boolean;
+  isJamExperience: boolean;
   isPlaying: boolean;
   loopEnabled: boolean;
   previewMode: boolean;
@@ -32,6 +33,7 @@ interface UseAgenticTimelineControllerParams {
 export function useAgenticTimelineController({
   currentBeat,
   isDraggingPlayhead,
+  isJamExperience,
   isPlaying,
   loopEnabled,
   previewMode,
@@ -53,11 +55,12 @@ export function useAgenticTimelineController({
     () =>
       getAgenticTimelineMetrics({
         currentBeat,
+        isJamExperience,
         previewMode,
         previewViewportWidth,
         scrollLeft,
       }),
-    [currentBeat, previewMode, previewViewportWidth, scrollLeft],
+    [currentBeat, isJamExperience, previewMode, previewViewportWidth, scrollLeft],
   );
 
   useEffect(() => {

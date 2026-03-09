@@ -19,6 +19,7 @@ describe("AgenticProducingPage model", () => {
   it("derives stable preview timeline metrics", () => {
     const metrics = getAgenticTimelineMetrics({
       currentBeat: 6,
+      isJamExperience: false,
       previewMode: true,
       previewViewportWidth: 1280,
       scrollLeft: 0,
@@ -29,5 +30,25 @@ describe("AgenticProducingPage model", () => {
     expect(metrics.barWidth).toBe(metrics.beatsPerBar * metrics.pixelsPerBeat);
     expect(metrics.playheadViewportX).toBeCloseTo(metrics.previewPlayheadViewportX, 5);
     expect(metrics.timelineContentWidth).toBeGreaterThan(metrics.timelineGridWidth);
+  });
+
+  it("allocates taller track rows for Jamy lanes", () => {
+    const defaultMetrics = getAgenticTimelineMetrics({
+      currentBeat: 0,
+      isJamExperience: false,
+      previewMode: false,
+      previewViewportWidth: 0,
+      scrollLeft: 0,
+    });
+    const jamMetrics = getAgenticTimelineMetrics({
+      currentBeat: 0,
+      isJamExperience: true,
+      previewMode: false,
+      previewViewportWidth: 0,
+      scrollLeft: 0,
+    });
+
+    expect(defaultMetrics.trackRowHeight).toBe(116);
+    expect(jamMetrics.trackRowHeight).toBe(176);
   });
 });

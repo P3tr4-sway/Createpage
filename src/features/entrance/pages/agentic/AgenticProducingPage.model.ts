@@ -23,6 +23,7 @@ export interface AgenticTimelineMetrics {
 
 interface AgenticTimelineMetricsInput {
   currentBeat: number;
+  isJamExperience: boolean;
   previewMode: boolean;
   previewViewportWidth: number;
   scrollLeft: number;
@@ -52,6 +53,7 @@ export function createAgenticUiId(prefix: string) {
 
 export function getAgenticTimelineMetrics({
   currentBeat,
+  isJamExperience,
   previewMode,
   previewViewportWidth,
   scrollLeft,
@@ -60,7 +62,7 @@ export function getAgenticTimelineMetrics({
   const previewPlayheadTargetRatio = 2 / 3;
   const trackPanelWidth = previewMode ? 282 : 356;
   const arrangementHeaderHeight = previewMode ? 44 : 58;
-  const trackRowHeight = previewMode ? 92 : 116;
+  const trackRowHeight = previewMode ? 92 : isJamExperience ? 176 : 116;
   const bottomTransportHeight = previewMode ? 72 : 94;
   const pixelsPerBeat = previewMode ? 26 : 36;
   const beatsPerBar = 4;
