@@ -38,8 +38,8 @@ type EntranceViewAction =
   | { type: "set-tutorial-open"; payload: boolean };
 
 const initialEntranceViewState: EntranceViewState = {
-  activeBoard: "create",
-  activeSection: "studio",
+  activeBoard: "play",
+  activeSection: "launch",
   pendingScrollTarget: null,
   fullscreenView: null,
   activeSubView: "home",
