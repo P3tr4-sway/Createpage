@@ -16,7 +16,6 @@ import {
   secondaryButtonStyle,
   sectionDescriptionStyle,
   sectionTitleStyle,
-  templateStripHintStyle,
   templateStripStyle,
 } from "@/features/entrance/workspace/EntranceWorkspaceBrowse.styles";
 export type { QuickAction } from "@/features/entrance/workspace/EntranceWorkspace.types";
@@ -30,7 +29,7 @@ interface QuickAccessCarouselProps {
   actions: QuickAction[];
   onSeeAll: () => void;
   heading: string;
-  hint: string;
+  hint?: string;
   seeAllLabel: string;
 }
 
@@ -95,17 +94,15 @@ export function QuickAccessCarousel({
   actions,
   onSeeAll,
   heading,
-  hint,
   seeAllLabel,
 }: QuickAccessCarouselProps) {
   const { containerRef, isDragging, dragBind } = useDragScroll("x");
 
   return (
     <div style={templateStripStyle}>
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between">
         <div>
           <p style={miniSectionTitleStyle}>{heading}</p>
-          <p style={templateStripHintStyle}>{hint}</p>
         </div>
         <button
           type="button"

@@ -5,11 +5,9 @@ import { useHasCoarsePointer } from "@/shared/hooks/use-mobile";
 const jamCopyByLocale = {
   en: {
     title: "Jamy",
-    subtitle: "Open a stripped-back DAW and jam against a backing track.",
   },
   "zh-CN": {
     title: "Jamy",
-    subtitle: "打开一个更轻量的 DAW，直接对着 backing track 开始 jam。",
   },
 } as const;
 
@@ -32,7 +30,7 @@ export function JamWithAI({ onLaunch }: JamWithAIProps) {
       className="tablet-touch-target tablet-pressable relative flex h-full w-full flex-col overflow-hidden rounded-card border border-border p-6 text-left"
       style={{ backgroundColor: "var(--card)" }}
     >
-      <div className="mb-2 flex items-center justify-between">
+      <div className="mb-1 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h3
             style={{
@@ -47,19 +45,7 @@ export function JamWithAI({ onLaunch }: JamWithAIProps) {
         </div>
       </div>
 
-      <p
-        className="mb-5"
-        style={{
-          color: "var(--secondary)",
-          fontSize: "var(--text-sm)",
-          fontWeight: "var(--font-weight-normal)",
-          fontFamily: "var(--app-font-family)",
-        }}
-      >
-        {copy.subtitle}
-      </p>
-
-      <div className="flex flex-1 items-center justify-center py-5">
+      <div className="flex flex-1 items-center justify-center py-4">
         <div
           className="relative flex w-full max-w-[360px] items-center justify-center overflow-hidden"
           style={{

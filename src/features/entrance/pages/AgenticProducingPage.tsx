@@ -20,6 +20,9 @@ import {
   Headphones,
   AudioWaveform,
   Drum,
+  ChevronRight,
+  PanelRightClose,
+  PanelRightOpen,
 } from "lucide-react";
 import { AgenticOverlayDock } from "@/features/entrance/components/AgenticOverlayDock";
 import { useEntranceLocale } from "@/features/entrance/EntranceLocaleContext";
@@ -36,6 +39,87 @@ import type {
 import { useAgenticOverlayController } from "@/features/entrance/pages/agentic/useAgenticOverlayController";
 import { useAgenticTimelineController } from "@/features/entrance/pages/agentic/useAgenticTimelineController";
 import { useAgenticSessionState } from "@/features/entrance/state/useAgenticSessionState";
+import { ImageWithFallback } from "@/shared/ui/ImageWithFallback";
+
+interface JamLibraryItem {
+  id: string;
+  title: string;
+  meta: string;
+  role: string;
+  tags: string[];
+  imageUrl: string;
+  fill: string;
+  accent: string;
+}
+
+const jamLibraryFilters = [
+  "Saved",
+  "Hot",
+  "New",
+  "Indie",
+  "Rock",
+  "Neo-Soul",
+  "Blues",
+  "Funk",
+] as const;
+
+const jamLibraryTracks: JamLibraryItem[] = [
+  {
+    id: "jam-track-1",
+    title: "Sunset Drive",
+    meta: "Indie, 92 BPM, 4/4",
+    role: "Guide",
+    tags: ["Hot", "Indie"],
+    imageUrl:
+      "https://images.unsplash.com/photo-1511379938547-c1f69419868d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+    fill: "linear-gradient(135deg, rgba(45, 212, 191, 0.94), rgba(13, 148, 136, 0.9))",
+    accent: "#ECFEFF",
+  },
+  {
+    id: "jam-track-2",
+    title: "Blue Room Jam",
+    meta: "Blues, 76 BPM, 12/8",
+    role: "Pocket",
+    tags: ["Hot", "Blues"],
+    imageUrl:
+      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+    fill: "linear-gradient(135deg, rgba(96, 165, 250, 0.94), rgba(37, 99, 235, 0.9))",
+    accent: "#EFF6FF",
+  },
+  {
+    id: "jam-track-3",
+    title: "Velvet Pocket",
+    meta: "Neo-Soul, 84 BPM, 4/4",
+    role: "Warm",
+    tags: ["Saved", "Neo-Soul"],
+    imageUrl:
+      "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+    fill: "linear-gradient(135deg, rgba(167, 139, 250, 0.94), rgba(124, 58, 237, 0.88))",
+    accent: "#F5F3FF",
+  },
+  {
+    id: "jam-track-4",
+    title: "After Hours",
+    meta: "Funk, 104 BPM, 4/4",
+    role: "Groove",
+    tags: ["New", "Funk"],
+    imageUrl:
+      "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+    fill: "linear-gradient(135deg, rgba(251, 191, 36, 0.94), rgba(217, 119, 6, 0.9))",
+    accent: "#FFFBEB",
+  },
+  {
+    id: "jam-track-5",
+    title: "Rust Echo",
+    meta: "Rock, 118 BPM, 4/4",
+    role: "Drive",
+    tags: ["Hot", "Rock"],
+    imageUrl:
+      "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200",
+    fill: "linear-gradient(135deg, rgba(248, 113, 113, 0.94), rgba(220, 38, 38, 0.88))",
+    accent: "#FEF2F2",
+  },
+];
 
 interface AgenticProducingPageProps {
   onBack?: () => void;
@@ -58,6 +142,7 @@ export function AgenticProducingPage({
   const locale = useEntranceLocale();
   const copy = agenticCopyByLocale[locale];
   const isJamExperience = experience === "jam";
+  const jamSelectorVisible = isJamExperience && !previewMode;
   const localizedTargets = getMusicianTargetsForLocale(locale);
   const resolvedInitialTracks = useMemo(
     () => initialTracks ?? getInitialTracksForLocale(locale),
@@ -128,6 +213,12 @@ export function AgenticProducingPage({
   const selectedStyle = styleDraft.trim() || copy.selectedStyleFallback;
   const producerWorkspaceVisible =
     !isJamExperience && showAgentOverlay && agentMode === "producer" && producerWorkspaceOpen;
+  const [jamLibraryCollapsed, setJamLibraryCollapsed] = useState(false);
+  const [activeJamFilter, setActiveJamFilter] = useState<string>("Hot");
+  const [selectedJamTrackId, setSelectedJamTrackId] = useState(jamLibraryTracks[0]?.id ?? "");
+  const jamSelectorExpandedWidth = 364;
+  const jamSelectorCollapsedWidth = 86;
+  const jamSelectorWidth = jamLibraryCollapsed ? jamSelectorCollapsedWidth : jamSelectorExpandedWidth;
   const [jamSuggestionStage, setJamSuggestionStage] =
     useState<JamSuggestionStage>("pre-record");
   const [timelineViewportHeight, setTimelineViewportHeight] = useState(0);
@@ -191,6 +282,56 @@ export function AgenticProducingPage({
   const producerSuggestions = isJamExperience
     ? copy.jamProducerSuggestions[jamSuggestionStage]
     : undefined;
+  const jamLibraryUiCopy =
+    locale === "zh-CN"
+      ? {
+          eyebrow: "Jam Track Library",
+          title: "选择 Jam Track",
+          tracks: "条 tracks",
+          filter: "筛选",
+          expand: "展开 Jam Track 选择器",
+          collapse: "收起 Jam Track 选择器",
+        }
+      : {
+          eyebrow: "Jam Track Library",
+          title: "Choose a jam track",
+          tracks: "tracks",
+          filter: "Filter",
+          expand: "Expand jam track selector",
+          collapse: "Collapse jam track selector",
+        };
+  const jamLibraryResults = useMemo(() => {
+    if (["Saved", "Hot", "New"].includes(activeJamFilter)) {
+      return jamLibraryTracks;
+    }
+
+    return jamLibraryTracks.filter((track) =>
+      track.tags.some((tag) => tag.toLowerCase() === activeJamFilter.toLowerCase()),
+    );
+  }, [activeJamFilter]);
+  const selectedJamTrack =
+    jamLibraryResults.find((track) => track.id === selectedJamTrackId) ??
+    jamLibraryTracks.find((track) => track.id === selectedJamTrackId) ??
+    jamLibraryTracks[0];
+
+  useEffect(() => {
+    if (!isJamExperience || !selectedJamTrack) {
+      return;
+    }
+
+    setTracks((prev) =>
+      prev.map((track) =>
+        track.id === "backing-track"
+          ? {
+              ...track,
+              level: "-3.0 dB",
+              clips: [createJamLibraryClip(selectedJamTrack)],
+            }
+          : track,
+      ),
+    );
+  }, [isJamExperience, selectedJamTrack, setTracks]);
+
   const {
     handleMusicianGenerate,
     handleProducerSubmit,
@@ -267,13 +408,19 @@ export function AgenticProducingPage({
   return (
     <section
       ref={previewRootRef}
-      className="flex h-full w-full overflow-hidden"
+      className="relative flex h-full w-full overflow-hidden"
       style={{
         backgroundColor: isJamExperience ? "#EEF2F7" : "var(--agentic-bg)",
         fontFamily: "var(--app-font-family)",
       }}
     >
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div
+        className="flex min-w-0 flex-1 flex-col"
+        style={{
+          paddingRight: jamSelectorVisible ? jamSelectorWidth + 20 : 0,
+          transition: "padding-right 220ms ease",
+        }}
+      >
         {!previewMode ? (
           <div
             className="flex items-center justify-between"
@@ -1206,6 +1353,225 @@ export function AgenticProducingPage({
           ) : null}
         </div>
       </div>
+
+      {jamSelectorVisible ? (
+        <aside
+          className="absolute bottom-[88px] right-4 top-[88px] z-20 flex min-h-[360px] flex-col overflow-hidden rounded-[28px] border px-3.5 py-4 xl:right-6 xl:px-4 xl:py-5"
+          style={{
+            width: jamSelectorWidth,
+            borderColor: "rgba(15,23,42,0.08)",
+            background:
+              "linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(248,250,252,0.98) 100%)",
+            boxShadow: "0 24px 54px rgba(15, 23, 42, 0.14)",
+            backdropFilter: "blur(18px)",
+            transition: "width 220ms ease, box-shadow 220ms ease",
+          }}
+        >
+          <div
+            className="mb-4 flex items-start gap-3"
+            style={{ justifyContent: jamLibraryCollapsed ? "flex-end" : "space-between" }}
+          >
+            {jamLibraryCollapsed ? null : (
+              <div>
+                <p
+                  style={{
+                    margin: 0,
+                    color: "rgba(15,23,42,0.48)",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {jamLibraryUiCopy.eyebrow}
+                </p>
+                <h3
+                  style={{
+                    margin: "8px 0 4px",
+                    color: "var(--foreground)",
+                    fontSize: 20,
+                    fontWeight: 700,
+                    lineHeight: 1.08,
+                  }}
+                >
+                  {jamLibraryUiCopy.title}
+                </h3>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2">
+              {jamLibraryCollapsed ? null : (
+                <span
+                  className="rounded-full border px-3 py-1.5"
+                  style={{
+                    borderColor: "rgba(148, 163, 184, 0.16)",
+                    color: "rgba(15,23,42,0.52)",
+                    fontSize: 11,
+                    fontWeight: 700,
+                  }}
+                >
+                  {jamLibraryResults.length} {jamLibraryUiCopy.tracks}
+                </span>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setJamLibraryCollapsed((prev) => !prev)}
+                className="tablet-touch-target tablet-pressable inline-flex items-center justify-center rounded-full"
+                aria-label={jamLibraryCollapsed ? jamLibraryUiCopy.expand : jamLibraryUiCopy.collapse}
+                title={jamLibraryCollapsed ? jamLibraryUiCopy.expand : jamLibraryUiCopy.collapse}
+                style={{
+                  width: 38,
+                  height: 38,
+                  border: jamLibraryCollapsed ? "none" : "1px solid rgba(148, 163, 184, 0.16)",
+                  backgroundColor: jamLibraryCollapsed ? "transparent" : "rgba(241,245,249,0.96)",
+                  color: "var(--foreground)",
+                }}
+              >
+                {jamLibraryCollapsed ? (
+                  <PanelRightOpen size={16} strokeWidth={1.8} />
+                ) : (
+                  <PanelRightClose size={16} strokeWidth={1.8} />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {jamLibraryCollapsed ? null : (
+            <>
+              <p
+                style={{
+                  margin: 0,
+                  color: "rgba(15,23,42,0.48)",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                }}
+              >
+                {jamLibraryUiCopy.filter}: {activeJamFilter}
+              </p>
+              <div className="mt-4 flex gap-2 overflow-x-auto pb-2" style={{ WebkitOverflowScrolling: "touch" }}>
+                {jamLibraryFilters.map((filter) => {
+                  const isActive = activeJamFilter === filter;
+
+                  return (
+                    <button
+                      key={filter}
+                      type="button"
+                      onClick={() => setActiveJamFilter(filter)}
+                      className="tablet-touch-target tablet-pressable inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border px-3.5 py-1.5"
+                      style={{
+                        borderColor: isActive ? "rgba(59,130,246,0.22)" : "rgba(148,163,184,0.18)",
+                        backgroundColor: isActive ? "rgba(59,130,246,0.12)" : "rgba(255,255,255,0.7)",
+                        color: isActive ? "#1D4ED8" : "rgba(15,23,42,0.72)",
+                        fontSize: 11,
+                        fontWeight: 700,
+                        minHeight: 28,
+                      }}
+                    >
+                      {filter}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          <div
+            className="flex min-h-0 flex-1 flex-col overflow-y-auto pr-1"
+            style={{ maxHeight: "100%", marginTop: jamLibraryCollapsed ? 8 : 14, gap: jamLibraryCollapsed ? 10 : 8 }}
+          >
+            {jamLibraryResults.map((track) => {
+              const isSelected = track.id === selectedJamTrack?.id;
+
+              return (
+                <button
+                  key={track.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedJamTrackId(track.id);
+                    setSelectedTrackId("backing-track");
+                  }}
+                  className="tablet-pressable w-full text-left"
+                  style={{
+                    borderRadius: jamLibraryCollapsed ? 16 : 20,
+                    border: "none",
+                    backgroundColor: isSelected ? "rgba(255,255,255,1)" : "transparent",
+                    boxShadow: isSelected ? "inset 0 0 0 1px rgba(59,130,246,0.18)" : "none",
+                    padding: jamLibraryCollapsed ? 6 : "7px 8px 7px 9px",
+                  }}
+                >
+                  <div className={jamLibraryCollapsed ? "flex items-center justify-center" : "flex w-full items-center gap-2.5"}>
+                    <div
+                      className="relative overflow-hidden"
+                      style={{
+                        borderRadius: jamLibraryCollapsed ? 14 : 16,
+                        minHeight: jamLibraryCollapsed ? 64 : 44,
+                        width: jamLibraryCollapsed ? "100%" : 46,
+                        flexShrink: 0,
+                        backgroundColor: "rgba(226,232,240,0.7)",
+                      }}
+                    >
+                      <ImageWithFallback
+                        src={track.imageUrl}
+                        alt={track.title}
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          background:
+                            "linear-gradient(180deg, rgba(15,23,42,0) 30%, rgba(15,23,42,0.54) 100%)",
+                        }}
+                      />
+                    </div>
+
+                    {jamLibraryCollapsed ? null : (
+                      <div className="min-w-0 flex flex-1 items-center gap-3">
+                        <div className="min-w-0 flex-1">
+                          <h4
+                            className="truncate"
+                            style={{
+                              margin: 0,
+                              color: "var(--foreground)",
+                              fontSize: 14,
+                              fontWeight: 700,
+                              lineHeight: 1.1,
+                            }}
+                          >
+                            {track.title}
+                          </h4>
+                          <p
+                            className="truncate"
+                            style={{
+                              margin: "4px 0 0",
+                              color: "rgba(15,23,42,0.56)",
+                              fontSize: 11,
+                              fontWeight: 600,
+                              lineHeight: 1.35,
+                            }}
+                          >
+                            {track.meta}
+                          </p>
+                        </div>
+
+                        <div className="ml-auto flex flex-shrink-0 items-center justify-end">
+                          <ChevronRight
+                            size={14}
+                            strokeWidth={1.8}
+                            style={{ color: "rgba(15,23,42,0.45)", flexShrink: 0 }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </aside>
+      ) : null}
     </section>
   );
 }
@@ -1376,6 +1742,17 @@ function createJamBackingClip(
           ? "linear-gradient(135deg, rgba(45, 212, 191, 0.94), rgba(13, 148, 136, 0.9))"
           : "linear-gradient(135deg, rgba(167, 139, 250, 0.94), rgba(124, 58, 237, 0.88))",
     accent: "#EFF6FF",
+  };
+}
+
+function createJamLibraryClip(track: JamLibraryItem) {
+  return {
+    id: `${track.id}-clip`,
+    label: track.title,
+    startBeat: 0,
+    durationBeats: 48,
+    fill: track.fill,
+    accent: track.accent,
   };
 }
 

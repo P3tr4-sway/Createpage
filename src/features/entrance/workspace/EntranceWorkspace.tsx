@@ -61,7 +61,6 @@ import { EntranceWorkspaceHero } from "@/features/entrance/workspace/EntranceWor
 import { EntranceWorkspaceTutorialPanel } from "@/features/entrance/workspace/EntranceWorkspaceTutorialPanel";
 import {
   secondaryButtonStyle,
-  sectionDescriptionStyle,
   sectionTitleStyle,
 } from "@/features/entrance/workspace/EntranceWorkspaceBrowse.styles";
 import { getEntranceWorkspaceTone } from "@/features/entrance/workspace/EntranceWorkspace.theme";
@@ -305,7 +304,6 @@ export function EntranceWorkspace() {
   const homePreviewZoom = 1.14;
   const homePreviewFocusX = 0.42;
   const mainHeaderHeight = 72;
-  const boardSwitcherHeight = 78;
   const isLooperFullscreen = activeSubView === "looper";
   const showMainHeader = activeSubView !== "home" && !isLooperFullscreen;
   const showSidebar = !isLooperFullscreen;
@@ -313,6 +311,42 @@ export function EntranceWorkspace() {
   const sidebarWidth = 399;
   const sidebarInlinePadding = 24;
   const mainContentInlinePadding = 32;
+  const inactiveBoard = activeBoard === "play" ? "create" : "play";
+  const utilityControls = (
+    <>
+      <div className="relative" style={languageSelectWrapStyle}>
+        <select
+          value={locale}
+          onChange={(event) => setLocale(event.target.value as Locale)}
+          className="tablet-touch-target"
+          style={languageSelectStyle}
+          aria-label={copy.languageSelectorAriaLabel}
+        >
+          {localeOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <ChevronDown
+          aria-hidden="true"
+          size={14}
+          strokeWidth={1.8}
+          style={languageSelectIconStyle}
+        />
+      </div>
+
+      <button
+        type="button"
+        onClick={() => setTheme(isDark ? "light" : "dark")}
+        className="tablet-icon-target tablet-pressable"
+        style={iconButtonStyle}
+        aria-label={isDark ? copy.switchToLightMode : copy.switchToDarkMode}
+      >
+        {isDark ? <Sun size={16} strokeWidth={1.9} /> : <Moon size={16} strokeWidth={1.9} />}
+      </button>
+    </>
+  );
 
   if (fullscreenView === "agentic-producing") {
     return (
@@ -333,36 +367,31 @@ export function EntranceWorkspace() {
   return (
     <EntranceLocaleProvider locale={locale}>
       <div
-        className="relative flex h-full w-full flex-col overflow-hidden"
+        className="relative flex h-full w-full overflow-hidden"
         style={{
           fontFamily: "var(--app-font-family)",
           background: shellTone.appBg,
         }}
       >
-        <div
-          className="relative shrink-0"
-          style={{
-            height: boardSwitcherHeight,
-            minHeight: boardSwitcherHeight,
-            backgroundColor: shellTone.mainHeaderBg,
-            borderBottom: `1px solid ${shellTone.railBorder}`,
-            backdropFilter: "blur(20px)",
-          }}
-        >
-          <div
-            className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center"
+        {showSidebar ? (
+          <aside
+            className="relative flex h-full shrink-0 flex-col"
             style={{
-              gap: 18,
+              width: sidebarWidth,
+              minWidth: sidebarWidth,
+              flexBasis: sidebarWidth,
+              padding: `22px ${sidebarInlinePadding}px 16px`,
+              background: shellTone.sidebarBackground,
+              borderRight: `1px solid ${shellTone.railBorder}`,
+              boxShadow: shellTone.sidebarShadow,
+              zIndex: 2,
             }}
           >
-            {(["play", "create"] as const).map((board) => {
-              const isActive = activeBoard === board;
-
-              return (
+              <div className="mb-4 flex items-baseline gap-3">
+                <h1 style={railHeadingStyle}>{copy.boardSwitcher[activeBoard]}</h1>
                 <button
-                  key={board}
                   type="button"
-                  onClick={() => switchBoard(board)}
+                  onClick={() => switchBoard(inactiveBoard)}
                   className="tablet-touch-target tablet-pressable"
                   style={{
                     minWidth: 0,
@@ -371,73 +400,15 @@ export function EntranceWorkspace() {
                     border: "none",
                     borderRadius: 0,
                     backgroundColor: "transparent",
-                    color: isActive ? "var(--foreground)" : "var(--secondary)",
-                    fontSize: 22,
-                    fontWeight: isActive ? 700 : 520,
-                    letterSpacing: isActive ? "0.01em" : "0.02em",
+                    color: "var(--secondary)",
+                    fontSize: 17,
+                    fontWeight: 600,
+                    lineHeight: 1.02,
+                    letterSpacing: "0.01em",
                   }}
                 >
-                  {copy.boardSwitcher[board]}
+                  {copy.boardSwitcher[inactiveBoard]}
                 </button>
-              );
-            })}
-          </div>
-
-          <div
-            className="absolute right-6 top-1/2 flex -translate-y-1/2 items-center gap-2"
-            style={{ zIndex: 1 }}
-          >
-            <div className="relative" style={languageSelectWrapStyle}>
-              <select
-                value={locale}
-                onChange={(event) => setLocale(event.target.value as Locale)}
-                className="tablet-touch-target"
-                style={languageSelectStyle}
-                aria-label={copy.languageSelectorAriaLabel}
-              >
-                {localeOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                aria-hidden="true"
-                size={14}
-                strokeWidth={1.8}
-                style={languageSelectIconStyle}
-              />
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setTheme(isDark ? "light" : "dark")}
-              className="tablet-icon-target tablet-pressable"
-              style={iconButtonStyle}
-              aria-label={isDark ? copy.switchToLightMode : copy.switchToDarkMode}
-            >
-              {isDark ? <Sun size={16} strokeWidth={1.9} /> : <Moon size={16} strokeWidth={1.9} />}
-            </button>
-          </div>
-        </div>
-
-        <div className="flex min-h-0 flex-1 overflow-hidden">
-          {showSidebar ? (
-            <aside
-              className="relative flex h-full shrink-0 flex-col"
-              style={{
-                width: sidebarWidth,
-                minWidth: sidebarWidth,
-                flexBasis: sidebarWidth,
-                padding: `22px ${sidebarInlinePadding}px 14px`,
-                background: shellTone.sidebarBackground,
-                borderRight: `1px solid ${shellTone.railBorder}`,
-                boxShadow: shellTone.sidebarShadow,
-                zIndex: 2,
-              }}
-            >
-              <div style={{ marginBottom: 18 }}>
-                <h1 style={railHeadingStyle}>{copy.boardSwitcher[activeBoard]}</h1>
               </div>
 
               <div
@@ -493,6 +464,17 @@ export function EntranceWorkspace() {
                   </section>
                 </div>
               </div>
+
+              <div
+                className="flex items-center gap-2"
+                style={{
+                  marginTop: 12,
+                  paddingTop: 14,
+                  borderTop: `1px solid ${shellTone.railBorder}`,
+                }}
+              >
+                {utilityControls}
+              </div>
             </aside>
           ) : null}
 
@@ -540,22 +522,8 @@ export function EntranceWorkspace() {
                     }}
                   >
                     <section ref={launchRef} style={workspaceSectionStyle}>
-                      <div className="mb-4 flex items-center justify-between">
-                        <div>
-                          <h3 style={sectionTitleStyle}>Start playing right away.</h3>
-                          <p style={sectionDescriptionStyle}>
-                            Jump into loops, jam starters, and backing tracks without opening a project first.
-                          </p>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => openBackingTrackWorkspace("Hot")}
-                          className="tablet-touch-target tablet-pressable inline-flex items-center gap-2 rounded-[var(--radius-control)]"
-                          style={secondaryButtonStyle}
-                        >
-                          Backing Track
-                        </button>
+                      <div className="mb-3">
+                        <h3 style={sectionTitleStyle}>Start playing right away.</h3>
                       </div>
 
                       <div className="flex flex-col gap-5">
@@ -564,7 +532,6 @@ export function EntranceWorkspace() {
                             <LoopLaunchPanel
                               onLaunch={() => handleLaunch("looper")}
                               title={copy.looperLaunchTitle}
-                              description={copy.looperLaunchDescription}
                             />
                           </div>
 
@@ -577,7 +544,6 @@ export function EntranceWorkspace() {
                           actions={boardQuickActions}
                           onSeeAll={() => setActiveSubView("quick-actions")}
                           heading={copy.quickActionsHeading}
-                          hint={copy.quickActionsHint}
                           seeAllLabel={copy.seeAll}
                         />
                       </div>
@@ -668,12 +634,9 @@ export function EntranceWorkspace() {
                       }}
                     >
                       <section ref={launchRef} style={workspaceSectionStyle}>
-                        <div className="mb-4 flex items-center justify-between">
+                        <div className="mb-3 flex items-center justify-between">
                           <div>
                             <h3 style={sectionTitleStyle}>Start from an idea.</h3>
-                            <p style={sectionDescriptionStyle}>
-                              Open a project workspace, capture a take, and keep AI available as a background assistant.
-                            </p>
                           </div>
                         </div>
 
@@ -681,7 +644,6 @@ export function EntranceWorkspace() {
                           actions={boardQuickActions}
                           onSeeAll={() => setActiveSubView("quick-actions")}
                           heading={copy.quickActionsHeading}
-                          hint={copy.quickActionsHint}
                           seeAllLabel={copy.seeAll}
                         />
                       </section>
@@ -809,7 +771,21 @@ export function EntranceWorkspace() {
             onOpenChange={setTutorialOpen}
             tutorial={selectedTutorial}
           />
-        </div>
+
+          {showSidebar ? null : (
+            <div
+              className="absolute bottom-6 left-6 z-20 flex items-center gap-2"
+              style={{
+                padding: 10,
+                borderRadius: 18,
+                border: `1px solid ${shellTone.railBorder}`,
+                backgroundColor: shellTone.mainHeaderBg,
+                backdropFilter: "blur(18px)",
+              }}
+            >
+              {utilityControls}
+            </div>
+          )}
       </div>
     </EntranceLocaleProvider>
   );

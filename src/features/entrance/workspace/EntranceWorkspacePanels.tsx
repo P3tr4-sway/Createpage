@@ -4,7 +4,6 @@ import type { SidebarProject } from "@/features/entrance/workspace/EntranceWorks
 
 interface LoopLaunchPanelProps {
   title: string;
-  description: string;
   onLaunch: () => void;
 }
 
@@ -21,7 +20,6 @@ interface SidebarProjectListItemProps {
 export function LoopLaunchPanel({
   onLaunch,
   title,
-  description,
 }: LoopLaunchPanelProps) {
   return (
     <button
@@ -30,15 +28,13 @@ export function LoopLaunchPanel({
       className="tablet-touch-target tablet-pressable tablet-hover-soft relative flex h-full w-full flex-col overflow-hidden rounded-card border border-border p-6 text-left"
       style={loopLaunchPanelStyle}
     >
-      <div className="mb-2 flex items-center justify-between">
+      <div className="mb-1 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h3 style={loopLaunchTitleStyle}>{title}</h3>
         </div>
       </div>
 
-      <p style={loopLaunchDescriptionStyle}>{description}</p>
-
-      <div className="flex flex-1 items-center justify-center py-6">
+      <div className="flex flex-1 items-center justify-center py-4">
         <div style={loopGraphicWrapStyle}>
           <div style={loopOuterDiscStyle} />
           <div style={loopOuterGuideStyle} />
@@ -177,14 +173,6 @@ const loopLaunchTitleStyle: CSSProperties = {
   color: "var(--foreground)",
   fontSize: "var(--text-xl)",
   fontWeight: 700,
-  fontFamily: "var(--app-font-family)",
-};
-
-const loopLaunchDescriptionStyle: CSSProperties = {
-  margin: 0,
-  color: "var(--secondary)",
-  fontSize: "var(--text-sm)",
-  fontWeight: "var(--font-weight-normal)",
   fontFamily: "var(--app-font-family)",
 };
 
