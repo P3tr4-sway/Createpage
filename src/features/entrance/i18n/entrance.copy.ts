@@ -28,6 +28,10 @@ export const getInitialLocale = (): Locale => {
 };
 
 export type EntranceWorkspaceCopy = {
+  boardSwitcher: {
+    play: string;
+    create: string;
+  };
   contentTitles: Record<
     | "home"
     | "looper"
@@ -74,6 +78,10 @@ export type EntranceWorkspaceCopy = {
 
 export const copyByLocale = {
   en: {
+    boardSwitcher: {
+      play: "Play",
+      create: "Create",
+    },
     contentTitles: {
       home: "Create",
       looper: "Looper",
@@ -251,6 +259,10 @@ export const copyByLocale = {
     looperLaunchDescription: "Play fast.",
   },
   "zh-CN": {
+    boardSwitcher: {
+      play: "Play",
+      create: "Create",
+    },
     contentTitles: {
       home: "创作",
       looper: "循环器",

@@ -9,6 +9,7 @@ import {
 import type { TutorialCourse } from "@/features/entrance/components/TutorialDialog";
 import type { BrowseItem, GuitarClip } from "@/features/entrance/model/entrance.types";
 import type {
+  EntranceBoard,
   FullscreenView,
   HomeSubView,
   SectionId,
@@ -16,9 +17,11 @@ import type {
 import type { ActionId } from "@/features/entrance/workspace/EntranceWorkspace.types";
 
 interface UseEntranceWorkspaceControllerParams {
+  activeBoard: EntranceBoard;
   activeSection: SectionId;
   activeSubView: HomeSubView;
   pendingScrollTarget: SectionId | null;
+  setActiveBoard: (value: EntranceBoard) => void;
   setActiveSection: (value: SectionId) => void;
   setPendingScrollTarget: (value: SectionId | null) => void;
   setActiveSubView: (value: HomeSubView) => void;
@@ -30,9 +33,11 @@ interface UseEntranceWorkspaceControllerParams {
 }
 
 export function useEntranceWorkspaceController({
+  activeBoard,
   activeSection,
   activeSubView,
   pendingScrollTarget,
+  setActiveBoard,
   setActiveSection,
   setPendingScrollTarget,
   setActiveSubView,
@@ -163,18 +168,34 @@ export function useEntranceWorkspaceController({
   );
 
   const openAgenticWorkspace = useCallback(() => {
+    setActiveBoard("create");
     setFullscreenView("agentic-producing");
-  }, [setFullscreenView]);
+  }, [setActiveBoard, setFullscreenView]);
 
   const openLooperWorkspace = useCallback((filter: string) => {
+    setActiveBoard("play");
     setLooperInitialFilter(filter);
     setActiveSubView("looper");
-  }, [setActiveSubView]);
+  }, [setActiveBoard, setActiveSubView]);
 
   const openBackingTrackWorkspace = useCallback((filter: string) => {
+    setActiveBoard("play");
     setBackingTrackInitialFilter(filter);
     setActiveSubView("instant-backing-track");
-  }, [setActiveSubView]);
+  }, [setActiveBoard, setActiveSubView]);
+
+  const switchBoard = useCallback((nextBoard: EntranceBoard) => {
+    setActiveBoard(nextBoard);
+    setActiveSubView("home");
+    setPendingScrollTarget(null);
+    setActiveSection(nextBoard === "create" ? "studio" : "launch");
+    setHeroPromptOpen(false);
+  }, [
+    setActiveBoard,
+    setActiveSection,
+    setActiveSubView,
+    setPendingScrollTarget,
+  ]);
 
   const openTemplate = useCallback((item: BrowseItem) => {
     setSelectedTemplate(item);
@@ -225,6 +246,7 @@ export function useEntranceWorkspaceController({
   }, []);
 
   return {
+    activeBoard,
     studioRef,
     launchRef,
     communityRef,
@@ -244,6 +266,7 @@ export function useEntranceWorkspaceController({
     openAgenticWorkspace,
     openLooperWorkspace,
     openBackingTrackWorkspace,
+    switchBoard,
     openTemplate,
     openSong,
     openGuitar,

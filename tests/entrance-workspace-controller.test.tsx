@@ -3,6 +3,7 @@ import { useEntranceWorkspaceController } from "../src/features/entrance/workspa
 
 describe("useEntranceWorkspaceController", () => {
   it("opens workspace flows and updates local selections", () => {
+    const setActiveBoard = vi.fn();
     const setActiveSection = vi.fn();
     const setPendingScrollTarget = vi.fn();
     const setActiveSubView = vi.fn();
@@ -14,9 +15,11 @@ describe("useEntranceWorkspaceController", () => {
 
     const { result } = renderHook(() =>
       useEntranceWorkspaceController({
+        activeBoard: "create",
         activeSection: "studio",
         activeSubView: "home",
         pendingScrollTarget: null,
+        setActiveBoard,
         setActiveSection,
         setPendingScrollTarget,
         setActiveSubView,
@@ -38,6 +41,8 @@ describe("useEntranceWorkspaceController", () => {
     });
 
     expect(setFullscreenView).toHaveBeenCalledWith("agentic-producing");
+    expect(setActiveBoard).toHaveBeenCalledWith("create");
+    expect(setActiveBoard).toHaveBeenCalledWith("play");
     expect(setActiveSubView).toHaveBeenCalledWith("looper");
     expect(setActiveSubView).toHaveBeenCalledWith("instant-backing-track");
     expect(result.current.looperInitialFilter).toBe("Rock");

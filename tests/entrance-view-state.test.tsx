@@ -6,6 +6,7 @@ describe("useEntranceViewState", () => {
     const { result } = renderHook(() => useEntranceViewState());
 
     act(() => {
+      result.current.setActiveBoard("play");
       result.current.setActiveSubView("looper");
       result.current.setProjectsOpen(true);
       result.current.setTemplateOpen(true);
@@ -15,6 +16,7 @@ describe("useEntranceViewState", () => {
       result.current.setActiveSection("community");
     });
 
+    expect(result.current.viewState.activeBoard).toBe("play");
     expect(result.current.viewState.activeSubView).toBe("looper");
     expect(result.current.viewState.projectsOpen).toBe(true);
     expect(result.current.viewState.templateOpen).toBe(true);

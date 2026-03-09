@@ -195,4 +195,19 @@ describe("EntranceWorkspace integration", () => {
     ).not.toBeInTheDocument();
     expect(screen.getByText("Start with the idea.")).toBeInTheDocument();
   });
+
+  it("switches between create and play boards from the top rail", () => {
+    window.localStorage.setItem(LOCALE_STORAGE_KEY, "en");
+
+    render(<EntranceWorkspace />);
+
+    expect(screen.getByText("Start with the idea.")).toBeInTheDocument();
+    expect(screen.queryByText("jam-with-ai")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Play" }));
+
+    expect(screen.getByText("jam-with-ai")).toBeInTheDocument();
+    expect(screen.getByText("Start playing right away.")).toBeInTheDocument();
+    expect(screen.queryByText("Start with the idea.")).not.toBeInTheDocument();
+  });
 });

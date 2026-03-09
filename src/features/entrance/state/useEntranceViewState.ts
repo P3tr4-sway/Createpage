@@ -1,6 +1,7 @@
 import { useReducer } from "react";
 
 export type SectionId = "studio" | "launch" | "community";
+export type EntranceBoard = "play" | "create";
 export type FullscreenView = "agentic-producing" | null;
 export type HomeSubView =
   | "home"
@@ -12,6 +13,7 @@ export type HomeSubView =
   | "tutorials";
 
 interface EntranceViewState {
+  activeBoard: EntranceBoard;
   activeSection: SectionId;
   pendingScrollTarget: SectionId | null;
   fullscreenView: FullscreenView;
@@ -24,6 +26,7 @@ interface EntranceViewState {
 }
 
 type EntranceViewAction =
+  | { type: "set-active-board"; payload: EntranceBoard }
   | { type: "set-active-section"; payload: SectionId }
   | { type: "set-pending-scroll-target"; payload: SectionId | null }
   | { type: "set-fullscreen-view"; payload: FullscreenView }
@@ -35,6 +38,7 @@ type EntranceViewAction =
   | { type: "set-tutorial-open"; payload: boolean };
 
 const initialEntranceViewState: EntranceViewState = {
+  activeBoard: "create",
   activeSection: "studio",
   pendingScrollTarget: null,
   fullscreenView: null,
@@ -51,6 +55,8 @@ function entranceViewReducer(
   action: EntranceViewAction,
 ): EntranceViewState {
   switch (action.type) {
+    case "set-active-board":
+      return { ...state, activeBoard: action.payload };
     case "set-active-section":
       return { ...state, activeSection: action.payload };
     case "set-pending-scroll-target":
@@ -82,6 +88,8 @@ export function useEntranceViewState() {
 
   return {
     viewState,
+    setActiveBoard: (value: EntranceBoard) =>
+      dispatch({ type: "set-active-board", payload: value }),
     setActiveSection: (value: SectionId) =>
       dispatch({ type: "set-active-section", payload: value }),
     setPendingScrollTarget: (value: SectionId | null) =>
